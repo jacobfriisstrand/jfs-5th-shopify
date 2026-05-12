@@ -1,0 +1,39 @@
+{
+  // ──────────────────────────────────────────────────────────────────────────
+  // Linter: vite-plus uses oxlint. These WORKSPACE settings override
+  // whatever a developer has in their User settings, so editor diagnostics
+  // always match `vp lint` / `vp check`.
+  // The recommended editor extension is "oxc.oxc-vscode" (see
+  // .vscode/extensions.json).
+  // ──────────────────────────────────────────────────────────────────────────
+
+  // Hard-disable competing linters/formatters at the workspace level so they
+  // can't produce diagnostics or rewrites that diverge from the build.
+  "eslint.enable": false,
+  "biome.enabled": false,
+  "prettier.enable": false,
+
+  // Do NOT auto-format on save; the project ships no Prettier / formatter
+  // config and source style is preserved as-authored.
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "never",
+    "source.fixAll.eslint": "never",
+    "source.fixAll.biome": "never"
+  },
+
+  // Per-language: ensure no language-specific default reintroduces format-on-save.
+  "[javascript]": { "editor.formatOnSave": false },
+  "[typescript]": { "editor.formatOnSave": false },
+  "[json]": { "editor.formatOnSave": false },
+  "[jsonc]": { "editor.formatOnSave": false },
+  "[css]": { "editor.formatOnSave": false },
+  "[liquid]": { "editor.formatOnSave": false },
+  "[html]": { "editor.formatOnSave": false },
+  "[markdown]": { "editor.formatOnSave": false },
+
+  // Files
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true
+}

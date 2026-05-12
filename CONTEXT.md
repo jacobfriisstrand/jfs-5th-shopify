@@ -1,0 +1,150 @@
+# jfs-5th-shopify
+
+A minimal Shopify theme starter derived from Shopify's **Horizon** theme, with a TypeScript schema build, native-ESM importmap runtime, and Tailwind v4 styling. This file fixes the vocabulary used in issues, ADRs, refactors, and merchant-facing copy so terms don't drift.
+
+## Language
+
+### Theme primitives
+
+**Section**:
+A full-width modular page component, defined as a `.liquid` file in `sections/`, customizable in the theme editor.
+_Avoid_: Module, widget, component (ambiguous — see below).
+
+**Block**:
+A reusable, nestable, merchant-customizable unit (`.liquid` in `blocks/`) that can be placed inside a Section or another Block.
+_Avoid_: Component, widget, partial.
+
+**Snippet**:
+A reusable Liquid fragment in `snippets/` rendered via `{% render %}`. Not editable in the theme editor.
+_Avoid_: Partial, include, helper.
+
+**Template**:
+A `.json` file in `templates/` that composes Sections for a given page type. In this starter, templates are intentionally minimal stubs — merchants compose layouts in the editor.
+_Avoid_: Page, layout (Layout means something else here).
+
+**Layout**:
+A top-level `.liquid` wrapper in `layout/` that provides `<head>`, `<body>`, and globals. Currently `theme.liquid` and `password.liquid`.
+_Avoid_: Wrapper, shell.
+
+### Build pipeline
+
+**Schema**:
+A TypeScript file under `src/schemas/**/*.schema.ts` exporting a `defineSection()` or `defineBlock()` object. Compiled to JSON and injected into the matching `.liquid` file's `{% schema %}` tag by `npm run schemas`. **Never hand-edit the `{% schema %}` tag.**
+_Avoid_: Settings, config, manifest.
+
+**Schema build**:
+The `tsx src/schemas/build.ts` step that compiles schemas and writes them into liquid files only when JSON content actually changed.
+
+**vp / vite-plus**:
+The build tool wrapping Vite. Used for CSS (Tailwind v4), schema hot-reload, and the project's `vp check` / `vp fmt` standards. `vp` is the canonical CLI; do not invoke `vite` directly.
+_Avoid_: Vite (when referring to the project's build entry point).
+
+**Importmap runtime**:
+The browser-native ESM loader configured in `snippets/scripts.liquid` that maps every `@theme/<name>` specifier to its compiled `assets/<name>.js`. There is no bundler in the runtime path.
+_Avoid_: Bundle, bundler output.
+
+**`@theme/*` specifier**:
+The bare-module specifier convention (e.g. `import { Component } from '@theme/component'`) resolved at runtime by the importmap and at type-check time by the `@theme/*` path in `tsconfig.json`. New scripts must register an importmap entry.
+
+**Compiled asset**:
+A file under `assets/` produced by the build (`app.css`, `*.js`). Gitignored except for `critical.css` and other manually-curated static files. Source of truth lives in `src/`.
+_Avoid_: Bundle, build output.
+
+### Styling
+
+**Token**:
+A design value exposed both as a Shopify CSS variable (e.g. `--color-background`, set per-theme by merchant settings) and as a Tailwind theme value (e.g. `bg-bg`) declared in `src/styles/app.css` under `@theme`.
+_Avoid_: Variable, theme value (alone — both are too vague).
+
+**Custom element / JS component**:
+A `class extends HTMLElement` defined under `src/scripts/` (e.g. `cart-drawer`, `product-form`). The base class is in `src/scripts/component.ts`. Use this term when discussing runtime behaviour; use **Block** or **Section** for the merchant-facing concept.
+_Avoid_: Component (alone — ambiguous with Block).
+
+### Heritage
+
+**Horizon**:
+Shopify's reference theme. This starter is a stripped-down derivative — core runtime kept, design system and marketing sections removed. When restoring a removed feature, port from Horizon (or this repo's git history).
+
+### Runtime patterns
+
+**Variant update**:
+The flow that propagates a variant change through the page. Triggered by `<variant-picker>`, which fetches the section from Shopify (`?section_id=…`) and dispatches a `VariantUpdateEvent` carrying both the variant JSON and the new HTML snapshot. Each interested **Custom element** listens on its closest section and reads its own block out of the snapshot. The server-rendered HTML is the source of truth — see [ADR-0001](docs/adr/0001-variant-updates-use-server-rendered-html.md) for why this is **not** unified into a transactional module.
+_Avoid_: Variant sync, variant propagation, variant pipeline.
+
+**Section Rendering**:
+The pipeline that re-renders a section server-side via Shopify's Section Rendering API (`?section_id=…`) and patches the live DOM in place using a morph diff. Implemented by `src/scripts/section-renderer.ts` (fetch + cache + dedupe) and `src/scripts/morph.ts` (DOM diff + Custom element `updatedCallback` hook). The default mode replaces the whole section subtree; **Hydration** is the surgical alternative.
+_Avoid_: Section refresh, partial render, section reload.
+
+**Hydration**:
+A targeted **Section Rendering** mode that morphs only the elements carrying a `data-hydration-key="<value>"` attribute, leaving every other node untouched. Designed for serving a cache-friendly page with stale personalized fragments (cart count, recommendations, B2B pricing, country-dependent copy) and refreshing only those fragments after first paint. Opt in by adding `data-hydration-key` to the elements that need it and calling `hydrate(section.id)` from `@theme/section-hydration`. See [ADR-0002](docs/adr/0002-section-rendering-and-hydration.md).
+_Avoid_: Rehydrate, soft refresh, partial update.
+
+**Morph preserver**:
+A function registered via `registerMorphPreserver(fn)` from `@theme/morph` that copies state (typically `style` or `data-*` attributes) from the old DOM node to the new one during a **Section Rendering** morph. **Custom elements** that hold UI state not present in the server response (positioned popovers, expanded panels, locally-toggled flags) register a preserver at module top-level. Co-locating the rule with the element that owns it avoids a centralized list in `morph.ts`.
+_Avoid_: Morph hook, attribute pin, state guard.
+
+**Defer-load**:
+A pattern where a **Custom element** module is not in the initial page bundle and is fetched via dynamic `import('@theme/<name>')` only when the user signals intent (typically focus, hover, or first interaction). Deferred modules count as **0 KB** against the route's **Perf budget** because they are not in the initial bundle. Used in this codebase for predictive search (loaded on first focus of the search input) — see [ADR-0003](docs/adr/0003-architectural-pillars.md). Distinct from a code-split bundle: there is no bundler; the dynamic import resolves through the **Importmap runtime** to an existing `assets/<name>.js`.
+_Avoid_: Lazy-load (overloaded with image lazy-loading), code-split.
+
+### Performance contract
+
+**Perf budget**:
+The per-route and per-file size + Lighthouse-score contract enforced in CI. Source of truth is `perf-budget.json` at the repo root. Per-route budgets cap the gzipped JS shipped on a route's initial paint (homepage 25 KB, collection 40 KB, PDP 60 KB, cart 50 KB). Per-file caps prevent any single **Compiled asset** from blowing the budget alone (15 KB JS, 30 KB CSS gzipped). Lighthouse-mobile-4G thresholds are perf 90, a11y 95, best-practices 95, SEO 95. Enforced by `scripts/check-budgets.ts` (per-file + per-route, iteration 1) and Lighthouse CI (deferred to iteration 2). See [docs/perf-budget.md](docs/perf-budget.md).
+_Avoid_: Performance limit, size cap, weight target.
+
+**`[budget-bump]`**:
+A PR-title prefix that authorizes a deliberate change to `perf-budget.json`. The CI gate fails any PR that exceeds budget unless the PR title contains `[budget-bump]` AND the diff includes a change to `perf-budget.json`. Forces budget changes to be visible, reviewable, and auditable via `git log perf-budget.json`.
+_Avoid_: Budget override, perf waiver.
+
+### Iteration discipline
+
+**Vertical slice**:
+A scope-limiting unit of work: ship one route end-to-end (template + sections + blocks + scripts + perf-budget verification + a11y check) before broadening. Iteration 1 is a hero-only homepage slice; iteration 2 broadens to a real PDP and collection. Avoids the failure mode of half-built sections piling up across every template.
+_Avoid_: MVP, increment, sprint goal (all overloaded).
+
+### Product model
+
+**Color group**:
+A Shopify **metaobject** (`color_group`) that groups multiple **Color products** (e.g. "Blue Hoodie", "Red Hoodie") into a single merchant-facing concept ("Hoodie Classic"). Fields: `name` (text), `entries` (list of product references), `primary_product` (single product reference). The metaobject is the single point of edit per group — merchants manage it entirely in Shopify Admin. See [ADR-0004](docs/adr/0004-product-model.md) and [docs/setup/color-groups.md](docs/setup/color-groups.md).
+_Avoid_: Product family, variant group, color set.
+
+**Color group entries**:
+The list of product references on a **Color group** metaobject. Reading `product.metafields.color_group.value.entries` from any product in the group yields the full set of sibling color products. Replaces the bidirectional `color_siblings` metafield pattern that was considered and rejected (see ADR-0004).
+_Avoid_: Color siblings (legacy term, rejected — do not use).
+
+**Primary product** (of a Color group):
+The single product within a **Color group** designated as canonical for collection-grid display. Stored as the `primary_product` field on the **Color group** metaobject. The collection grid renders only the primary product per group via `_resolve-primary.liquid`, deduping the other entries. If `primary_product` is unset, the renderer falls back to alphabetical order over `entries` and logs a configuration warning.
+_Avoid_: Default product, hero product, lead variant.
+
+**Color product**:
+A standalone Shopify product representing one color of a merchandiseable item. Each color is its own product (not a Shopify variant) so that color selection can navigate as a full-page transition, color images can be the product's own media, and SEO/inventory tracking is per-color. Sizes within a color remain Shopify variants on that product. See [ADR-0004](docs/adr/0004-product-model.md).
+_Avoid_: Color variant (color is _not_ a variant in this model).
+
+## Relationships
+
+- A **Template** composes one or more **Section**s
+- A **Section** may contain **Block**s; a **Block** may contain other **Block**s
+- A **Section** or **Block** is paired with exactly one **Schema** (TS) that generates its `{% schema %}` tag
+- A **Block** or **Section** may render one or more **Snippet**s via `{% render %}`
+- A **Section** or **Block** loads a **Custom element** by `<script type="module">` whose imports resolve through the **Importmap runtime**
+- A **Custom element** imports peers via the **`@theme/*` specifier**
+- The **Schema build** writes into the `{% schema %}` tag of a **Section** or **Block** liquid file
+- A **Color group** has many **Color group entries** (each a **Color product**) and exactly one **Primary product** drawn from those entries
+- A **Color product** references its **Color group** via a single `color_group` metafield (single metaobject reference)
+- Every **Compiled asset** under `assets/` is constrained by the **Perf budget**; route-level totals follow the **Importmap runtime** + `<script>` graph
+
+## Example dialogue
+
+> **Dev:** "I need to add a testimonial carousel. Should it be a Section or a Block?"
+> **Domain expert:** "If it's the full-width thing the merchant drops onto a Template, it's a **Section**. The individual testimonials inside it are **Block**s with `type: '@theme'` allowing nesting. Define the **Schema** in `src/schemas/sections/testimonials.schema.ts` — don't touch the `{% schema %}` tag in liquid directly. If you need shared markup like a star-rating, factor it as a **Snippet**."
+>
+> **Dev:** "And the JS for the carousel?"
+> **Domain expert:** "A **Custom element** in `src/scripts/testimonials-carousel.ts`. Add it to the **Importmap** in `snippets/scripts.liquid` so other modules can import it via `@theme/testimonials-carousel`."
+
+## Flagged ambiguities
+
+- **"Component"** — used colloquially for both **Block** (merchant-facing) and **Custom element** (runtime JS). Resolved: prefer the specific term. If you must use "component", qualify it ("JS component" / "block component").
+- **"Layout"** — could mean a Shopify `layout/*.liquid` file or a CSS arrangement. Resolved: capital-L **Layout** = the file in `layout/`; otherwise use "arrangement" or a Tailwind-specific term.
+- **"Settings"** — Shopify uses this for both global theme settings (`config/settings_schema.json`) and per-section/block settings. Resolved: say **global settings** vs **section settings** / **block settings** when it matters.
+- **"Bundle"** — there is no bundling in this project. Use **Compiled asset** or **Module**.
