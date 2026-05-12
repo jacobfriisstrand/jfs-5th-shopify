@@ -1,0 +1,28 @@
+{% doc %}
+  The `error` icon as a complete inline `<svg>`. Render via the `icon`
+  wrapper rather than directly: `{% render 'icon', icon: 'error' %}`.
+
+  @param {number} [size] - Width and height in pixels. Defaults to 16.
+  @param {string} [icon_class] - Extra CSS classes for the `<svg>`.
+{% enddoc %}
+
+{%- assign icon_size = size | default: 16 -%}
+{%- assign icon_extra_class = icon_class | default: '' -%}
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="{{ icon_size }}"
+  height="{{ icon_size }}"
+  viewBox="0 0 20 20"
+  focusable="false"
+  aria-hidden="true"
+  class="icon icon-error{% if icon_extra_class != '' %} {{ icon_extra_class }}{% endif %}"
+>
+  <path d="M10 14a.75.75 0 0 1-.75-.75v-3.5a.75.75 0 0 1 1.5 0v3.5A.75.75 0 0 1 10 14ZM9 7a1 1 0 1 1 2 0 1 1 0 0 1-2 0Z" fill="currentColor" />
+  <path
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Zm-1.5 0a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0Z"
+    fill="currentColor"
+  />
+</svg>

@@ -1,24 +1,10 @@
-<div class="blog-post-content rte">
-  <rte-formatter>
-    {{ article.content }}
-  </rte-formatter>
+{% comment %} _blog-post-content: scaffold — populate as needed. {% endcomment %}
+<div class="blog-post-content">
+  {% content_for 'blocks' %}
 </div>
-
-{% stylesheet %}
-  .blog-post-content {
-    max-width: var(--normal-content-width);
-    margin: 0 auto;
-  }
-{% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:names.content",
-  "settings": [],
-  "presets": [
-    {
-      "name": "t:names.content"
-    }
-  ]
+  "name": "t:names.content"
 }
 {% endschema %}

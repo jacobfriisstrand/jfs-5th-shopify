@@ -1,3 +1,15 @@
+# License & attribution
+
+`jfs-5th-shopify` is a derivative of Shopify's
+[Horizon](https://github.com/Shopify/horizon) theme. The original Shopify
+license — reproduced verbatim below — applies to the entire repository
+(including any modifications by Jacob Friis Strand).
+
+In particular, derivative themes based on this code **cannot** be submitted to
+the Shopify Theme Store. See the full text below for the precise terms.
+
+---
+
 Copyright (c) 2025-present Shopify Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, sell and/or create derivative works of the Software or any part thereof, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:

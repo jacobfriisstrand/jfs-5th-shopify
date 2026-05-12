@@ -1,0 +1,23 @@
+{% doc %}
+  The `search` icon as a complete inline `<svg>`. Render via the `icon`
+  wrapper rather than directly: `{% render 'icon', icon: 'search' %}`.
+
+  @param {number} [size] - Width and height in pixels. Defaults to 16.
+  @param {string} [icon_class] - Extra CSS classes for the `<svg>`.
+{% enddoc %}
+
+{%- assign icon_size = size | default: 16 -%}
+{%- assign icon_extra_class = icon_class | default: '' -%}
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="{{ icon_size }}"
+  height="{{ icon_size }}"
+  viewBox="0 0 16 16"
+  focusable="false"
+  aria-hidden="true"
+  class="icon icon-search{% if icon_extra_class != '' %} {{ icon_extra_class }}{% endif %}"
+>
+  <circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5" />
+  <path d="M10.5 10.5 L13.5 13.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+</svg>
