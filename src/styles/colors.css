@@ -1,0 +1,14 @@
+/*
+ * Color tokens: map Shopify CSS variables to Tailwind utilities.
+ *
+ * Usage: bg-bg, text-fg, border-bg, etc.
+ */
+:root {
+  --color-background: #ffffff;
+  --color-foreground: #333333;
+}
+
+@theme {
+  --color-bg: var(--color-background);
+  --color-fg: var(--color-foreground);
+}

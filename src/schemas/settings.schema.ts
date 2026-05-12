@@ -1,0 +1,98 @@
+/**
+ * Global theme settings (config/settings_schema.json).
+ *
+ * Edit this file, then run `npm run schemas` (or `npm run build`) to regenerate
+ * config/settings_schema.json. The first entry MUST be the `theme_info` group
+ * — Shopify uses it for the Theme Editor sidebar header.
+ *
+ * Keep this small. Reach for section / block schemas before adding a global
+ * setting; only put truly cross-cutting toggles here.
+ */
+
+import type {
+  CheckboxSetting,
+  ImagePickerSetting,
+  RangeSetting,
+} from "./types";
+
+interface ThemeInfoGroup {
+  name: "theme_info";
+  theme_name: string;
+  theme_version: string;
+  theme_author: string;
+  theme_documentation_url?: string;
+  theme_support_url?: string;
+}
+
+type Setting = ImagePickerSetting | RangeSetting | CheckboxSetting;
+
+interface SettingsGroup {
+  name: string;
+  settings: Setting[];
+}
+
+const groups: [ThemeInfoGroup, ...SettingsGroup[]] = [
+  {
+    name: "theme_info",
+    theme_name: "jfs-5th-shopify",
+    theme_version: "0.1.0",
+    theme_author: "Jacob Friis Strand",
+  },
+
+  {
+    name: "Branding",
+    settings: [
+      {
+        type: "image_picker",
+        id: "logo",
+        label: "Logo",
+      },
+      {
+        type: "range",
+        id: "logo_width",
+        label: "Logo width",
+        min: 50,
+        max: 250,
+        step: 10,
+        unit: "px",
+        default: 120,
+      },
+      {
+        type: "image_picker",
+        id: "favicon",
+        label: "Favicon",
+        info: "Will be scaled down to 32 × 32px",
+      },
+    ],
+  },
+
+  {
+    name: "Layout",
+    settings: [
+      {
+        type: "range",
+        id: "page_width",
+        label: "Page width",
+        min: 1000,
+        max: 1600,
+        step: 50,
+        unit: "px",
+        default: 1400,
+      },
+    ],
+  },
+
+  {
+    name: "Cart",
+    settings: [
+      {
+        type: "checkbox",
+        id: "show_add_discount_code",
+        label: "Show discount-code field in cart",
+        default: false,
+      },
+    ],
+  },
+];
+
+export default groups;

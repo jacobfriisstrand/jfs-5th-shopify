@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@import "./base.css";
+@import "./colors.css";
+@import "./typography.css";
+@import "./radii.css";
+
+@source "../../sections/**/*.liquid";
+@source "../../blocks/**/*.liquid";
+@source "../../snippets/**/*.liquid";
+@source "../../layout/**/*.liquid";
+@source "../../templates/**/*.liquid";

@@ -1,0 +1,12 @@
+/*
+ * Border radius tokens: map Shopify style settings to Tailwind utilities.
+ *
+ * Usage: rounded-input
+ */
+:root {
+  --style-border-radius-inputs: 4px;
+}
+
+@theme {
+  --radius-input: var(--style-border-radius-inputs);
+}

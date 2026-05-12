@@ -1,0 +1,32 @@
+{
+  "name": "jfs-5th-shopify",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bash bin/dev.sh",
+    "build": "npm run schemas && npm run scripts && vp build",
+    "schemas": "tsx src/schemas/build.ts",
+    "scripts": "tsx src/scripts/build.ts",
+    "lint": "vp lint",
+    "check": "vp check",
+    "theme:push": "npm run build && shopify theme push",
+    "prepare": "vp config"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/node": "^25.5.2",
+    "esbuild": "^0.28.0",
+    "glob": "^13.0.6",
+    "tailwindcss": "^4.2.2",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vite-plus": "latest"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+  },
+  "packageManager": "npm@11.12.1"
+}
