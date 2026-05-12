@@ -1,0 +1,37 @@
+{
+  "_comment": "Performance budget contract. See docs/perf-budget.md and docs/adr/0003-architectural-pillars.md (pillar 3). Sizes are in bytes, gzipped (decimal KB: 25 KB = 25000 bytes). Changes to this file MUST be paired with a [budget-bump] PR title prefix.",
+  "perFile": {
+    "js": {
+      "maxBytesGzipped": 15000
+    },
+    "css": {
+      "maxBytesGzipped": 30000
+    }
+  },
+  "perRoute": {
+    "/": {
+      "template": "index",
+      "maxBytesGzipped": 50000
+    },
+    "/collections/*": {
+      "template": "collection",
+      "maxBytesGzipped": 40000
+    },
+    "/products/*": {
+      "template": "product",
+      "maxBytesGzipped": 60000
+    },
+    "/cart": {
+      "template": "cart",
+      "maxBytesGzipped": 50000
+    }
+  },
+  "lighthouse": {
+    "mobile4G": {
+      "performance": 90,
+      "accessibility": 95,
+      "bestPractices": 95,
+      "seo": 95
+    }
+  }
+}
