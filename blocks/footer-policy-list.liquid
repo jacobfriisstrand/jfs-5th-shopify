@@ -1,6 +1,21 @@
-{% comment %} footer-policy-list: scaffold — populate as needed. {% endcomment %}
-<div class="footer-policy-list">
-</div>
+{%- assign policies = shop.policies | where: 'body' -%}
+
+{%- if policies.size > 0 -%}
+  <nav data-footer-policy-list aria-label="{{ 'content.terms_and_policies' | t }}">
+    <ul role="list" class="flex flex-wrap gap-4 text-sm">
+      {%- for policy in policies -%}
+        <li>
+          <a
+            href="{{ policy.url }}"
+            class="underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg"
+          >
+            {{- policy.title -}}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </nav>
+{%- endif -%}
 
 {% schema %}
 {

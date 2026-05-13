@@ -1,6 +1,8 @@
-{% comment %} footer-copyright: scaffold — populate as needed. {% endcomment %}
-<div class="footer-copyright">
-</div>
+{%- assign current_year = 'now' | date: '%Y' -%}
+
+<p data-footer-copyright class="text-sm">
+  &copy; {{ current_year }} {{ shop.name }}
+</p>
 
 {% schema %}
 {
