@@ -169,6 +169,40 @@ Rules:
 - Prefer hard-coded values over settings. A setting is a long-term contract — deletion is a breaking change in `settings_data.json`.
 - When asked to "scaffold a hero / product card / X", interpret literally: structural shell only. Wait for follow-up before adding settings or visual variations.
 
+### Branching & commits
+
+**Branch model:**
+
+- `main` — release branch. Only updated by merging `development` at release time. Never commit directly.
+- `development` — integration branch. All feature branches fork from and merge back into `development`. Shares full history with `main` so `development → main` merges are always fast-forward / conflict-free.
+- `feature/<issue-number>-<slug>` — short-lived feature branches off `development` (e.g. `feature/12-hamburger-menu`). One branch per issue. Delete after merge.
+
+**Commits:**
+
+Every commit message must follow [Conventional Commits](https://www.conventionalcommits.org/) **and** include the GitHub issue number + short title in the scope so history is greppable from either side.
+
+Format:
+
+```
+<type>(#<issue>-<short-title>): <imperative summary>
+```
+
+- `<type>` — `feat`, `fix`, `refactor`, `docs`, `chore`, `perf`, `test`, `style`, `build`, `ci`, `revert`.
+- `<issue>` — the GitHub issue number this commit advances (e.g. `12`). For commits not tied to an issue (one-off chores, repo hygiene), drop the scope: `chore: <summary>`.
+- `<short-title>` — 2-4 word kebab-case slug derived from the issue title.
+- `<imperative summary>` — present tense, lowercase, no trailing period, ≤ 72 chars.
+
+Examples:
+
+```
+feat(#12-hamburger-menu): add header drawer with focus trap
+fix(#19-pdp-color-swatches): correct contrast on selected state
+refactor(#11-header-footer-shell): adopt Tailwind utilities for header
+docs: require html + css-motion-systems skills for all liquid edits
+```
+
+For atomic-commit batches that touch multiple issues, split into separate commits — one issue per commit.
+
 ## Flagged ambiguities
 
 - **"Component"** — used colloquially for both **Block** (merchant-facing) and **Custom element** (runtime JS). Resolved: prefer the specific term. If you must use "component", qualify it ("JS component" / "block component").
