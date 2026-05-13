@@ -73,7 +73,10 @@ const SRC_SCRIPTS_DIR = join(ROOT, "src", "scripts");
 // ---------- I/O helpers ----------
 
 function readJSON<T>(path: string): T {
-  return JSON.parse(readFileSync(path, "utf8")) as T;
+  // Shopify CLI prepends a `/* ... */` banner to templates/*.json on sync.
+  // Strip a single leading block comment before parsing.
+  const raw = readFileSync(path, "utf8").replace(/^\s*\/\*[\s\S]*?\*\/\s*/, "");
+  return JSON.parse(raw) as T;
 }
 
 function readLiquid(path: string): string | null {
