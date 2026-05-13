@@ -1,0 +1,88 @@
+{% liquid
+  assign heading = section.settings.heading
+  assign subheading = section.settings.subheading
+  assign image = section.settings.image
+  assign button_label = section.settings.button_label
+  assign button_link = section.settings.button_link
+%}
+
+<section class="hero relative isolate w-full overflow-hidden bg-bg text-fg">
+  {%- if image != blank -%}
+    <div class="absolute inset-0 -z-10">
+      {{
+        image
+        | image_url: width: 2400
+        | image_tag:
+          loading: 'eager',
+          fetchpriority: 'high',
+          decoding: 'async',
+          sizes: '100vw',
+          widths: '480, 768, 1024, 1440, 1920, 2400',
+          class: 'h-full w-full object-cover',
+          alt: image.alt | default: heading
+      }}
+      <div class="absolute inset-0 bg-fg/30"></div>
+    </div>
+  {%- endif -%}
+
+  <div class="mx-auto flex min-h-[60vh] max-w-screen-xl flex-col items-center justify-center gap-4 px-4 py-16 text-center sm:py-24">
+    {%- if heading != blank -%}
+      <h1 class="font-primary text-4xl font-bold leading-tight sm:text-5xl md:text-6xl">
+        {{ heading | escape }}
+      </h1>
+    {%- endif -%}
+
+    {%- if subheading != blank -%}
+      <p class="max-w-2xl text-lg sm:text-xl">{{ subheading | escape }}</p>
+    {%- endif -%}
+
+    {%- if button_label != blank and button_link != blank -%}
+      <a
+        href="{{ button_link }}"
+        class="mt-2 inline-flex w-fit items-center justify-center rounded-input bg-fg px-6 py-3 text-base font-medium text-bg transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg"
+      >
+        {{ button_label | escape }}
+      </a>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "t:names.hero",
+  "class": "section-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:settings.heading"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "t:settings.subheading"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:settings.image"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:settings.button_label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:settings.button_link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.hero",
+      "category": "t:categories.banners"
+    }
+  ]
+}
+{% endschema %}

@@ -793,6 +793,8 @@
     "bottom_row": "Bottom row",
     "bottom_padding": "Bottom padding",
     "button": "Button",
+    "button_label": "Button label",
+    "button_link": "Button link",
     "button_text_case": "Text case",
     "card_height": "Card height",
     "card_hover_effect": "Card hover effect",
@@ -1109,6 +1111,7 @@
     // Icon line thickness setting label
     "stroke": "Stroke",
     "style": "Style",
+    "subheading": "Subheading",
     "submenu_size": "Submenu size",
     "success_color": "Success",
     "swatches": "Swatches",
