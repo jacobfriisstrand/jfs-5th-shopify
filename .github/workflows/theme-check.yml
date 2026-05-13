@@ -32,5 +32,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Compiled assets (`assets/app.css`, `assets/*.js`) are gitignored.
+      # Build them first or theme check raises MissingAsset for every
+      # `{{ '…' | asset_url }}` reference.
+      - name: Build theme
+        run: npm run build
+
       - name: Run theme check
         run: npx shopify theme check --fail-level=error
