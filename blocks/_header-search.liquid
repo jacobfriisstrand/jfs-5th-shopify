@@ -1,0 +1,96 @@
+{% comment %}
+  Header search: trigger button + full-viewport <dialog> hosting a
+  <predictive-search> custom element. Mirrors the menu drawer pattern.
+
+  - Server-side: only the trigger and the empty dialog shell are rendered.
+  - Client-side: <predictive-search> debounces input, fetches the
+    `predictive-search` section markup with `?section_id=predictive-search`,
+    and swaps the results region.
+  - Accessibility: input owns role="combobox" wiring (aria-controls,
+    aria-expanded, aria-activedescendant). Results region is role="listbox".
+    Arrow Up/Down navigates options; Enter follows the active option;
+    Escape closes the dialog.
+{% endcomment %}
+
+<button
+  type="button"
+  data-search-trigger
+  aria-label="{{ 'actions.open_search' | t }}"
+  aria-controls="header-search-dialog"
+  aria-expanded="false"
+  class="inline-flex items-center justify-center p-2"
+>
+  {%- render 'icon', icon: 'search', size: 24 -%}
+</button>
+
+<dialog-component id="header-search-dialog" class="contents">
+  <dialog
+    ref="dialog"
+    aria-label="{{ 'content.search' | t }}"
+    class="m-0 h-dvh w-screen max-w-none bg-bg text-fg p-0"
+  >
+    <predictive-search class="flex flex-col h-full">
+      <div class="flex items-center gap-2 border-b border-fg/10 p-4">
+        <form
+          action="{{ routes.search_url }}"
+          method="get"
+          role="search"
+          class="flex-1"
+        >
+          <label for="header-search-input" class="sr-only">
+            {{- 'content.search_input_label' | t -}}
+          </label>
+          <input
+            ref="input"
+            id="header-search-input"
+            type="search"
+            name="q"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="{{ 'placeholders.search' | t }}"
+            role="combobox"
+            aria-controls="header-search-results"
+            aria-expanded="false"
+            aria-autocomplete="list"
+            class="w-full bg-transparent border-0 outline-none text-lg py-2 focus-visible:outline-2 focus-visible:outline-offset-2"
+          >
+        </form>
+        <button
+          type="button"
+          on:click="dialog-component/closeDialog"
+          aria-label="{{ 'actions.close_search' | t }}"
+          class="p-2"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <line x1="6" y1="6" x2="18" y2="18" />
+            <line x1="18" y1="6" x2="6" y2="18" />
+          </svg>
+        </button>
+      </div>
+
+      <div
+        ref="results"
+        id="header-search-results"
+        role="listbox"
+        aria-label="{{ 'content.search_results_label' | t }}"
+        class="flex-1 overflow-auto p-4"
+      ></div>
+    </predictive-search>
+  </dialog>
+</dialog-component>
+
+{% schema %}
+{
+  "name": "t:names.search_input",
+  "tag": null
+}
+{% endschema %}
