@@ -61,22 +61,32 @@ Rules:
 See [ADR-0003](./docs/adr/0003-architectural-pillars.md), pillar 8, for the
 rationale.
 
-### Scaffolding new liquid files
+### Skill canon for liquid, JS/TS, and CSS work
 
-When scaffolding any new `.liquid` file (Section, Block, Snippet, or Layout)
-you **must** load and follow these skills before writing markup or styles:
+The two skills below are **canonical** for any work in this repo that touches
+markup, scripts, or styles. Load and follow them **whenever you create or
+edit** a `.liquid`, `.ts`, `.js`, or `.css` file — not just when scaffolding
+something new:
 
 - [`.agents/skills/html/SKILL.md`](./.agents/skills/html/SKILL.md) — semantic,
   accessible, low-noise markup. Governs element choice, landmarks, headings,
-  forms, and replacement of custom controls with native HTML.
+  forms, and replacement of custom controls with native HTML. Applies to
+  `sections/`, `blocks/`, `snippets/`, `layout/`, and any HTML produced by
+  `src/scripts/*.ts`.
 - [`.agents/skills/css-motion-systems/SKILL.md`](./.agents/skills/css-motion-systems/SKILL.md)
   — motion design for any transitions, keyframes, `linear()` easing, transform
-  strategy, and View Transitions usage on the new file.
+  strategy, and View Transitions usage. Applies to `src/styles/*.css`,
+  Tailwind utility choices in liquid markup, and any animation-related JS.
 
 These are **in addition to** the topic-specific `*-accessibility.mdc` rules in
 [`docs/agent-reference/`](./docs/agent-reference/) (see "Accessibility canon"
 above). The skills set the baseline; the `.mdc` files cover component-specific
 interaction patterns. Both apply.
+
+**Discipline:** if you are about to edit any `.liquid`, `.ts`, `.js`, or
+`.css` file and you have not already opened these two skills in the current
+session, open them first. Re-reading is cheap; shipping noisy markup or
+ad-hoc motion is expensive.
 
 ### Minimal scaffolding & least privilege for editor controls
 

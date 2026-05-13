@@ -94,9 +94,16 @@ Iteration-1 application: predictive search. The header search input binds a `foc
 
 See `CONTEXT.md` → **Defer-load**.
 
-### 8. Accessibility canon: `docs/agent-reference/*-accessibility.mdc`
+### 8. Accessibility canon: `docs/agent-reference/*-accessibility.mdc` plus the html/motion skills
 
 The 27 `*-accessibility.mdc` files in `docs/agent-reference/` (inherited from Horizon's Cursor rules) are the **canonical reference** for any component matching their topic. Deviations require a justification in the PR description that links the specific rule line being deviated from.
+
+In addition, two skills are **canonical** for any work that touches markup, scripts, or styles — not only for new scaffolds, but for **every** edit to a `.liquid`, `.ts`, `.js`, or `.css` file:
+
+- [`.agents/skills/html/SKILL.md`](../../.agents/skills/html/SKILL.md) — semantic, accessible, low-noise markup.
+- [`.agents/skills/css-motion-systems/SKILL.md`](../../.agents/skills/css-motion-systems/SKILL.md) — motion design, transform strategy, easing, and View Transitions usage.
+
+The skills set the baseline for element choice, landmark structure, native-control preference, and motion accessibility (`prefers-reduced-motion`, GPU-friendly properties, timing heuristics). The `*-accessibility.mdc` files layer component-specific interaction patterns on top (focus trapping in dialogs, keyboard semantics for menus, screen-reader announcement choreography). Both apply; the skills do not replace the `.mdc` canon and the `.mdc` canon does not replace the skills.
 
 No axe-core CI in iteration 1. The Lighthouse a11y ≥ 95 gate (pillar 3) is sufficient for the iteration-1 surface area. Axe-core is the finer mesh added when interactive components beyond cart and predictive search land.
 
