@@ -1,12 +1,23 @@
-{% comment %} footer: scaffold — populate as needed. {% endcomment %}
-<div class="footer">
-  {% content_for 'blocks' %}
+{% comment %}
+  Footer section — slice 1 minimal: navigation menu, copyright, policy links.
+
+  All child blocks are statically rendered for predictability across routes.
+  The `menu` block is the same construct used by the header nav; the merchant
+  picks which linklist (admin → Online Store → Navigation) it renders.
+{% endcomment %}
+
+<div
+  data-footer-row
+  class="flex flex-col items-start gap-4 mx-auto max-w-screen-xl px-4 py-6 sm:flex-row sm:items-center sm:justify-between"
+>
+  {% content_for 'block', type: 'menu', id: 'footer-menu' %}
+  {% content_for 'block', type: 'footer-copyright', id: 'footer-copyright' %}
+  {% content_for 'block', type: 'footer-policy-list', id: 'footer-policy-list' %}
 </div>
 
 {% schema %}
 {
   "name": "t:names.footer",
-  "class": "section-wrapper",
   "enabled_on": {
     "groups": [
       "footer"

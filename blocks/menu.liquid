@@ -1,10 +1,45 @@
-{% comment %} menu: scaffold — populate as needed. {% endcomment %}
-<div class="menu">
-</div>
+{% comment %}
+  menu: renders a Shopify navigation linklist (configured in admin under
+  Online Store → Navigation) as an inline list of links. The same block is
+  used for header and footer navigation; the merchant picks which linklist
+  via the `menu` setting in the theme editor.
+{% endcomment %}
+
+{%- assign menu = linklists[block.settings.menu] -%}
+{%- if menu != blank and menu.links.size > 0 -%}
+  <nav data-menu aria-label="{{ menu.title | escape }}">
+    <ul role="list" class="flex flex-wrap gap-4 text-sm">
+      {%- for link in menu.links -%}
+        <li>
+          <a
+            href="{{ link.url }}"
+            class="underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
+            {% if link.active %}aria-current="page"{% endif %}
+          >
+            {{ link.title }}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </nav>
+{%- endif -%}
 
 {% schema %}
 {
   "name": "t:names.menu",
-  "tag": null
+  "tag": null,
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "t:labels.menu",
+      "default": "footer"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.menu"
+    }
+  ]
 }
 {% endschema %}
