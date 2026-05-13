@@ -173,9 +173,9 @@ Rules:
 
 **Branch model:**
 
-- `main` — release branch. Only updated by merging `development` at release time. Never commit directly.
-- `development` — integration branch. All feature branches fork from and merge back into `development`. Shares full history with `main` so `development → main` merges are always fast-forward / conflict-free.
-- `feature/<issue-number>-<slug>` — short-lived feature branches off `development` (e.g. `feature/12-hamburger-menu`). One branch per issue. Delete after merge.
+- `main` — release branch. Only updated by merging `develop` at release time. Never commit directly.
+- `develop` — integration branch. All feature branches fork from and merge back into `develop`. Shares full history with `main` so `develop → main` merges are always fast-forward / conflict-free.
+- `feature/<issue-number>-<slug>` — short-lived feature branches off `develop` (e.g. `feature/12-hamburger-menu`). One branch per issue. Delete after merge.
 
 **Commits:**
 
