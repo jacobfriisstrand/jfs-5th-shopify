@@ -21,7 +21,7 @@ interface ThemeInfoGroup {
   theme_version: string;
   theme_author: string;
   theme_documentation_url?: string;
-  theme_support_url?: string;
+  theme_support_email?: string;
 }
 
 type Setting = ImagePickerSetting | RangeSetting | CheckboxSetting;
@@ -37,6 +37,9 @@ const groups: [ThemeInfoGroup, ...SettingsGroup[]] = [
     theme_name: "jfs-5th-shopify",
     theme_version: "0.1.0",
     theme_author: "Jacob Friis Strand",
+    theme_support_email: "jacob@friis.com",
+    theme_documentation_url:
+      "https://github.com/jacobfriisstrand/jfs-5th-shopify",
   },
 
   {
