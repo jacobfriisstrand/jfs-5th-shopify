@@ -1,0 +1,36 @@
+# Shopify theme check.
+#
+# Mirrors the local `.vite-hooks/pre-push` hook so the check cannot be bypassed
+# with `git push --no-verify` or by pushing from a machine without the hook
+# installed. Catches liquid-specific lints (ValidSchemaTranslations, schema
+# validity, deprecated tags, ValidJSON, missing translations) that
+# `vp check` / oxlint / tsgo cannot see.
+#
+# `--fail-level=error` blocks the build on errors only; warnings are reported
+# in the job log but do not fail the run.
+
+name: theme-check
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+jobs:
+  theme-check:
+    name: Shopify theme check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run theme check
+        run: npx shopify theme check --fail-level=error
