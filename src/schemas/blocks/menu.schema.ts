@@ -5,10 +5,15 @@ export default defineBlock({
   tag: null,
   settings: [
     {
+      type: "text",
+      id: "heading",
+      label: "t:content.heading",
+    },
+    {
       type: "link_list",
       id: "menu",
-      label: "t:labels.menu",
-      default: "footer",
+      label: "t:content.menu",
+      default: "main-menu",
     },
   ],
   presets: [{ name: "t:names.menu" }],

@@ -3,24 +3,23 @@
   Online Store → Navigation) as an inline list of links. The same block is
   used for header and footer navigation; the merchant picks which linklist
   via the `menu` setting in the theme editor.
+
+  The `<ul>` markup is owned by `snippets/menu-list.liquid` so header and
+  footer navigations stay byte-identical at the link level.
 {% endcomment %}
 
-{%- assign menu = linklists[block.settings.menu] -%}
-{%- if menu != blank and menu.links.size > 0 -%}
-  <nav data-menu aria-label="{{ menu.title | escape }}">
-    <ul role="list" class="flex flex-wrap gap-4 text-sm">
-      {%- for link in menu.links -%}
-        <li>
-          <a
-            href="{{ link.url }}"
-            class="underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
-            {% if link.active %}aria-current="page"{% endif %}
-          >
-            {{ link.title }}
-          </a>
-        </li>
-      {%- endfor -%}
-    </ul>
+{%- assign linklist = linklists[block.settings.menu] -%}
+{%- if linklist != blank and linklist.links.size > 0 -%}
+  {%- assign nav_label = block.settings.heading | default: linklist.title -%}
+  <nav data-menu aria-label="{{ nav_label | escape }}" class="flex flex-col gap-3">
+    {%- if block.settings.heading != blank -%}
+      <h2 class="text-sm font-semibold uppercase tracking-wide">{{ block.settings.heading | escape }}</h2>
+    {%- endif -%}
+    {%- render 'menu-list',
+      linklist: linklist,
+      list_classes: 'flex flex-col gap-2 text-sm',
+      link_classes: 'underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
+    -%}
   </nav>
 {%- endif -%}
 
@@ -30,10 +29,15 @@
   "tag": null,
   "settings": [
     {
+      "type": "text",
+      "id": "heading",
+      "label": "t:content.heading"
+    },
+    {
       "type": "link_list",
       "id": "menu",
-      "label": "t:labels.menu",
-      "default": "footer"
+      "label": "t:content.menu",
+      "default": "main-menu"
     }
   ],
   "presets": [
