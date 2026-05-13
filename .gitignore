@@ -19,5 +19,7 @@ release
 # Build outputs
 dist/
 
-# Compiled JS output (esbuild compiles src/scripts/*.ts → assets/*.js — run `npm run build` to regenerate)
-assets/*.js
+# Compiled / generated theme assets — `assets/` is build output (esbuild,
+# Tailwind, copied static files). Source of truth lives in `src/`. Run
+# `npm run build` to regenerate.
+assets/
