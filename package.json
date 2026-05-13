@@ -10,6 +10,7 @@
     "scripts": "tsx src/scripts/build.ts",
     "lint": "vp lint",
     "check": "vp check",
+    "theme:check": "shopify theme check --fail-level=error",
     "theme:push": "npm run build && shopify theme push",
     "prepare": "vp config"
   },
