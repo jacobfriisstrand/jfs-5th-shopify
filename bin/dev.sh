@@ -33,11 +33,33 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# 3. Start `shopify theme dev` in the background, mirroring its output to a
+# 3. Push local theme files to the remote dev theme BEFORE starting
+#    `shopify theme dev`. Without this, any divergence between local and
+#    the remote dev theme triggers an interactive "Reconciliation Strategy"
+#    prompt during `theme dev`'s initial sync. Because we background the CLI
+#    (so we can grep its log for the ready banner before starting watchers),
+#    keystrokes typed at this terminal go to the bash script's foreground
+#    process group rather than the backgrounded CLI — so the prompt is
+#    unanswerable. By aligning local→remote up front with a non-interactive
+#    `theme push`, the divergence (and therefore the prompt) never happens.
+#
+#    --development   target the linked dev theme (creates one if needed)
+#    --nodelete      don't delete remote-only files (some are managed by
+#                    Shopify, not us)
+#    --json          machine-readable, suppresses interactive prompts
+#    --ignore        config/settings_schema.json is generated locally from
+#                    src/schemas/** and intentionally diverges; same ignore
+#                    as the `theme dev --theme-editor-sync` invocation below
+echo "[dev] Aligning remote dev theme with local files..."
+shopify theme push \
+  --development \
+  --nodelete \
+  --json \
+  --ignore "config/settings_schema.json" >/dev/null
+
+# 4. Start `shopify theme dev` in the background, mirroring its output to a
 #    log file so we can grep for the "Preview your theme" ready banner.
-#    Note: config/settings_schema.json is generated locally from src/schemas/**,
-#    so we ignore it from --theme-editor-sync to avoid the interactive
-#    "remote vs local" reconciliation prompt that hangs the dev server.
+#    The pre-push above ensures no reconciliation prompt is needed.
 SHOPIFY_LOG=$(mktemp -t shopify-dev.XXXXXX)
 
 shopify theme dev \
@@ -47,7 +69,7 @@ shopify theme dev \
   2>&1 | tee "$SHOPIFY_LOG" &
 SHOPIFY_PID=$!
 
-# 4. Wait for Shopify CLI's initial sync to finish — signaled by the
+# 5. Wait for Shopify CLI's initial sync to finish — signaled by the
 #    "Preview your theme" success banner. Time out after 5 minutes so we
 #    never hang forever.
 echo "[dev] Waiting for Shopify theme dev to finish initial sync..."
@@ -83,7 +105,7 @@ while true; do
   sleep 1
 done
 
-# 5. Now start the watchers. Use `npx tsx` so the script doesn't depend on
+# 6. Now start the watchers. Use `npx tsx` so the script doesn't depend on
 #    `tsx` being globally installed (the previous bare `tsx` invocation
 #    failed silently in shells without node_modules/.bin on PATH).
 vp build --watch &
@@ -92,6 +114,6 @@ VP_PID=$!
 npx tsx src/scripts/build.ts --watch &
 ESBUILD_PID=$!
 
-# 6. Wait on the foreground Shopify process so the script stays attached and
+# 7. Wait on the foreground Shopify process so the script stays attached and
 #    Ctrl-C propagates correctly.
 wait "$SHOPIFY_PID"
