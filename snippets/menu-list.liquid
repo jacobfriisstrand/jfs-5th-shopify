@@ -1,0 +1,37 @@
+{% doc %}
+  Renders a Shopify navigation linklist as a `<ul>` of `<a>` links. The
+  wrapping `<nav>` (with its own accessible label) is the caller's
+  responsibility — this snippet only owns list semantics.
+
+  Used by both `blocks/menu.liquid` (footer reuse) and
+  `blocks/_header-menu.liquid` (header inline + drawer) so a linklist's
+  list/link markup has a single source of truth.
+
+  @param {linklist} linklist - The Shopify linklist to render.
+  @param {string} [list_classes] - Tailwind classes for the `<ul>`.
+  @param {string} [link_classes] - Tailwind classes for each `<a>`.
+
+  @example
+  {% render 'menu-list', linklist: linklists.main-menu %}
+{% enddoc %}
+
+{%- liquid
+  assign list_classes = list_classes | default: 'flex flex-wrap gap-4 text-sm'
+  assign link_classes = link_classes | default: 'underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
+-%}
+
+{%- if linklist != blank and linklist.links.size > 0 -%}
+  <ul role="list" class="{{ list_classes }}">
+    {%- for link in linklist.links -%}
+      <li>
+        <a
+          href="{{ link.url }}"
+          class="{{ link_classes }}"
+          {% if link.active %}aria-current="page"{% endif %}
+        >
+          {{ link.title }}
+        </a>
+      </li>
+    {%- endfor -%}
+  </ul>
+{%- endif -%}

@@ -1,17 +1,33 @@
 {% comment %}
-  Header section — slice 1 minimal: logo on the left, cart icon on the right.
+  Header section.
 
-  Hamburger menu (slice 2) and predictive search (slice 3) will be inserted
-  here as additional blocks.
+  The outer `<header-component>` custom element owns the responsive layout
+  decision: it publishes `data-menu-style="menu|drawer"` on itself based on
+  touch capability + inline-menu overflow, and Tailwind's
+  `group-data-[menu-style=…]` variants on the children switch visibility
+  without any JS-driven `display:` toggling.
+
+  Predictive search (slice 3) and the JS cart-drawer (slice 11) will drop
+  in as additional blocks/listeners later.
 {% endcomment %}
 
-<div
-  data-header-row
-  class="flex items-center justify-between gap-4 mx-auto max-w-screen-xl px-4 py-3"
+<header-component
+  class="group block"
+  data-menu-style="menu"
 >
-  {% content_for 'block', type: '_header-logo', id: 'header-logo' %}
-  {% content_for 'block', type: '_header-cart', id: 'header-cart' %}
-</div>
+  <div
+    data-header-row
+    class="flex items-center justify-between gap-4 mx-auto max-w-screen-xl px-4 py-3"
+  >
+    {% content_for 'block', type: '_header-logo', id: 'header-logo' %}
+    {% content_for 'block', type: '_header-menu', id: 'header-menu' %}
+    {% content_for 'block', type: '_header-search', id: 'header-search' %}
+    {% content_for 'block', type: '_header-cart', id: 'header-cart' %}
+  </div>
+</header-component>
+
+<script src="{{ 'header.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'predictive-search.js' | asset_url }}" type="module" fetchpriority="low"></script>
 
 {% schema %}
 {
