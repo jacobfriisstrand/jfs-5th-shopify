@@ -61,6 +61,52 @@ Rules:
 See [ADR-0003](./docs/adr/0003-architectural-pillars.md), pillar 8, for the
 rationale.
 
+### Scaffolding new liquid files
+
+When scaffolding any new `.liquid` file (Section, Block, Snippet, or Layout)
+you **must** load and follow these skills before writing markup or styles:
+
+- [`.agents/skills/html/SKILL.md`](./.agents/skills/html/SKILL.md) — semantic,
+  accessible, low-noise markup. Governs element choice, landmarks, headings,
+  forms, and replacement of custom controls with native HTML.
+- [`.agents/skills/css-motion-systems/SKILL.md`](./.agents/skills/css-motion-systems/SKILL.md)
+  — motion design for any transitions, keyframes, `linear()` easing, transform
+  strategy, and View Transitions usage on the new file.
+
+These are **in addition to** the topic-specific `*-accessibility.mdc` rules in
+[`docs/agent-reference/`](./docs/agent-reference/) (see "Accessibility canon"
+above). The skills set the baseline; the `.mdc` files cover component-specific
+interaction patterns. Both apply.
+
+### Minimal scaffolding & least privilege for editor controls
+
+When scaffolding a new `.liquid` file (Section, Block, Snippet, or Layout) you
+**must** start from the absolute minimum and only add what was explicitly
+asked for.
+
+Guiding principle: **the theme editor exposes as little control over the UI
+as possible.** The developer decides which knobs the merchant gets, on a
+case-by-case basis. The merchant edits **content** by default; structure,
+layout, color, spacing, typography, and motion are owned by code unless the
+developer explicitly asks for them to be settings.
+
+Rules:
+
+- Default schema for a new section/block: `name` + `preset` only; **no
+  settings unless asked**.
+- Markup: smallest correct structure for the request — no "helpful" extras
+  (alignment toggles, color overrides, padding controls, spacing presets,
+  decorative wrappers, hover affordances, etc.).
+- If a setting feels obvious but wasn't asked for ("surely they want a
+  heading?"), **ask first** instead of adding it. Apply the principle of
+  least privilege: only grant editor control when the developer confirms it.
+- Prefer hard-coded values over settings. A setting is a long-term contract
+  — deletion is a breaking change in `config/settings_data.json` and any
+  `templates/*.json` referencing it.
+- When asked to "scaffold a hero / product card / X", interpret literally:
+  structural shell only. Wait for follow-up before adding settings or visual
+  variations.
+
 ## Build pipeline
 
 This project uses **vite-plus** (`vp`), **esbuild** (TypeScript type-strip mode),
