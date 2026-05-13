@@ -173,8 +173,8 @@ Rules:
 
 **Branch model:**
 
-- `main` — release branch. Only updated by merging `develop` at release time. Never commit directly.
-- `develop` — integration branch. All feature branches fork from and merge back into `develop`. Shares full history with `main` so `develop → main` merges are always fast-forward / conflict-free.
+- `develop` — **default branch** and integration branch. All feature branches fork from and merge back into `develop`. Because it is the default branch, GitHub's built-in "closing keywords on merge" behaviour (`Closes #N`, `Fixes #N`, `Resolves #N` in PR body) auto-closes referenced issues when their PR merges here.
+- `main` — release branch. Only updated by merging `develop` at release time. Never commit directly. Shares full history with `develop` so `develop → main` merges are always fast-forward / conflict-free.
 - `feature/<issue-number>-<slug>` — short-lived feature branches off `develop` (e.g. `feature/12-hamburger-menu`). One branch per issue. Delete after merge.
 
 **Commits:**
