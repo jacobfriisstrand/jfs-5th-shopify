@@ -1,30 +1,19 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "main": {
       "type": "section",
       "settings": {}
     },
-    "hero_yJPeaM": {
-      "type": "hero",
-      "name": "t:names.hero",
+    "home_hero": {
+      "type": "home-hero",
       "settings": {
         "heading": "Welcome to our store",
         "subheading": "Discover our latest collection.",
         "image": "shopify://shop_images/jorgen-hendriksen-BomU_atAAKQ-unsplash.jpg",
         "button_label": "Shop now",
-        "button_link": "shopify://pages/contact",
-        "alignment": "left"
+        "button_link": "shopify://pages/contact"
       }
     }
   },
-  "order": ["main", "hero_yJPeaM"]
+  "order": ["main", "home_hero"]
 }

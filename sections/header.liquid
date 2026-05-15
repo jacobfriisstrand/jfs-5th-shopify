@@ -12,12 +12,12 @@
 {% endcomment %}
 
 <header-component
-  class="group block"
+  class="group grid-12"
   data-menu-style="menu"
 >
   <div
     data-header-row
-    class="flex items-center justify-between gap-4 mx-auto max-w-screen-xl px-4 py-3"
+    class="col-content flex items-center justify-between gap-4 py-3"
   >
     {% content_for 'block', type: '_header-logo', id: 'header-logo' %}
     {% content_for 'block', type: '_header-menu', id: 'header-menu' %}

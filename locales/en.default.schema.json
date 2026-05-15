@@ -324,6 +324,7 @@
     "hero": "Hero",
     "hero_bottom_aligned": "Hero: Bottom aligned",
     "hero_marquee": "Hero: Marquee",
+    "home_hero": "Home hero",
     "icon": "Icon",
     "icons": "Icons",
     "icons_with_text": "Icons with text",
@@ -355,6 +356,7 @@
     "page": "Page",
     // Theme block name for main page body content
     "page_content": "Content",
+    "page_hero": "Page hero",
     "page_layout": "Page layout",
     "payment_icons": "Payment icons",
     "policy_list": "Policy links",

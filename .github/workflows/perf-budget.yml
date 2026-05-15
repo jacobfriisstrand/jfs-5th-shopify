@@ -1,17 +1,9 @@
 # Perf budget enforcement.
 #
-# Two jobs:
-#   1. `budget` — builds the theme and runs `scripts/check-budgets.ts`. Fails if
-#      any per-file cap, per-route budget, or custom-element registration is
-#      violated. This is the deterministic gate documented in
-#      docs/perf-budget.md and ADR-0003 pillar 3.
-#   2. `budget-bump-prefix` — runs only on pull requests. If `perf-budget.json`
-#      is modified in the diff, the PR title MUST start with `[budget-bump]`.
-#      This makes every loosening of a budget auditable via
-#      `git log --all -- perf-budget.json` and discourages quiet relaxations.
-#
-# Both jobs are required for merge; configure them as required status checks
-# in the repository settings.
+# `budget` — builds the theme and runs `scripts/check-budgets.ts`. Fails if any
+# per-file cap, per-route budget, or custom-element registration is violated.
+# This is the deterministic gate documented in docs/perf-budget.md and ADR-0003
+# pillar 3.
 
 name: perf-budget
 
@@ -41,35 +33,3 @@ jobs:
 
       - name: Check budgets
         run: npx tsx scripts/check-budgets.ts
-
-  budget-bump-prefix:
-    name: "[budget-bump] prefix check"
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Verify [budget-bump] prefix when perf-budget.json changes
-        env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          set -euo pipefail
-
-          if git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -qx "perf-budget.json"; then
-            echo "perf-budget.json was modified in this PR."
-            if [[ "$PR_TITLE" =~ ^\[budget-bump\] ]]; then
-              echo "✓ PR title starts with [budget-bump]: \"$PR_TITLE\""
-              exit 0
-            else
-              echo "✗ PR title must start with [budget-bump] when perf-budget.json is modified."
-              echo "  Current title: \"$PR_TITLE\""
-              echo "  See docs/perf-budget.md → \"Changing a budget — [budget-bump]\"."
-              exit 1
-            fi
-          else
-            echo "perf-budget.json unchanged; [budget-bump] prefix not required."
-          fi

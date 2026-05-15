@@ -1,0 +1,160 @@
+/*
+ * Layout tokens + responsive 12-column grid system (ADR-0004).
+ *
+ * Pattern: named-grid-lines, single-level, custom span/start utilities.
+ * Inspired by https://www.joshwcomeau.com/css/full-bleed/
+ *
+ * Track count collapses with viewport:
+ *   - mobile (<md):    4 inner cols + fixed outer gutter rails
+ *   - md  (≥768px):    8 inner cols + fixed outer gutter rails
+ *   - lg  (≥1024px):  12 inner cols + minmax(gutter, 1fr) outer rails
+ *                     that absorb space above --layout-content-width
+ *                     (centred content) but never collapse below the gutter
+ *
+ * Utilities (apply to direct children of `.grid-12`):
+ *   - `full-bleed`   span [full-start] → [full-end] (container/viewport width).
+ *                    On mobile/tablet this is the same as `col-content`
+ *                    because [full-*] and [content-*] coincide there.
+ *   - `col-content`  span [content-start] → [content-end] (all inner cols).
+ *   - `span-N`       span N inner cols, defaulting start to content-start.
+ *                    **Must match the active track count** — write
+ *                    `span-4 md:span-8 lg:span-12`. Overflowing N creates
+ *                    auto-sized implicit tracks that steal space from the
+ *                    explicit 1fr tracks and break the layout.
+ *   - `cs-N`         start at the Nth named [col-start] line. Only valid
+ *                    up to the active track count; pair with responsive
+ *                    prefixes (e.g. `lg:cs-3`) to avoid landing in
+ *                    implicit territory on smaller breakpoints.
+ *
+ * Bracket gotcha: stacked line names at the same line position must sit
+ * inside a single bracket pair (`[full-start content-start]`), NOT two
+ * adjacent brackets (`[full-start] [content-start]`). The two-bracket
+ * form is silently dropped by browsers — the entire `grid-template-columns`
+ * declaration becomes invalid and named-line utilities all no-op.
+ *
+ * Source-order: `cs-*` is defined AFTER `span-*` so that
+ * `class="cs-7 span-6"` reliably starts at col 7 and spans 6 cols.
+ */
+
+@theme {
+  --layout-content-width: 1440px;
+  --layout-gap: clamp(12px, 2vw, 20px);
+  --layout-gutter: clamp(16px, 4vw, 32px);
+}
+
+@utility grid-12 {
+  display: grid;
+  column-gap: var(--layout-gap);
+  grid-template-columns:
+    [full-start] var(--layout-gutter)
+    [content-start]
+    repeat(4, [col-start] minmax(0, 1fr))
+    [content-end]
+    var(--layout-gutter) [full-end];
+
+  @variant md {
+    grid-template-columns:
+      [full-start] var(--layout-gutter)
+      [content-start]
+      repeat(8, [col-start] minmax(0, 1fr))
+      [content-end]
+      var(--layout-gutter) [full-end];
+  }
+
+  @variant lg {
+    grid-template-columns:
+      [full-start] minmax(var(--layout-gutter), 1fr)
+      [content-start]
+      repeat(
+        12,
+        [col-start]
+          minmax(
+            0,
+            calc((var(--layout-content-width) - 11 * var(--layout-gap)) / 12)
+          )
+      )
+      [content-end]
+      minmax(var(--layout-gutter), 1fr) [full-end];
+  }
+}
+
+@utility full-bleed {
+  grid-column: full-start / full-end;
+}
+@utility col-content {
+  grid-column: content-start / content-end;
+}
+
+@utility span-1 {
+  grid-column: content-start / span 1;
+}
+@utility span-2 {
+  grid-column: content-start / span 2;
+}
+@utility span-3 {
+  grid-column: content-start / span 3;
+}
+@utility span-4 {
+  grid-column: content-start / span 4;
+}
+@utility span-5 {
+  grid-column: content-start / span 5;
+}
+@utility span-6 {
+  grid-column: content-start / span 6;
+}
+@utility span-7 {
+  grid-column: content-start / span 7;
+}
+@utility span-8 {
+  grid-column: content-start / span 8;
+}
+@utility span-9 {
+  grid-column: content-start / span 9;
+}
+@utility span-10 {
+  grid-column: content-start / span 10;
+}
+@utility span-11 {
+  grid-column: content-start / span 11;
+}
+@utility span-12 {
+  grid-column: content-start / span 12;
+}
+
+@utility cs-1 {
+  grid-column-start: col-start 1;
+}
+@utility cs-2 {
+  grid-column-start: col-start 2;
+}
+@utility cs-3 {
+  grid-column-start: col-start 3;
+}
+@utility cs-4 {
+  grid-column-start: col-start 4;
+}
+@utility cs-5 {
+  grid-column-start: col-start 5;
+}
+@utility cs-6 {
+  grid-column-start: col-start 6;
+}
+@utility cs-7 {
+  grid-column-start: col-start 7;
+}
+@utility cs-8 {
+  grid-column-start: col-start 8;
+}
+@utility cs-9 {
+  grid-column-start: col-start 9;
+}
+@utility cs-10 {
+  grid-column-start: col-start 10;
+}
+@utility cs-11 {
+  grid-column-start: col-start 11;
+}
+@utility cs-12 {
+  grid-column-start: col-start 12;
+}
