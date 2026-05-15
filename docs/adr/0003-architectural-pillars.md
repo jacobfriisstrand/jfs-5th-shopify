@@ -52,7 +52,7 @@ Lighthouse mobile/4G:
 - Best-practices ≥ **95**
 - SEO ≥ **95**
 
-Enforcement (iteration 1): `scripts/check-budgets.ts` runs in GitHub Actions after `npm run build`. It walks `assets/*.{js,css}`, gzips each, and walks the `.liquid` graph from each route's template to compute per-route module sets. Failure is a non-zero exit code → red CI. The `[budget-bump]` PR-title prefix is the **only** way to merge a budget-exceeding change, and it requires the diff to also modify `perf-budget.json` so the increase is auditable in `git log perf-budget.json`.
+Enforcement (iteration 1): `scripts/check-budgets.ts` runs in GitHub Actions after `npm run build`. It walks `assets/*.{js,css}`, gzips each, and walks the `.liquid` graph from each route's template to compute per-route module sets. Failure is a non-zero exit code → red CI. The legitimate way to merge a budget-exceeding change is to raise the relevant number in `perf-budget.json` within the same PR and justify it in the description; the change stays auditable in `git log perf-budget.json`.
 
 Enforcement (iteration 2): Lighthouse CI against an unpublished preview theme. Deferred because it requires `SHOPIFY_CLI_THEME_TOKEN` in GH secrets and a deployed preview per PR.
 
@@ -115,7 +115,7 @@ The declaration of canon also lives in `AGENTS.md` — see the "Accessibility ca
 
 ### Positive
 
-- **Every CI gate has a number.** `[budget-bump]` makes the only path to relaxing a gate a visible diff. No silent drift.
+- **Every CI gate has a number.** Raising a budget requires editing `perf-budget.json` in the PR — a visible diff, no silent drift.
 - **One mental model for "should this be JS?"** — pillar 1 + pillar 7 between them describe both the default (Liquid) and the escape hatch (defer-load).
 - **Generators stay schema-synced.** Pillar 4's import-from-types trick means the generator never falls behind the schema definitions.
 - **Vertical slicing sets a per-iteration definition of done.** A homepage with no PDP is acceptable for iteration 1; a half-built PDP and a half-built collection is not.
@@ -125,7 +125,7 @@ The declaration of canon also lives in `AGENTS.md` — see the "Accessibility ca
 
 - **No test runner means refactors of pure logic carry risk.** Mitigated by pillar 5's commitment to add Vitest at the first non-trivial pure function. The cost of catching this late is a single PR's worth of test infrastructure.
 - **Per-route budget calculation requires walking the `.liquid` graph.** This is non-trivial code (~150 lines in `scripts/check-budgets.ts`). Mitigated by writing it once and treating it as part of the build infrastructure.
-- **`[budget-bump]` PRs are an honour-system gate** — a sloppy review can wave through an unjustified budget increase. Mitigated by the auditable `git log perf-budget.json` trail.
+- **Budget bumps are an honour-system gate** — a sloppy review can wave through an unjustified increase. Mitigated by the auditable `git log perf-budget.json` trail.
 - **Accessibility canon depends on the `.mdc` files staying truthful.** They were Shopify Horizon's rules; some may age. Mitigated by treating them as living documents — deviations link the rule line and may also amend the `.mdc` if the rule itself is wrong.
 - **Defer-load adds a one-time first-keystroke latency** for the deferred surface. Negligible (~100–200 ms on warm 4G for a 10 KB module) and only on the first interaction per session. Visible to screen readers via the `aria-live` mitigation.
 
