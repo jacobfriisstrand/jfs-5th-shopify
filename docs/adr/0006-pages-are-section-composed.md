@@ -25,9 +25,11 @@ Every page on this storefront is composed in the theme editor by adding sections
 
 ### `templates/page.json` is the section-composed default
 
-`templates/page.json` is itself a section-composed template. Every page in Shopify Admin (created without picking a template suffix) uses it. The template renders a `main-page` section that exposes `{% content_for 'blocks' %}` — merchants compose the page entirely from blocks dropped into that section in the theme editor.
+`templates/page.json` is itself a section-composed template. Every page in Shopify Admin (created without picking a template suffix) uses it. Out of the box the template ships with a single `page-hero` section ([`sections/page-hero.liquid`](../../sections/page-hero.liquid)) so every new page has a meaningful default surface; merchants compose the rest of the page by adding additional sections via the theme editor.
 
-The base `templates/page.json` is intentionally **not** a "render `page.content`" stub. There is no fallback that auto-renders the rich-text body. If a merchant writes content in the page rich-text editor and the theme has no block configured to display it, that content does not appear on the storefront. This is the desired behaviour: it forces structured authoring through blocks.
+The `page-hero` section is restricted to page templates via `enabled_on: { templates: ["page"] }` so it cannot accidentally be added to product, collection, blog, or index templates.
+
+The base `templates/page.json` is intentionally **not** a "render `page.content`" stub. There is no fallback that auto-renders the rich-text body. If a merchant writes content in the page rich-text editor and the theme has no section configured to display it, that content does not appear on the storefront. This is the desired behaviour: it forces structured authoring through sections.
 
 ### Alternate page layouts are template suffixes
 
