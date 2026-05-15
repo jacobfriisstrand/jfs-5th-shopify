@@ -117,6 +117,34 @@ Rules:
   structural shell only. Wait for follow-up before adding settings or visual
   variations.
 
+### Settings ↔ markup parity
+
+Every setting declared in a section/block schema **must** be both assigned
+and referenced in the corresponding `.liquid` file:
+
+1. Add `assign <name> = block.settings.<id>` (or `section.settings.<id>`)
+   inside the file's `{% liquid %}` block.
+2. Reference `<name>` in the markup with the appropriate guard
+   (`{% if <name> != blank %}`, `{% if <name> %}`, etc.).
+
+Conversely, every variable referenced in markup must come from a setting
+or a literal Liquid object (`product`, `cart`, …).
+
+Why this is a hard rule: Liquid silently coerces undefined identifiers to
+`nil`/empty. A guard like `{% if image != blank %}` over an unassigned
+`image` evaluates to `false` forever — the markup inside is dead code,
+and **no build step (esbuild, schemas, vp check, theme check) catches
+it**. The defect is invisible until someone notices the feature doesn't
+work in the editor.
+
+Self-check before declaring a block/section done:
+
+- Diff the schema's `settings[].id` list against the `assign` lines in
+  `{% liquid %}` — they should match 1:1 (minus settings the markup
+  intentionally ignores, which should be rare and commented).
+- Grep the file for each setting id; every id should appear at least
+  once in markup.
+
 ## Build pipeline
 
 This project uses **vite-plus** (`vp`), **esbuild** (TypeScript type-strip mode),
@@ -279,6 +307,7 @@ This project uses **TailwindCSS v4** via the `@tailwindcss/vite` plugin. All sty
 **Rules:**
 
 - Use Tailwind utility classes in Liquid markup — do NOT use `{% stylesheet %}` blocks
+- **No custom (semantic) classnames in markup or schemas.** Do not write `class="main-page"`, `class="product-card"`, `class="section-wrapper"`, or any similar bespoke class. Likewise, do not set the section schema `class` property to a custom name. Style with Tailwind utilities only. If a pattern truly cannot be expressed with utilities, define it as a Tailwind `@utility` (or `@layer components` rule) in `src/styles/` so it is part of the design system, not an ad-hoc class. The compiled CSS should contain zero hand-named selectors that exist only to be matched against markup.
 - Use `{% javascript %}` tags only when component-scoped JS is needed
 - Tailwind theme tokens are defined in `src/styles/app.css` via the `@theme` directive
 - Shopify CSS variables (defined in `src/styles/` with defaults, overridden by theme settings in layouts) are mapped to Tailwind tokens:
@@ -288,6 +317,14 @@ This project uses **TailwindCSS v4** via the `@tailwindcss/vite` plugin. All sty
   - `rounded-input` → `var(--style-border-radius-inputs)`
 - For new theme tokens, add them to the `@theme` block in `src/styles/app.css`
 - Use `@source` directives in `app.css` to ensure Tailwind scans new directories
+- **Do not combine a custom `@utility` with a built-in Tailwind utility that
+  sets the SAME property.** Custom `@utility` rules and Tailwind's built-in
+  utilities live in the same layer with equal specificity, so source order
+  decides the winner. For example, a custom `@utility foo { width: 100vw }`
+  combined with `class="foo w-full"` will lose: `.w-full { width: 100% }` is
+  emitted after the custom rule. Either use the custom utility alone, or
+  ensure the custom utility and the Tailwind utility set _different_
+  properties (e.g. `grid-column` vs `width`) so they compose cleanly.
 
 **Example — Tailwind in Liquid:**
 
