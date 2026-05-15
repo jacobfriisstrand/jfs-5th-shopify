@@ -355,6 +355,7 @@
     "page": "Page",
     // Theme block name for main page body content
     "page_content": "Content",
+    "page_hero": "Page hero",
     "page_layout": "Page layout",
     "payment_icons": "Payment icons",
     "policy_list": "Policy links",
