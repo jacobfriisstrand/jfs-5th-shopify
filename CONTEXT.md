@@ -93,8 +93,8 @@ _Avoid_: Lazy-load (overloaded with image lazy-loading), code-split.
 The per-route and per-file size + Lighthouse-score contract enforced in CI. Source of truth is `perf-budget.json` at the repo root. Per-route budgets cap the gzipped JS shipped on a route's initial paint (homepage 25 KB, collection 40 KB, PDP 60 KB, cart 50 KB). Per-file caps prevent any single **Compiled asset** from blowing the budget alone (15 KB JS, 30 KB CSS gzipped). Lighthouse-mobile-4G thresholds are perf 90, a11y 95, best-practices 95, SEO 95. Enforced by `scripts/check-budgets.ts` (per-file + per-route, iteration 1) and Lighthouse CI (deferred to iteration 2). See [docs/perf-budget.md](docs/perf-budget.md).
 _Avoid_: Performance limit, size cap, weight target.
 
-**`[budget-bump]`**:
-A PR-title prefix that authorizes a deliberate change to `perf-budget.json`. The CI gate fails any PR that exceeds budget unless the PR title contains `[budget-bump]` AND the diff includes a change to `perf-budget.json`. Forces budget changes to be visible, reviewable, and auditable via `git log perf-budget.json`.
+**Budget change**:
+A deliberate edit to `perf-budget.json`. The CI gate fails any PR that exceeds budget; the legitimate path is to raise the relevant number in `perf-budget.json` within the same PR and justify the increase in the PR description. Visible and auditable via `git log perf-budget.json`.
 _Avoid_: Budget override, perf waiver.
 
 ### Iteration discipline

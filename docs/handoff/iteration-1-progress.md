@@ -23,7 +23,7 @@ later change.
 |---|---|---|---|
 | 1 | `perf-budget.json` (per-route caps, per-file caps, Lighthouse floors) | done | `3e7e58c` |
 | 2 | `scripts/check-budgets.ts` (per-file + per-route + custom-element registration linter) | done | `3e7e58c` |
-| 3 | `.github/workflows/perf-budget.yml` (CI on PR + push to main/develop, plus `[budget-bump]` PR-title gate) | done | `3e7e58c` |
+| 3 | `.github/workflows/perf-budget.yml` (CI on PR + push to main/develop) | done | `3e7e58c` |
 | 4 | `scripts/new.ts` (scaffolder for sections/blocks: liquid + schema + optional script + importmap entry, atomic) | done | `3e7e58c` |
 | 5 | `sections/hero.liquid` + matching `src/schemas/sections/hero.schema.ts` | **next** | — |
 | 6 | Wire `templates/index.json` to render the hero | not started | — |
@@ -76,8 +76,8 @@ The eight pillars iteration-1 must respect:
 4. View Transitions for navigation.
 5. **Perf-budget contract.** Per-route gzipped initial-paint static graph.
    Decimal-KB (50 KB = 50 000 bytes). Defined in `perf-budget.json`.
-   Enforced by `scripts/check-budgets.ts`. Every PR runs it. Bumping the
-   budget requires a `[budget-bump]` PR-title prefix.
+   Enforced by `scripts/check-budgets.ts`. Every PR runs it. Raising a
+   budget requires editing `perf-budget.json` in the same PR.
 6. Accessibility canon: the `*-accessibility.mdc` files in
    `docs/agent-reference/` are authoritative. Deviations require
    justification in the PR.

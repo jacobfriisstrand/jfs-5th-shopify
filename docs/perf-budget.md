@@ -73,29 +73,26 @@ Lighthouse CI runs against an unpublished preview theme on each PR. Requires:
 
 Deferred until iteration 2 lands a real PDP and collection — Lighthouse over a hero-only homepage is a low-signal gate.
 
-## Changing a budget — `[budget-bump]`
+## Changing a budget
 
-The CI gate fails any PR that exceeds the budget. The **only** legitimate way to merge such a PR:
+The CI gate fails any PR that exceeds the budget. The legitimate way to merge such a PR:
 
 1. Decide the new budget. Justify it in the PR description (e.g. "PDP gains a recommendations carousel that adds 8 KB; new budget 68 KB").
 2. Edit `perf-budget.json` in the same PR.
-3. Prefix the PR title with `[budget-bump]` (literal, lowercase, square brackets).
 
-CI passes only when both conditions hold: title prefix present **and** `perf-budget.json` changed in the diff.
+CI passes once `perf-budget.json` reflects a value the actual build no longer exceeds. Run `git log --all -- perf-budget.json` to audit every change to a budget over time.
 
-The `[budget-bump]` prefix is what makes budget changes auditable. Run `git log --all -- perf-budget.json` to see the history of every change with its justification.
+### What does **not** require a budget change
 
-### What is **not** a `[budget-bump]`
-
-- A typo fix in `perf-budget.json` that doesn't change a number — no prefix needed; CI passes anyway because no budget is exceeded.
-- A refactor that drops bytes — no prefix; CI passes; consider tightening the budget in a follow-up PR.
-- A "we'll fix it later" exemption — there is no exemption mechanism. Either the change fits the budget, or the budget moves with explicit justification.
+- A typo fix in `perf-budget.json` that doesn't change a number — CI passes anyway because no budget is exceeded.
+- A refactor that drops bytes — CI passes; consider tightening the budget in a follow-up PR.
+- A "we'll fix it later" exemption — there is no exemption mechanism. Either the change fits the budget, or the budget moves with explicit justification in the PR description.
 
 ## How to investigate a budget failure
 
 When `scripts/check-budgets.ts` fails, the printed table tells you which file or route blew the budget. Common culprits:
 
-- **A new `src/scripts/<name>.ts` was added** and it's both large and statically loaded. Options: defer-load it (ADR-0003 pillar 7), split it, or accept a `[budget-bump]`.
+- **A new `src/scripts/<name>.ts` was added** and it's both large and statically loaded. Options: defer-load it (ADR-0003 pillar 7), split it, or raise the budget with justification.
 - **A vendored library was imported into an existing module.** Check `import` lines in the modified module; the importmap doesn't bundle, but a transitively-imported large module still counts toward the route.
 - **A new section was added to a route's template** and it pulls in a script. Either the script is defensible (and the budget moves) or the section can be defer-rendered via `data-hydration-key` (ADR-0002).
 
@@ -103,18 +100,18 @@ Run `gzip -c assets/<file>.js | wc -c` to inspect a specific file's gzipped size
 
 ## Why these numbers
 
-- **50 KB homepage** — a fully-fledged Shopify homepage typically composes hero, featured product/collection, image-with-text, testimonials, and newsletter sections. 50 KB allows those sections plus the global runtime (header, dialog, view-transitions, polyfills) without pre-emptively shipping PDP-specific code. If the homepage adds quick-add cards (which pull in `product-form.js` + `variant-picker.js`), that's an explicit `[budget-bump]` conversation — not a free lunch.
+- **50 KB homepage** — a fully-fledged Shopify homepage typically composes hero, featured product/collection, image-with-text, testimonials, and newsletter sections. 50 KB allows those sections plus the global runtime (header, dialog, view-transitions, polyfills) without pre-emptively shipping PDP-specific code. If the homepage adds quick-add cards (which pull in `product-form.js` + `variant-picker.js`), that's an explicit budget-raise conversation — not a free lunch.
 - **40 KB collection** — adds filter form interactivity (a thin enhancement layer; full filtering is server-rendered per ADR-0003 pillar 6). _Note: this is currently lower than the homepage; revisit when collection gains quick-add or comparable JS-heavy surfaces._
 - **60 KB PDP** — adds variant picker, image gallery, swatch interactions. Highest budget because it's the highest-conversion surface and its JS pays for itself.
 - **50 KB cart** — adds cart-line-item editing, accelerated checkout button initialisation. Lower than PDP because most cart traffic is post-conversion-intent.
 - **15 KB per JS file** — a single file at the cap can fit in one of the smaller route budgets. Higher would let one file dominate.
 - **30 KB per CSS file** — Tailwind v4's tree-shaken output for a complex page sits comfortably under this. Higher would mean either too many components in one stylesheet or an unconfigured `content` glob.
 
-These numbers are **calibrated for iteration 1 + iteration 2**. They should be tightened — not relaxed — as the catalogue stabilises. The existence of `[budget-bump]` is to make the rare necessary loosenings visible, not to make them routine.
+These numbers are **calibrated for iteration 1 + iteration 2**. They should be tightened — not relaxed — as the catalogue stabilises. Loosenings should be rare and clearly justified in the PR description so they remain visible in `git log --all -- perf-budget.json`.
 
 ## Related
 
 - [ADR-0003 — Architectural pillars](adr/0003-architectural-pillars.md), pillar 3 (rationale) and pillar 7 (defer-load).
-- `CONTEXT.md` → **Perf budget**, **`[budget-bump]`**, **Defer-load**.
+- `CONTEXT.md` → **Perf budget**, **Defer-load**.
 - `scripts/check-budgets.ts` — the enforcer (to be added).
 - `perf-budget.json` — the data (to be added).
