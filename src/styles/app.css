@@ -3,6 +3,7 @@
 @import "./colors.css";
 @import "./typography.css";
 @import "./radii.css";
+@import "./layout.css";
 
 @source "../../sections/**/*.liquid";
 @source "../../blocks/**/*.liquid";
