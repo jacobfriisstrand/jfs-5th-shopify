@@ -61,6 +61,36 @@ Rules:
 See [ADR-0003](./docs/adr/0003-architectural-pillars.md), pillar 8, for the
 rationale.
 
+### Headings: always via the `heading` snippet
+
+**All `<h1>`–`<h6>` elements MUST be rendered via
+[`snippets/heading.liquid`](./snippets/heading.liquid).** Direct heading
+literals (`<h1>…</h1>`, `<h2>…</h2>`, …) in `.liquid` files are forbidden,
+except inside the snippet itself.
+
+```liquid
+{% render 'heading',
+  text: collection.title,
+  level: 1,
+  id: heading_id,
+  class: 'text-2xl font-medium sm:text-3xl'
+%}
+```
+
+Rules in brief (full reasoning in
+[ADR-0008](./docs/adr/0008-heading-snippet-for-all-headings.md)):
+
+- The `level` prop is mandatory unless you want the snippet default
+  (`level: 2`). Never pass `level: 2` redundantly — omit it.
+- Reusable components (product card, blog card, accordion row, etc.) that
+  render a heading MUST accept a `heading_level` parameter and forward it
+  to the snippet. They MUST NOT hard-code a level.
+- Container components derive child levels as `parent + 1` (e.g. a
+  carousel at `heading_level: 2` passes `heading_level: 3` to its cards).
+- Existing direct heading literals are migrated opportunistically: when
+  you touch a file for unrelated work, convert its headings in the same
+  commit.
+
 ### Skill canon for liquid, JS/TS, and CSS work
 
 The two skills below are **canonical** for any work in this repo that touches
