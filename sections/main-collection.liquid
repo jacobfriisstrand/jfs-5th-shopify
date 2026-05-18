@@ -8,9 +8,12 @@
   aria-labelledby="{{ heading_id }}"
 >
   <div class="col-content flex flex-col gap-8">
-    <h1 id="{{ heading_id }}" class="text-2xl font-medium sm:text-3xl">
-      {{ collection.title | escape }}
-    </h1>
+    {% render 'heading',
+      text: collection.title,
+      level: 1,
+      id: heading_id,
+      class: 'text-2xl font-medium sm:text-3xl'
+    %}
 
     {%- if products.size == 0 -%}
       <p>{{ 'content.no_products_found' | t }}</p>
@@ -21,7 +24,7 @@
             {%- render '_resolve-primary', product: product -%}
           {%- endcapture -%}
           {%- if should_render contains 'true' -%}
-            <li>{% render 'product-card', product: product %}</li>
+            <li>{% render 'product-card', product: product, heading_level: 2 %}</li>
           {%- endif -%}
         {%- endfor -%}
       </ul>

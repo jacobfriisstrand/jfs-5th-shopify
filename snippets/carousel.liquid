@@ -28,6 +28,9 @@
   @param {string} [slides_per_view] - Smallest-breakpoint slidesPerView
     forwarded to `<swiper-carousel>`. Default: '1.2'.
   @param {string} [heading] - Optional heading rendered in the header.
+  @param {number} [heading_level] - Heading level (1-6) for the carousel
+    heading. Defaults to 2. Card titles inside the carousel automatically
+    render one level deeper than this.
   @param {string} [subheading] - Optional subheading rendered under heading.
   @param {string} [heading_id] - DOM id for the heading; lets the caller
     wire `aria-labelledby` on its section. Required if `heading` is set.
@@ -54,6 +57,8 @@
   assign slides_per_view = slides_per_view | default: '1.2'
   assign item_count = count | default: items.size
   assign link_text = link_text | default: 'View all'
+  assign resolved_heading_level = heading_level | default: 2
+  assign card_heading_level = resolved_heading_level | plus: 1
   assign use_carousel = false
   if item_count >= min_for_carousel
     assign use_carousel = true
@@ -78,9 +83,12 @@
       {%- if heading != blank or subheading != blank -%}
         <div class="flex flex-col gap-1">
           {%- if heading != blank -%}
-            <h2 id="{{ heading_id }}" class="font-primary text-2xl font-bold sm:text-3xl">
-              {{ heading | escape }}
-            </h2>
+            {% render 'heading',
+              text: heading,
+              level: resolved_heading_level,
+              id: heading_id,
+              class: 'font-primary text-2xl font-bold sm:text-3xl'
+            %}
           {%- endif -%}
           {%- if subheading != blank -%}
             <p class="text-fg/70 text-sm sm:text-base">{{ subheading | escape }}</p>
@@ -106,7 +114,7 @@
       <li>
         {%- case type -%}
           {%- when 'product' -%}
-            {% render 'product-card', product: item %}
+            {% render 'product-card', product: item, heading_level: card_heading_level %}
           {%- else -%}
             {{ 'Unknown carousel card type: ' | append: type }}
         {%- endcase -%}
