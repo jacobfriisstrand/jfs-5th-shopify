@@ -948,6 +948,7 @@
     "link": "Link",
     "custom_link": "Custom link",
     "link_preset": "Link preset",
+    "link_label": "Link label",
     "links": "Links",
     "logo": "Logo",
     "logo_font": "Logo font",
@@ -1025,6 +1026,7 @@
     "product_type": "Product type",
     "products": "Products",
     "products_per_page": "Products per page",
+    "products_to_show": "Products to show",
     "product_custom_property": {
       "heading": "Heading",
       "description": "Description",

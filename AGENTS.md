@@ -145,6 +145,24 @@ Self-check before declaring a block/section done:
 - Grep the file for each setting id; every id should appear at least
   once in markup.
 
+### One `{% liquid %}` block per file, hoisted to the top
+
+Every `.liquid` file has **at most one `{% liquid %}` block**, placed at
+the very top of the file (after the `{% doc %}` header for
+snippets/blocks, before any markup or `{% schema %}` tag). All variable
+assignments, defaults, and pre-render computation live inside it.
+
+Do **not** sprinkle multiple `{% liquid %}` tags through the file. Do not
+use bare mid-file `{% assign %}` or branching blocks whose only purpose
+is to compute a value — fold them into the prologue. Conditional
+assignments use `if`/`case` _inside_ the prologue.
+
+`{% render %}` and `{% content_for %}` tags stay in the markup (they
+produce output, not values). Tiny inline output expressions like
+`{{ product.title }}` are fine in markup; they are not "computation".
+
+Rationale and a full before/after example: [ADR-0007](./docs/adr/0007-single-liquid-tag-per-file.md).
+
 ## Build pipeline
 
 This project uses **vite-plus** (`vp`), **esbuild** (TypeScript type-strip mode),
