@@ -226,5 +226,10 @@
       "default_title": "Default Title",
       "sticky_add_to_cart": "Quick add to cart bar"
     }
+  },
+  "sections": {
+    "featured_collection": {
+      "label": "Featured collection"
+    }
   }
 }
