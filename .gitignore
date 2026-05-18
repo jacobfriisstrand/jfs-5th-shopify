@@ -23,3 +23,6 @@ dist/
 # Tailwind, copied static files). Source of truth lives in `src/`. Run
 # `npm run build` to regenerate.
 assets/
+
+# Local development files
+.env.*

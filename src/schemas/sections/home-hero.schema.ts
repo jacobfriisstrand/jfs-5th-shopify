@@ -1,8 +1,10 @@
 import { defineSection } from "../types.ts";
 
 export default defineSection({
-  name: "t:names.hero",
-  class: "section-wrapper",
+  name: "t:names.home_hero",
+  enabled_on: {
+    templates: ["index"],
+  },
   settings: [
     {
       type: "text",
@@ -32,7 +34,7 @@ export default defineSection({
   ],
   presets: [
     {
-      name: "t:names.hero",
+      name: "t:names.home_hero",
       category: "t:categories.banners",
     },
   ],

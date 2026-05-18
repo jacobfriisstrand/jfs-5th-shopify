@@ -5,4 +5,5 @@ export default defineSection({
   enabled_on: {
     groups: ["footer"],
   },
+  blocks: [{ type: "menu" }, { type: "@theme" }],
 });

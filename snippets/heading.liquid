@@ -1,0 +1,40 @@
+{% doc %}
+  Renders a heading element (`<h1>`–`<h6>`) at the requested level.
+
+  Use this anywhere a heading's level is decided by the caller's surrounding
+  hierarchy rather than the component itself (e.g. a card title is `<h3>`
+  when nested under a section `<h2>`, but `<h2>` when it sits directly under
+  a page `<h1>`).
+
+  @param {string} text - The heading text. Required. Output is HTML-escaped.
+  @param {number} [level] - Heading level, 1–6. Defaults to 2.
+  @param {string} [id] - Optional `id` attribute (e.g. for `aria-labelledby`).
+  @param {string} [class] - Optional CSS classes.
+
+  @example
+  {% render 'heading', text: collection.title, level: 1, id: heading_id, class: 'text-2xl font-medium sm:text-3xl' %}
+
+  @example
+  {% render 'heading', text: product.title, level: card_heading_level, class: 'text-base font-medium' %}
+{% enddoc %}
+
+{% liquid
+  assign resolved_level = level | default: 2
+%}
+
+{%- case resolved_level -%}
+  {%- when 1 -%}
+    <h1{% if id != blank %} id="{{ id }}"{% endif %}{% if class != blank %} class="{{ class }}"{% endif %}>{{ text | escape }}</h1>
+  {%- when 2 -%}
+    <h2{% if id != blank %} id="{{ id }}"{% endif %}{% if class != blank %} class="{{ class }}"{% endif %}>{{ text | escape }}</h2>
+  {%- when 3 -%}
+    <h3{% if id != blank %} id="{{ id }}"{% endif %}{% if class != blank %} class="{{ class }}"{% endif %}>{{ text | escape }}</h3>
+  {%- when 4 -%}
+    <h4{% if id != blank %} id="{{ id }}"{% endif %}{% if class != blank %} class="{{ class }}"{% endif %}>{{ text | escape }}</h4>
+  {%- when 5 -%}
+    <h5{% if id != blank %} id="{{ id }}"{% endif %}{% if class != blank %} class="{{ class }}"{% endif %}>{{ text | escape }}</h5>
+  {%- when 6 -%}
+    <h6{% if id != blank %} id="{{ id }}"{% endif %}{% if class != blank %} class="{{ class }}"{% endif %}>{{ text | escape }}</h6>
+  {%- else -%}
+    <h2{% if id != blank %} id="{{ id }}"{% endif %}{% if class != blank %} class="{{ class }}"{% endif %}>{{ text | escape }}</h2>
+{%- endcase -%}

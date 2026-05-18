@@ -324,6 +324,7 @@
     "hero": "Hero",
     "hero_bottom_aligned": "Hero: Bottom aligned",
     "hero_marquee": "Hero: Marquee",
+    "home_hero": "Home hero",
     "icon": "Icon",
     "icons": "Icons",
     "icons_with_text": "Icons with text",
@@ -355,6 +356,7 @@
     "page": "Page",
     // Theme block name for main page body content
     "page_content": "Content",
+    "page_hero": "Page hero",
     "page_layout": "Page layout",
     "payment_icons": "Payment icons",
     "policy_list": "Policy links",
@@ -946,6 +948,7 @@
     "link": "Link",
     "custom_link": "Custom link",
     "link_preset": "Link preset",
+    "link_label": "Link label",
     "links": "Links",
     "logo": "Logo",
     "logo_font": "Logo font",
@@ -1023,6 +1026,7 @@
     "product_type": "Product type",
     "products": "Products",
     "products_per_page": "Products per page",
+    "products_to_show": "Products to show",
     "product_custom_property": {
       "heading": "Heading",
       "description": "Description",

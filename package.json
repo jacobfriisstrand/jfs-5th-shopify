@@ -5,13 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "bash bin/dev.sh",
-    "build": "npm run schemas && npm run scripts && vp build",
+    "build": "npm run schemas && npm run scripts && npm run vendor && vp build",
     "schemas": "tsx src/schemas/build.ts",
     "scripts": "tsx src/scripts/build.ts",
+    "vendor": "tsx scripts/vendor-swiper.ts",
     "lint": "vp lint",
     "check": "vp check",
+    "theme:check": "shopify theme check --fail-level=error",
     "theme:push": "npm run build && shopify theme push",
     "prepare": "vp config"
+  },
+  "dependencies": {
+    "swiper": "^11.2.10"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.2",

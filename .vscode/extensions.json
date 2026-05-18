@@ -1,7 +1,8 @@
 {
   // Recommended: vite-plus uses oxlint as its linter. Install the oxc extension
-  // so editor-time linting matches `vp lint` and `vp check`.
-  "recommendations": ["oxc.oxc-vscode"],
+  // so editor-time linting matches `vp lint` and `vp check`. Shopify's Liquid
+  // extension provides the `[liquid]` formatter (see .vscode/settings.json).
+  "recommendations": ["oxc.oxc-vscode", "Shopify.theme-check-vscode"],
   // Discouraged: this project does NOT use ESLint, Prettier, or Biome.
   // Disabling them here prevents per-developer IDE settings from running a
   // different linter or formatter than the one wired into the build.

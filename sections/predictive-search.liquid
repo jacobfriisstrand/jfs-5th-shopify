@@ -1,6 +1,57 @@
-{% comment %} predictive-search: scaffold — populate as needed. {% endcomment %}
-<div class="predictive-search">
-  {% content_for 'blocks' %}
+{% comment %}
+  Server-rendered predictive search results.
+
+  Fetched by the client-side <predictive-search> custom element via
+  `/search/suggest?q=…&section_id=predictive-search`. The element grafts
+  the inner `[data-predictive-search-content]` region into its results
+  region. We only render that single region — wrappers are stripped.
+
+  Each option carries `role="option"` + a unique `id` so the input's
+  `aria-activedescendant` can point at the keyboard-active result.
+{% endcomment %}
+
+{%- liquid
+  assign products = predictive_search.resources.results.products
+  assign terms = predictive_search.terms
+  assign performed = predictive_search.performed
+-%}
+
+<div data-predictive-search-content>
+  {%- if performed == false or terms == blank -%}
+    <p class="text-sm opacity-70">{{ 'content.search_input_placeholder' | t }}</p>
+  {%- elsif products.first == nil -%}
+    <p class="text-sm">
+      {{ 'content.search_results_no_results' | t: terms: terms }}
+    </p>
+  {%- else -%}
+    <ul class="flex flex-col gap-2">
+      {%- for product in products -%}
+        <li
+          id="predictive-search-result-{{ forloop.index0 }}"
+          role="option"
+          aria-selected="false"
+          data-predictive-search-result
+        >
+          <a
+            href="{{ product.url }}"
+            class="flex items-center gap-3 p-2 rounded-input hover:bg-fg/5 focus-visible:outline-2 focus-visible:outline-offset-2 aria-selected:bg-fg/10"
+          >
+            {%- if product.featured_image -%}
+              {{
+                product.featured_image
+                | image_url: width: 96
+                | image_tag: width: 48, height: 48, loading: 'lazy', class: 'object-cover rounded-input'
+              }}
+            {%- endif -%}
+            <span class="flex-1 min-w-0">
+              <span class="block truncate text-sm font-medium">{{ product.title }}</span>
+              <span class="block text-xs opacity-70">{{ product.price | money }}</span>
+            </span>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
 </div>
 
 {% schema %}

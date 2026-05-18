@@ -1,0 +1,5 @@
+# Run shopify theme check before pushing to remote. Catches liquid-specific
+# lints (ValidSchemaTranslations, schema validity, deprecated tags) that
+# vp check / oxlint can't see. `--fail-level=error` aborts the push on errors
+# only; warnings are reported but don't block.
+shopify theme check --fail-level=error

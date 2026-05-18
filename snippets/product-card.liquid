@@ -1,0 +1,51 @@
+{% doc %}
+  Renders a single product card: featured image (or placeholder), title,
+  price. Designed to be rendered inside a `for` loop over a collection's
+  products. The entire card is one `<a>` linking to the product page.
+
+  Wrap with whatever list semantics the caller needs (e.g. a `<li>` in a
+  `<ul role="list">` grid, or a `<swiper-slide>` inside `<carousel>`).
+
+  @param {product} product - The product to render. Required.
+  @param {number} [heading_level] - Heading level (2-6) for the product title.
+    Defaults to 3 — appropriate when the card is nested under a section h2.
+    Pass 2 when the card is the top item under a page-level h1 (e.g. PLP grid).
+
+  @example
+  {%- comment -%} PLP grid — collection title is h1, so card titles are h2 {%- endcomment -%}
+  <ul role="list" class="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
+    {%- for product in collection.products limit: 8 -%}
+      <li>{% render 'product-card', product: product, heading_level: 2 %}</li>
+    {%- endfor -%}
+  </ul>
+{% enddoc %}
+
+{% liquid
+  assign resolved_heading_level = heading_level | default: 3
+%}
+
+<a
+  href="{{ product.url }}"
+  class="group flex flex-col gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg"
+>
+  {%- if product.featured_image != blank -%}
+    <div class="aspect-square w-full overflow-hidden rounded-input bg-fg/5">
+      {{
+        product.featured_image
+        | image_url: width: 800
+        | image_tag:
+          loading: 'lazy',
+          decoding: 'async',
+          sizes: '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw',
+          widths: '200, 300, 400, 600, 800',
+          class: 'h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]',
+          alt: product.featured_image.alt | default: product.title
+      }}
+    </div>
+  {%- else -%}
+    <div class="aspect-square w-full rounded-input bg-fg/5" aria-hidden="true"></div>
+  {%- endif -%}
+
+  {% render 'heading', text: product.title, level: resolved_heading_level, class: 'text-base font-medium' %}
+  <p class="text-sm">{{ product.price | money }}</p>
+</a>

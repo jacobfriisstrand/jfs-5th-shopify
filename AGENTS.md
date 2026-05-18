@@ -61,6 +61,36 @@ Rules:
 See [ADR-0003](./docs/adr/0003-architectural-pillars.md), pillar 8, for the
 rationale.
 
+### Headings: always via the `heading` snippet
+
+**All `<h1>`–`<h6>` elements MUST be rendered via
+[`snippets/heading.liquid`](./snippets/heading.liquid).** Direct heading
+literals (`<h1>…</h1>`, `<h2>…</h2>`, …) in `.liquid` files are forbidden,
+except inside the snippet itself.
+
+```liquid
+{% render 'heading',
+  text: collection.title,
+  level: 1,
+  id: heading_id,
+  class: 'text-2xl font-medium sm:text-3xl'
+%}
+```
+
+Rules in brief (full reasoning in
+[ADR-0008](./docs/adr/0008-heading-snippet-for-all-headings.md)):
+
+- The `level` prop is mandatory unless you want the snippet default
+  (`level: 2`). Never pass `level: 2` redundantly — omit it.
+- Reusable components (product card, blog card, accordion row, etc.) that
+  render a heading MUST accept a `heading_level` parameter and forward it
+  to the snippet. They MUST NOT hard-code a level.
+- Container components derive child levels as `parent + 1` (e.g. a
+  carousel at `heading_level: 2` passes `heading_level: 3` to its cards).
+- Existing direct heading literals are migrated opportunistically: when
+  you touch a file for unrelated work, convert its headings in the same
+  commit.
+
 ### Skill canon for liquid, JS/TS, and CSS work
 
 The two skills below are **canonical** for any work in this repo that touches
@@ -116,6 +146,52 @@ Rules:
 - When asked to "scaffold a hero / product card / X", interpret literally:
   structural shell only. Wait for follow-up before adding settings or visual
   variations.
+
+### Settings ↔ markup parity
+
+Every setting declared in a section/block schema **must** be both assigned
+and referenced in the corresponding `.liquid` file:
+
+1. Add `assign <name> = block.settings.<id>` (or `section.settings.<id>`)
+   inside the file's `{% liquid %}` block.
+2. Reference `<name>` in the markup with the appropriate guard
+   (`{% if <name> != blank %}`, `{% if <name> %}`, etc.).
+
+Conversely, every variable referenced in markup must come from a setting
+or a literal Liquid object (`product`, `cart`, …).
+
+Why this is a hard rule: Liquid silently coerces undefined identifiers to
+`nil`/empty. A guard like `{% if image != blank %}` over an unassigned
+`image` evaluates to `false` forever — the markup inside is dead code,
+and **no build step (esbuild, schemas, vp check, theme check) catches
+it**. The defect is invisible until someone notices the feature doesn't
+work in the editor.
+
+Self-check before declaring a block/section done:
+
+- Diff the schema's `settings[].id` list against the `assign` lines in
+  `{% liquid %}` — they should match 1:1 (minus settings the markup
+  intentionally ignores, which should be rare and commented).
+- Grep the file for each setting id; every id should appear at least
+  once in markup.
+
+### One `{% liquid %}` block per file, hoisted to the top
+
+Every `.liquid` file has **at most one `{% liquid %}` block**, placed at
+the very top of the file (after the `{% doc %}` header for
+snippets/blocks, before any markup or `{% schema %}` tag). All variable
+assignments, defaults, and pre-render computation live inside it.
+
+Do **not** sprinkle multiple `{% liquid %}` tags through the file. Do not
+use bare mid-file `{% assign %}` or branching blocks whose only purpose
+is to compute a value — fold them into the prologue. Conditional
+assignments use `if`/`case` _inside_ the prologue.
+
+`{% render %}` and `{% content_for %}` tags stay in the markup (they
+produce output, not values). Tiny inline output expressions like
+`{{ product.title }}` are fine in markup; they are not "computation".
+
+Rationale and a full before/after example: [ADR-0007](./docs/adr/0007-single-liquid-tag-per-file.md).
 
 ## Build pipeline
 
@@ -279,6 +355,7 @@ This project uses **TailwindCSS v4** via the `@tailwindcss/vite` plugin. All sty
 **Rules:**
 
 - Use Tailwind utility classes in Liquid markup — do NOT use `{% stylesheet %}` blocks
+- **No custom (semantic) classnames in markup or schemas.** Do not write `class="main-page"`, `class="product-card"`, `class="section-wrapper"`, or any similar bespoke class. Likewise, do not set the section schema `class` property to a custom name. Style with Tailwind utilities only. If a pattern truly cannot be expressed with utilities, define it as a Tailwind `@utility` (or `@layer components` rule) in `src/styles/` so it is part of the design system, not an ad-hoc class. The compiled CSS should contain zero hand-named selectors that exist only to be matched against markup.
 - Use `{% javascript %}` tags only when component-scoped JS is needed
 - Tailwind theme tokens are defined in `src/styles/app.css` via the `@theme` directive
 - Shopify CSS variables (defined in `src/styles/` with defaults, overridden by theme settings in layouts) are mapped to Tailwind tokens:
@@ -288,6 +365,14 @@ This project uses **TailwindCSS v4** via the `@tailwindcss/vite` plugin. All sty
   - `rounded-input` → `var(--style-border-radius-inputs)`
 - For new theme tokens, add them to the `@theme` block in `src/styles/app.css`
 - Use `@source` directives in `app.css` to ensure Tailwind scans new directories
+- **Do not combine a custom `@utility` with a built-in Tailwind utility that
+  sets the SAME property.** Custom `@utility` rules and Tailwind's built-in
+  utilities live in the same layer with equal specificity, so source order
+  decides the winner. For example, a custom `@utility foo { width: 100vw }`
+  combined with `class="foo w-full"` will lose: `.w-full { width: 100% }` is
+  emitted after the custom rule. Either use the custom utility alone, or
+  ensure the custom utility and the Tailwind utility set _different_
+  properties (e.g. `grid-column` vs `width`) so they compose cleanly.
 
 **Example — Tailwind in Liquid:**
 

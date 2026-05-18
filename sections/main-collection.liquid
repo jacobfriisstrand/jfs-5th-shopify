@@ -1,7 +1,36 @@
-{% comment %} main-collection: scaffold — populate as needed. {% endcomment %}
-<div class="main-collection">
-  {% content_for 'blocks' %}
-</div>
+{% liquid
+  assign products = collection.products
+  assign heading_id = 'main-collection-' | append: section.id
+%}
+
+<section
+  class="grid-12 py-12 sm:py-16"
+  aria-labelledby="{{ heading_id }}"
+>
+  <div class="col-content flex flex-col gap-8">
+    {% render 'heading',
+      text: collection.title,
+      level: 1,
+      id: heading_id,
+      class: 'text-2xl font-medium sm:text-3xl'
+    %}
+
+    {%- if products.size == 0 -%}
+      <p>{{ 'content.no_products_found' | t }}</p>
+    {%- else -%}
+      <ul role="list" class="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
+        {%- for product in products -%}
+          {%- capture should_render -%}
+            {%- render '_resolve-primary', product: product -%}
+          {%- endcapture -%}
+          {%- if should_render contains 'true' -%}
+            <li>{% render 'product-card', product: product, heading_level: 2 %}</li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</section>
 
 {% schema %}
 {

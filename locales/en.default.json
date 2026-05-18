@@ -51,7 +51,11 @@
     "clear": "Clear",
     "clear_all": "Clear all",
     "close": "Close",
+    "close_menu": "Close menu",
+    "close_search": "Close search",
     "open": "Open",
+    "open_menu": "Open menu",
+    "open_search": "Open search",
     "continue_shopping": "Continue shopping",
     "enter_password": "Enter password",
     "log_in_html": "Have an account? <a href=\"{{ link }}\">Log in</a> to check out faster.",
@@ -221,6 +225,11 @@
       "in_cart": "in cart",
       "default_title": "Default Title",
       "sticky_add_to_cart": "Quick add to cart bar"
+    }
+  },
+  "sections": {
+    "featured_collection": {
+      "label": "Featured collection"
     }
   }
 }

@@ -20,6 +20,16 @@ npm run schemas
 npm run scripts
 vp build
 
+# 1b. Storefront password (set via `export SHOPIFY_FLAG_STORE_PASSWORD=...` in
+#     your shell or `.env.local`). Required by `shopify theme dev` when the
+#     dev store has password protection enabled; the CLI cannot prompt because
+#     we background it below. Only `theme dev` accepts --store-password;
+#     `theme push` uses the Admin API and doesn't need it.
+STORE_PASSWORD_FLAG=()
+if [[ -n "${SHOPIFY_FLAG_STORE_PASSWORD:-}" ]]; then
+  STORE_PASSWORD_FLAG=(--store-password "$SHOPIFY_FLAG_STORE_PASSWORD")
+fi
+
 # 2. Cleanup trap (PIDs filled in below as watchers are launched).
 VP_PID=""
 ESBUILD_PID=""
@@ -66,6 +76,7 @@ shopify theme dev \
   --live-reload=hot-reload \
   --theme-editor-sync \
   --ignore "config/settings_schema.json" \
+  "${STORE_PASSWORD_FLAG[@]}" \
   2>&1 | tee "$SHOPIFY_LOG" &
 SHOPIFY_PID=$!
 

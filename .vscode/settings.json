@@ -1,10 +1,9 @@
 {
   // ──────────────────────────────────────────────────────────────────────────
-  // Linter: vite-plus uses oxlint. These WORKSPACE settings override
-  // whatever a developer has in their User settings, so editor diagnostics
-  // always match `vp lint` / `vp check`.
-  // The recommended editor extension is "oxc.oxc-vscode" (see
-  // .vscode/extensions.json).
+  // Linter + formatter: vite-plus uses oxlint + oxfmt (`vp lint`, `vp fmt`,
+  // `vp check`). The official "oxc.oxc-vscode" extension wraps both, so
+  // editor diagnostics and on-save fixes always match the build.
+  // These WORKSPACE settings override per-developer User settings.
   // ──────────────────────────────────────────────────────────────────────────
 
   // Hard-disable competing linters/formatters at the workspace level so they
@@ -13,24 +12,49 @@
   "biome.enabled": false,
   "prettier.enable": false,
 
-  // Do NOT auto-format on save; the project ships no Prettier / formatter
-  // config and source style is preserved as-authored.
-  "editor.formatOnSave": false,
+  // Format on save via the oxc extension (oxfmt). Same engine as `vp fmt`.
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+
+  // Run oxlint autofixes on save in the same pass.
   "editor.codeActionsOnSave": {
-    "source.fixAll": "never",
-    "source.fixAll.eslint": "never",
-    "source.fixAll.biome": "never"
+    "source.fixAll.oxc": "explicit"
   },
 
-  // Per-language: ensure no language-specific default reintroduces format-on-save.
-  "[javascript]": { "editor.formatOnSave": false },
-  "[typescript]": { "editor.formatOnSave": false },
-  "[json]": { "editor.formatOnSave": false },
-  "[jsonc]": { "editor.formatOnSave": false },
-  "[css]": { "editor.formatOnSave": false },
-  "[liquid]": { "editor.formatOnSave": false },
+  // Per-language: route every file type the project uses through oxc.
+  "[javascript]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[typescript]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[json]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[jsonc]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[css]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[markdown]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  // Liquid: format via Shopify's official Liquid VS Code extension
+  // (Shopify.theme-check-vscode), which bundles @shopify/prettier-plugin-liquid.
+  // This extension is allowed alongside the oxc-only policy because it ONLY
+  // touches `.liquid` files and does not compete with oxlint/oxfmt.
+  "[liquid]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "Shopify.theme-check-vscode"
+  },
   "[html]": { "editor.formatOnSave": false },
-  "[markdown]": { "editor.formatOnSave": false },
 
   // Files
   "files.eol": "\n",

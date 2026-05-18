@@ -93,8 +93,8 @@ _Avoid_: Lazy-load (overloaded with image lazy-loading), code-split.
 The per-route and per-file size + Lighthouse-score contract enforced in CI. Source of truth is `perf-budget.json` at the repo root. Per-route budgets cap the gzipped JS shipped on a route's initial paint (homepage 25 KB, collection 40 KB, PDP 60 KB, cart 50 KB). Per-file caps prevent any single **Compiled asset** from blowing the budget alone (15 KB JS, 30 KB CSS gzipped). Lighthouse-mobile-4G thresholds are perf 90, a11y 95, best-practices 95, SEO 95. Enforced by `scripts/check-budgets.ts` (per-file + per-route, iteration 1) and Lighthouse CI (deferred to iteration 2). See [docs/perf-budget.md](docs/perf-budget.md).
 _Avoid_: Performance limit, size cap, weight target.
 
-**`[budget-bump]`**:
-A PR-title prefix that authorizes a deliberate change to `perf-budget.json`. The CI gate fails any PR that exceeds budget unless the PR title contains `[budget-bump]` AND the diff includes a change to `perf-budget.json`. Forces budget changes to be visible, reviewable, and auditable via `git log perf-budget.json`.
+**Budget change**:
+A deliberate edit to `perf-budget.json`. The CI gate fails any PR that exceeds budget; the legitimate path is to raise the relevant number in `perf-budget.json` within the same PR and justify the increase in the PR description. Visible and auditable via `git log perf-budget.json`.
 _Avoid_: Budget override, perf waiver.
 
 ### Iteration discipline
@@ -168,6 +168,40 @@ Rules:
 - If a setting feels obvious but wasn't asked for ("surely they want a heading?"), **ask first** instead of adding it. Apply the principle of least privilege: only grant editor control when I confirm I want it.
 - Prefer hard-coded values over settings. A setting is a long-term contract — deletion is a breaking change in `settings_data.json`.
 - When asked to "scaffold a hero / product card / X", interpret literally: structural shell only. Wait for follow-up before adding settings or visual variations.
+
+### Branching & commits
+
+**Branch model:**
+
+- `develop` — **default branch** and integration branch. All feature branches fork from and merge back into `develop`. Because it is the default branch, GitHub's built-in "closing keywords on merge" behaviour (`Closes #N`, `Fixes #N`, `Resolves #N` in PR body) auto-closes referenced issues when their PR merges here.
+- `main` — release branch. Only updated by merging `develop` at release time. Never commit directly. Shares full history with `develop` so `develop → main` merges are always fast-forward / conflict-free.
+- `feature/<issue-number>-<slug>` — short-lived feature branches off `develop` (e.g. `feature/12-hamburger-menu`). One branch per issue. Delete after merge.
+
+**Commits:**
+
+Every commit message must follow [Conventional Commits](https://www.conventionalcommits.org/) **and** include the GitHub issue number + short title in the scope so history is greppable from either side.
+
+Format:
+
+```
+<type>(#<issue>-<short-title>): <imperative summary>
+```
+
+- `<type>` — `feat`, `fix`, `refactor`, `docs`, `chore`, `perf`, `test`, `style`, `build`, `ci`, `revert`.
+- `<issue>` — the GitHub issue number this commit advances (e.g. `12`). For commits not tied to an issue (one-off chores, repo hygiene), drop the scope: `chore: <summary>`.
+- `<short-title>` — 2-4 word kebab-case slug derived from the issue title.
+- `<imperative summary>` — present tense, lowercase, no trailing period, ≤ 72 chars.
+
+Examples:
+
+```
+feat(#12-hamburger-menu): add header drawer with focus trap
+fix(#19-pdp-color-swatches): correct contrast on selected state
+refactor(#11-header-footer-shell): adopt Tailwind utilities for header
+docs: require html + css-motion-systems skills for all liquid edits
+```
+
+For atomic-commit batches that touch multiple issues, split into separate commits — one issue per commit.
 
 ## Flagged ambiguities
 

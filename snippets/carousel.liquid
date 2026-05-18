@@ -1,0 +1,147 @@
+{% doc %}
+  Renders a responsive `<ul>` grid that progressively enhances into a
+  Swiper-powered carousel via the `<swiper-carousel>` custom element.
+
+  The snippet owns:
+    - The header (heading + subheading on the left; collection link +
+      prev/next buttons on the right).
+    - The list semantics (`<ul role="list">` of `<li>`).
+    - The Tailwind grid classes (1 / 2 / 3 / 4 cols across sm/md/lg/xl).
+    - The decision of WHEN to enhance (threshold via `min_for_carousel`).
+    - The decision of WHAT to render inside each `<li>` (switched on `type`).
+
+  To add a new card type:
+    1. Create `snippets/<type>-card.liquid`.
+    2. Add a `when '<type>'` branch in the `case type` block below.
+
+  @param {string} type - Card type: 'product' (more to come).
+  @param {object} items - Items to render. Each item is passed to the card
+    snippet (a `product` for type='product'). Pass the full enumerable
+    (e.g. `collection.products`); use `count` to limit how many render.
+  @param {number} [count] - How many items to render from `items`. Caller is
+    responsible for clamping this to the collection size. Defaults to
+    `items.size` (which is unreliable on lazy product enumerables — pass
+    `count` explicitly for those).
+  @param {number} [min_for_carousel] - Minimum item count required to enhance
+    into a carousel. Below this, renders a plain grid (no JS loaded).
+    Default: 4.
+  @param {string} [slides_per_view] - Smallest-breakpoint slidesPerView
+    forwarded to `<swiper-carousel>`. Default: '1.2'.
+  @param {string} [heading] - Optional heading rendered in the header.
+  @param {number} [heading_level] - Heading level (1-6) for the carousel
+    heading. Defaults to 2. Card titles inside the carousel automatically
+    render one level deeper than this.
+  @param {string} [subheading] - Optional subheading rendered under heading.
+  @param {string} [heading_id] - DOM id for the heading; lets the caller
+    wire `aria-labelledby` on its section. Required if `heading` is set.
+  @param {string} [link_url] - Optional "view all" link target.
+  @param {string} [link_text] - Optional "view all" link label.
+    Default: 'View all'.
+
+  @example
+    {% render 'carousel',
+      type: 'product',
+      items: collection.products,
+      count: 8,
+      min_for_carousel: 4,
+      heading: collection.title,
+      subheading: collection.description,
+      heading_id: 'featured-collection-' | append: section.id,
+      link_url: collection.url,
+      link_text: 'View all'
+    %}
+{% enddoc %}
+
+{% liquid
+  assign min_for_carousel = min_for_carousel | default: 4
+  assign slides_per_view = slides_per_view | default: '1.2'
+  assign item_count = count | default: items.size
+  assign link_text = link_text | default: 'View all'
+  assign resolved_heading_level = heading_level | default: 2
+  assign card_heading_level = resolved_heading_level | plus: 1
+  assign use_carousel = false
+  if item_count >= min_for_carousel
+    assign use_carousel = true
+  endif
+  assign has_header = false
+  if heading != blank or subheading != blank or link_url != blank or use_carousel
+    assign has_header = true
+  endif
+%}
+
+{%- if item_count > 0 -%}
+  {%- if use_carousel -%}
+    <swiper-carousel
+      data-bundle-url="{{ 'swiper-element-bundle.js' | asset_url }}"
+      data-slides-per-view="{{ slides_per_view }}"
+      class="block"
+    >
+  {%- endif -%}
+
+  {%- if has_header -%}
+    <header class="mb-6 flex flex-wrap items-end justify-between gap-4 sm:mb-8">
+      {%- if heading != blank or subheading != blank -%}
+        <div class="flex flex-col gap-1">
+          {%- if heading != blank -%}
+            {% render 'heading',
+              text: heading,
+              level: resolved_heading_level,
+              id: heading_id,
+              class: 'font-primary text-2xl font-bold sm:text-3xl'
+            %}
+          {%- endif -%}
+          {%- if subheading != blank -%}
+            <p class="text-fg/70 text-sm sm:text-base">{{ subheading | escape }}</p>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      <div class="flex items-center gap-4">
+        {%- if link_url != blank -%}
+          <a
+            href="{{ link_url }}"
+            class="underline-offset-4 hover:underline text-sm sm:text-base"
+          >
+            {{ link_text | escape }}
+          </a>
+        {%- endif -%}
+      </div>
+    </header>
+  {%- endif -%}
+
+  <ul role="list" class="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
+    {%- for item in items limit: item_count -%}
+      <li>
+        {%- case type -%}
+          {%- when 'product' -%}
+            {% render 'product-card', product: item, heading_level: card_heading_level %}
+          {%- else -%}
+            {{ 'Unknown carousel card type: ' | append: type }}
+        {%- endcase -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+
+  {%- if use_carousel -%}
+    <div class="mt-6 flex justify-end gap-2 sm:mt-8" role="group" aria-label="Carousel navigation">
+      <button
+        type="button"
+        data-carousel-prev
+        aria-label="Previous"
+        class="border-fg/20 text-fg flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+      >
+        <span aria-hidden="true">&larr;</span>
+      </button>
+      <button
+        type="button"
+        data-carousel-next
+        aria-label="Next"
+        class="border-fg/20 text-fg flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+      >
+        <span aria-hidden="true">&rarr;</span>
+      </button>
+    </div>
+    </swiper-carousel>
+    <script src="{{ 'swiper-carousel.js' | asset_url }}" type="module" fetchpriority="low"></script>
+  {%- endif -%}
+{%- endif -%}

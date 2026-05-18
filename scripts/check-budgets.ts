@@ -30,7 +30,15 @@ import { gzipSync } from "node:zlib";
 type FileKind = "js" | "css";
 
 interface PerfBudget {
-  perFile: Record<FileKind, { maxBytesGzipped: number }>;
+  perFile: Record<FileKind, { maxBytesGzipped: number }> & {
+    /**
+     * Filenames excluded from the per-file cap. Use sparingly: only for
+     * vendored bundles that are intentionally lazy-loaded via dynamic
+     * `import()` and therefore never appear in any route's static graph
+     * (and so would not affect initial-paint performance).
+     */
+    exclude?: string[];
+  };
   perRoute: Record<string, { template: string; maxBytesGzipped: number }>;
   lighthouse: unknown; // unused by this script (LHCI is iteration 2)
 }
@@ -323,8 +331,10 @@ function main(): void {
 
   // ----- per-file -----
   console.log("Per-file budgets:");
+  const excluded = new Set(budget.perFile.exclude ?? []);
   const overFile: AssetSize[] = [];
   for (const a of assets.values()) {
+    if (excluded.has(a.name)) continue;
     const cap = budget.perFile[a.kind].maxBytesGzipped;
     if (a.gzippedBytes > cap) overFile.push(a);
   }

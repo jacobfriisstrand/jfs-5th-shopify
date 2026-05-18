@@ -6,7 +6,8 @@
     },
     "css": {
       "maxBytesGzipped": 30000
-    }
+    },
+    "exclude": ["swiper-element-bundle.js"]
   },
   "perRoute": {
     "/": {
@@ -24,6 +25,10 @@
     "/cart": {
       "template": "cart",
       "maxBytesGzipped": 50000
+    },
+    "/pages/*": {
+      "template": "page",
+      "maxBytesGzipped": 40000
     }
   },
   "lighthouse": {
