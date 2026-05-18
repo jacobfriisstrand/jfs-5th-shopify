@@ -1,0 +1,12 @@
+{
+  "servers": {
+    "swiper": {
+      "type": "http",
+      "url": "https://swiperjs.com/mcp"
+    },
+    "shopify-dev-mcp": {
+      "command": "npx",
+      "args": ["-y", "@shopify/dev-mcp@latest"]
+    }
+  }
+}
