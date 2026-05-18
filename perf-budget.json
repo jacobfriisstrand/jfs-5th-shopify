@@ -6,7 +6,8 @@
     },
     "css": {
       "maxBytesGzipped": 30000
-    }
+    },
+    "exclude": ["swiper-element-bundle.js"]
   },
   "perRoute": {
     "/": {
