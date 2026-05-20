@@ -20,7 +20,14 @@
     {%- else -%}
       <ul role="list" class="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
         {%- for product in products -%}
-          <li>{% render 'product-card', product: product, heading_level: 2 %}</li>
+          {%- assign seen_colors = '||' -%}
+          {%- for variant in product.variants -%}
+            {%- assign color_key = '|' | append: variant.option1 | append: '|' -%}
+            {%- unless seen_colors contains color_key -%}
+              {%- assign seen_colors = seen_colors | append: color_key -%}
+              <li>{% render 'product-card', product: product, variant: variant, heading_level: 2 %}</li>
+            {%- endunless -%}
+          {%- endfor -%}
         {%- endfor -%}
       </ul>
     {%- endif -%}
