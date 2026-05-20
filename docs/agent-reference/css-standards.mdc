@@ -456,18 +456,6 @@ For better CSS organization in complex themes:
 }
 ```
 
-### View Transitions
-
-```css
-@view-transition {
-  navigation: auto;
-}
-
-.page-content {
-  view-transition-name: main-content;
-}
-```
-
 ## Media Queries
 
 - Default to mobile first. e.g. `min-width` queries

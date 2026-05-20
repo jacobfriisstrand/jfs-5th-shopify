@@ -36,7 +36,7 @@ Two design pressures shape the seam.
    });
    ```
 
-   `morph.ts` retains exactly two preservation behaviors that are universal and have no element-level owner: `style.viewTransitionName` (set transiently by the View Transitions API, never present in server output) and the `Component.updatedCallback()` lifecycle hook.
+   `morph.ts` retains exactly one preservation behavior that is universal and has no element-level owner: the `Component.updatedCallback()` lifecycle hook.
 
 4. **The dead Horizon preservation list is removed.** The hard-coded attributes (`product-grid-view`, `data-current-checked`, `data-previous-checked`, `cart-summary-sticky`) and selectors (`floating-panel-component`, `fieldset.variant-option`, `#account-popover`) targeted elements that do not exist in this stripped-down starter. They were inert. Future restorations from Horizon bring back the elements *and* the preserver rules together — register them at the new element's module.
 

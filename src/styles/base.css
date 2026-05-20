@@ -13,7 +13,7 @@
      2. <dialog> baseline (Preflight zeroes margin/padding but leaves the
         rest to UA defaults).
      3. .visually-hidden — referenced by name from Horizon's a11y JS.
-     4. View-transition + dialog-animation rules (motion system).
+     4. Dialog-animation rules (motion system).
    ========================================================================== */
 
 /* -------------------------------------------------------------------------- */
@@ -73,48 +73,6 @@ dialog::backdrop {
 }
 
 /* -------------------------------------------------------------------------- */
-/* View transitions                                                           */
-/* -------------------------------------------------------------------------- */
-
-@view-transition {
-  navigation: auto;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  :root:active-view-transition-type(product-grid) {
-    .product-grid {
-      view-transition-name: product-grid;
-    }
-
-    footer {
-      view-transition-name: footer;
-    }
-
-    .product-grid__item {
-      transition: none;
-    }
-  }
-}
-
-::view-transition-new(product-grid) {
-  animation-delay: 150ms;
-  animation-name: fadeInUp;
-  animation-duration: var(--animation-speed, 200ms);
-  animation-timing-function: var(--animation-easing, ease-out);
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* Header menu drawer: full-viewport slide-in from the right with backdrop
    fade. The closing animation is triggered by the `.dialog-closing` class
    that <dialog-component> adds before awaiting `animationend` and calling

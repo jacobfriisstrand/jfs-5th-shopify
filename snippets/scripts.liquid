@@ -27,7 +27,6 @@
       "@theme/section-renderer":             "{{ 'section-renderer.js'             | asset_url }}",
       "@theme/swiper-loader":                "{{ 'swiper-loader.js'                | asset_url }}",
       "@theme/utilities":                    "{{ 'utilities.js'                    | asset_url }}",
-      "@theme/view-transitions":             "{{ 'view-transitions.js'             | asset_url }}",
       "@theme/viewport":                     "{{ 'viewport.js'                     | asset_url }}"
     }
   }
@@ -52,7 +51,6 @@
 {% endcomment %}
 <script src="{{ 'popover-polyfill.js' | asset_url }}" type="module" fetchpriority="low"></script>
 <script src="{{ 'dialog.js'           | asset_url }}" type="module" fetchpriority="low"></script>
-<script src="{{ 'view-transitions.js' | asset_url }}" type="module" fetchpriority="low"></script>
 
 {% if request.design_mode %}
   <script src="{{ 'theme-editor.js' | asset_url }}" type="module"></script>

@@ -15,7 +15,7 @@ This catalogue's structure: each merchandiseable item (e.g. "Hoodie Classic") is
 
 Three forces shaped the decision:
 
-**Force 1 — Colour selection should feel like a route change.** A different colour has different photography, possibly a different price, and ideally a different URL. Implementing colour as a Shopify variant means the variant picker swaps DOM in place; implementing it as a separate product means the colour swatch is a `<a href>` and the page navigates with view transitions.
+**Force 1 — Colour selection should feel like a route change.** A different colour has different photography, possibly a different price, and ideally a different URL. Implementing colour as a Shopify variant means the variant picker swaps DOM in place; implementing it as a separate product means the colour swatch is a `<a href>` and the page navigates.
 
 **Force 2 — A merchant team without engineers must edit this.** Any model that requires a metafield to be manually kept in sync on every related product (e.g. a bidirectional `color_siblings` metafield listing the other colours) is a footgun. The first time a merchant adds a fourth colour and forgets to update the other three, the grouping fractures invisibly.
 
@@ -27,7 +27,7 @@ A bidirectional `color_siblings` metafield (each product holds a list of its sib
 
 ### Colour is a product. Size is a variant on that product.
 
-Each colour of a merchandiseable item is its own Shopify product (e.g. "Hoodie Classic — Blue", "Hoodie Classic — Red"). Sizes within that colour remain Shopify variants on the colour product. The colour swatch on a PDP and a collection card is `<a href="/products/hoodie-classic-red">…</a>` — colour selection is a real navigation, eligible for view transitions.
+Each colour of a merchandiseable item is its own Shopify product (e.g. "Hoodie Classic — Blue", "Hoodie Classic — Red"). Sizes within that colour remain Shopify variants on the colour product. The colour swatch on a PDP and a collection card is `<a href="/products/hoodie-classic-red">…</a>` — colour selection is a real navigation.
 
 ### Grouping is a single `color_group` metaobject
 
@@ -105,7 +105,7 @@ The validator is not run automatically because it requires Admin API credentials
 ### Positive
 
 - **One edit per group when colours change.** The metaobject is the only place. No N-way fan-out of metafield writes.
-- **Colour swatches are real links.** View transitions, browser back/forward, deep links to a specific colour, per-colour SEO and OG tags — all work with zero JS.
+- **Colour swatches are real links.** Browser back/forward, deep links to a specific colour, per-colour SEO and OG tags — all work with zero JS.
 - **No 100-variant ceiling on colour count.** A group can have 30 colours; it would never fit as variants on one product.
 - **Per-colour inventory and merchandising is native.** A colour can go out of stock, be on sale, or have unique tags without affecting siblings.
 - **The PDP sibling query is one metafield read.** No GraphQL, no metafield-of-metafield walks.

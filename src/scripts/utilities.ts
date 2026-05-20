@@ -6,7 +6,6 @@
  * - `@theme/dom-events` — document/animation lifecycle, click hit-testing
  * - `@theme/viewport`   — breakpoints, motion preference, ResizeNotifier
  * - `@theme/geometry`   — clamp / center / start / closest
- * - `@theme/view-transitions` — same- and cross-document view transitions
  *
  * Anything in here is genuinely cross-cutting (network/string/parsing helpers,
  * a tiny shimmer custom element, the RecentlyViewed stub).

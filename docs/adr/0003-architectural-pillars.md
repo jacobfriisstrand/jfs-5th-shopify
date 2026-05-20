@@ -6,7 +6,7 @@ Accepted.
 
 ## Context
 
-This starter inherits Horizon's runtime (cart drawer, variant picker, section rendering, view transitions) but ships none of the marketing sections, design system, or templates that Horizon used to demonstrate them. We are building a real store on top of that runtime, and a long set of cross-cutting decisions had to land before any feature work could proceed without re-litigation.
+This starter inherits Horizon's runtime (cart drawer, variant picker, section rendering) but ships none of the marketing sections, design system, or templates that Horizon used to demonstrate them. We are building a real store on top of that runtime, and a long set of cross-cutting decisions had to land before any feature work could proceed without re-litigation.
 
 ADR-0001 covered variant updates. ADR-0002 covered section rendering and morph preservers. This ADR captures the eight remaining pillars that govern how every section, block, script, and CI gate in this codebase is built and shipped.
 
@@ -18,7 +18,7 @@ The pillars come from a grilling pass that used [`.agents/skills/grill-with-docs
 
 Every feature starts as Liquid + form posts + full-page navigation. JavaScript (a **Custom element** in `src/scripts/`) is added only when:
 
-- the behaviour cannot be expressed by a server round-trip (drag, drop, focus management, view transitions, intersection observers), or
+- the behaviour cannot be expressed by a server round-trip (drag, drop, focus management, intersection observers), or
 - the round-trip cost is measurably worse than a localised DOM update (already covered by ADR-0001 and ADR-0002 for variant updates and section rendering).
 
 Rationale: Liquid runs on Shopify's edge, requires zero client bytes, and is the format the merchant (via theme editor) and Shopify (via section rendering API) both already understand. Every JS-only feature is a private dialect.
@@ -101,7 +101,7 @@ The 27 `*-accessibility.mdc` files in `docs/agent-reference/` (inherited from Ho
 In addition, two skills are **canonical** for any work that touches markup, scripts, or styles — not only for new scaffolds, but for **every** edit to a `.liquid`, `.ts`, `.js`, or `.css` file:
 
 - [`.agents/skills/html/SKILL.md`](../../.agents/skills/html/SKILL.md) — semantic, accessible, low-noise markup.
-- [`.agents/skills/css-motion-systems/SKILL.md`](../../.agents/skills/css-motion-systems/SKILL.md) — motion design, transform strategy, easing, and View Transitions usage.
+- [`.agents/skills/css-motion-systems/SKILL.md`](../../.agents/skills/css-motion-systems/SKILL.md) — motion design, transform strategy, and easing.
 
 The skills set the baseline for element choice, landmark structure, native-control preference, and motion accessibility (`prefers-reduced-motion`, GPU-friendly properties, timing heuristics). The `*-accessibility.mdc` files layer component-specific interaction patterns on top (focus trapping in dialogs, keyboard semantics for menus, screen-reader announcement choreography). Both apply; the skills do not replace the `.mdc` canon and the `.mdc` canon does not replace the skills.
 

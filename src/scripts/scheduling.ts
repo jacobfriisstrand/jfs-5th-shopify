@@ -2,12 +2,7 @@
  * @theme/scheduling
  *
  * Idle / yield / debounce / throttle primitives, plus a small frame-aligned
- * Scheduler used to batch DOM work after view transitions settle.
- *
- * `viewTransition` is the in-flight same-document transition handle that
- * `@theme/view-transitions` publishes here so that `Scheduler.schedule()`
- * can await it before flushing DOM tasks. Keeping it in this Module
- * avoids a circular import with view-transitions.
+ * Scheduler used to batch DOM work.
  */
 
 /**
@@ -46,17 +41,6 @@ export function isLowPowerDevice() {
     Number(navigator.deviceMemory) <= 2
   );
 }
-
-/**
- * In-flight same-document view transition handle.
- * Written by `startViewTransition` in `@theme/view-transitions`,
- * read by `Scheduler.schedule()` below to avoid stomping on a transition.
- *
- * @type {{ current: Promise<void> | undefined }}
- */
-export const viewTransition = {
-  current: undefined,
-};
 
 /**
  * Creates a debounced function that delays calling the provided function (fn)
@@ -127,9 +111,6 @@ class Scheduler {
 
     if (!this.#scheduled) {
       this.#scheduled = true;
-
-      // Wait for any in-progress view transitions to finish
-      if (viewTransition.current) await viewTransition.current;
 
       requestAnimationFrame(this.flush);
     }

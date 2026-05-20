@@ -3,7 +3,7 @@
 A **minimal Shopify theme starter** stripped down from Shopify's
 [Horizon](https://github.com/Shopify/horizon) theme. Ships only the runtime
 plumbing (cart, header, footer skeleton, product page, predictive search,
-section/block schema runtime, view transitions) so you can compose your own UI
+section/block schema runtime) so you can compose your own UI
 on top with Tailwind v4.
 
 See [`AGENTS.md`](./AGENTS.md) for full architectural notes (Copilot reads it
@@ -42,7 +42,7 @@ once the Shopify CLI dev server is bound to `:9292`.
 ## Layout
 
 ```
-assets/      # Compiled output (app.css, base.css, view-transitions.css, *.js gitignored)
+assets/      # Compiled output (app.css, base.css, *.js gitignored)
 blocks/      # Theme blocks (.liquid)
 config/      # Global theme settings
 layout/      # theme.liquid + password.liquid
@@ -52,7 +52,7 @@ snippets/    # Reusable Liquid fragments (incl. scripts.liquid importmap)
 src/
   scripts/   # TypeScript web components → assets/*.js
   schemas/   # TypeScript schema definitions → liquid {% schema %} tags
-  styles/    # Tailwind v4 entry, tokens, base.css, view-transitions.css
+  styles/    # Tailwind v4 entry, tokens, base.css
   vite/      # Custom vite-plus plugin for schema hot reload
 templates/   # JSON template stubs
 ```

@@ -151,7 +151,6 @@ Use [client-side form validation](mdc:https:/developer.mozilla.org/en-US/docs/Le
 
 **Styling:**
 - `color-mix()` for dynamic color generation (used for progressive enhancement)
-- `view-transitions` for smooth page transitions
 - `@layer` for CSS cascade control
 
 **Interactions:**

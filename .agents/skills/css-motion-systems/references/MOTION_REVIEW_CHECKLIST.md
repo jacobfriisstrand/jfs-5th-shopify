@@ -21,13 +21,6 @@
 - Focus management remains correct through transitions
 - Keyboard and assistive tech flows are not blocked by animation
 
-## View Transitions
-
-- Feature detection and graceful fallback are present
-- Shared element naming is scoped and meaningful
-- Pseudo-element styles are explicit for root and shared groups
-- Cross-document behavior is verified on supported browsers
-
 ## Validation
 
 - Tested on desktop and mobile viewport sizes
