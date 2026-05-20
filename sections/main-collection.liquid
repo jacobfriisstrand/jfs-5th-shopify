@@ -20,12 +20,7 @@
     {%- else -%}
       <ul role="list" class="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
         {%- for product in products -%}
-          {%- capture should_render -%}
-            {%- render '_resolve-primary', product: product -%}
-          {%- endcapture -%}
-          {%- if should_render contains 'true' -%}
-            <li>{% render 'product-card', product: product, heading_level: 2 %}</li>
-          {%- endif -%}
+          <li>{% render 'product-card', product: product, heading_level: 2 %}</li>
         {%- endfor -%}
       </ul>
     {%- endif -%}

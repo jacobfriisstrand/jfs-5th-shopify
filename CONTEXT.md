@@ -105,21 +105,21 @@ _Avoid_: MVP, increment, sprint goal (all overloaded).
 
 ### Product model
 
-**Color group**:
-A Shopify **metaobject** (`color_group`) that groups multiple **Color products** (e.g. "Blue Hoodie", "Red Hoodie") into a single merchant-facing concept ("Hoodie Classic"). Fields: `name` (text), `entries` (list of product references), `primary_product` (single product reference). The metaobject is the single point of edit per group — merchants manage it entirely in Shopify Admin. See [ADR-0004](docs/adr/0004-product-model.md) and [docs/setup/color-groups.md](docs/setup/color-groups.md).
-_Avoid_: Product family, variant group, color set.
+**Product**:
+One Shopify product per merchandise item (e.g. "Hoodie Classic"). Color and size are **Variant option**s on that product — never separate products. See [ADR-0009](docs/adr/0009-product-model-standard-variants.md). This supersedes the colour-as-product model in [ADR-0004](docs/adr/0004-product-model.md).
+_Avoid_: Color product, color group (legacy terms, rejected — do not use).
 
-**Color group entries**:
-The list of product references on a **Color group** metaobject. Reading `product.metafields.color_group.value.entries` from any product in the group yields the full set of sibling color products. Replaces the bidirectional `color_siblings` metafield pattern that was considered and rejected (see ADR-0004).
-_Avoid_: Color siblings (legacy term, rejected — do not use).
+**Variant**:
+A Shopify variant on a **Product**, defined by the combination of its **Variant option** values (e.g. `Color: Blue, Size: M`). Variant selection swaps DOM in place via the **Section morph** contract — no route change.
+_Avoid_: SKU (overloaded), product variant (verbose).
 
-**Primary product** (of a Color group):
-The single product within a **Color group** designated as canonical for collection-grid display. Stored as the `primary_product` field on the **Color group** metaobject. The collection grid renders only the primary product per group via `_resolve-primary.liquid`, deduping the other entries. If `primary_product` is unset, the renderer falls back to alphabetical order over `entries` and logs a configuration warning.
-_Avoid_: Default product, hero product, lead variant.
+**Variant option**:
+An attribute axis on a **Product** (Shopify supports up to three). The catalogue uses two: `Color` as option 1 and `Size` as option 2. Position is fixed by convention so [`blocks/_product-media-gallery.liquid`](blocks/_product-media-gallery.liquid) can read the active color from `variant.option1` without name lookup.
+_Avoid_: Variant axis, option group.
 
-**Color product**:
-A standalone Shopify product representing one color of a merchandiseable item. Each color is its own product (not a Shopify variant) so that color selection can navigate as a full-page transition, color images can be the product's own media, and SEO/inventory tracking is per-color. Sizes within a color remain Shopify variants on that product. See [ADR-0004](docs/adr/0004-product-model.md).
-_Avoid_: Color variant (color is _not_ a variant in this model).
+**Variant gallery** (metaobject `variant_gallery`):
+A Shopify metaobject with two fields — `color` (product variant reference, pointing at the specific variant the gallery belongs to) and `images` (list of image file references). Authored in Admin → Content → Metaobjects via the native file picker; no JSON, no media IDs. The metaobject definition must have **Storefronts → Read** access enabled (type + fields) so Liquid can read it. The PDP enumerates entries globally via `shop.metaobjects.variant_gallery.values` and matches the entry whose `color` references the active variant. There is **no product metafield** — entries link to variants directly. The matched entry's `images` follow `variant.featured_image` as additional slides; no `product.media` spillover. See [ADR-0009](docs/adr/0009-product-model-standard-variants.md).
+_Avoid_: Color gallery metaobject, variant image set, variant gallery metafield (the prior product-metafield approach is deprecated).
 
 ## Relationships
 
@@ -130,8 +130,8 @@ _Avoid_: Color variant (color is _not_ a variant in this model).
 - A **Section** or **Block** loads a **Custom element** by `<script type="module">` whose imports resolve through the **Importmap runtime**
 - A **Custom element** imports peers via the **`@theme/*` specifier**
 - The **Schema build** writes into the `{% schema %}` tag of a **Section** or **Block** liquid file
-- A **Color group** has many **Color group entries** (each a **Color product**) and exactly one **Primary product** drawn from those entries
-- A **Color product** references its **Color group** via a single `color_group` metafield (single metaobject reference)
+- A **Product** has many **Variant**s, each defined by one value per **Variant option**; option 1 is `Color`, option 2 is `Size`
+- A **Variant gallery** metaobject references a specific **Variant** via its `color` field; the PDP enumerates `shop.metaobjects.variant_gallery.values` and renders the `images` of the entry whose `color` matches the active variant
 - Every **Compiled asset** under `assets/` is constrained by the **Perf budget**; route-level totals follow the **Importmap runtime** + `<script>` graph
 
 ## Example dialogue

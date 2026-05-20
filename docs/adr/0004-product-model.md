@@ -1,8 +1,12 @@
 # ADR-0004 — Product model: color is a product, size is a variant; color products group via a `color_group` metaobject
 
+# ADR-0004 — Product model: color is a product, size is a variant; color products group via a `color_group` metaobject
+
 ## Status
 
-Accepted.
+Superseded by [ADR-0009](0009-product-model-standard-variants.md).
+
+Original status: Accepted. Superseded because the colour-as-product model traded too much native Shopify tooling (per-variant inventory in one product, the variant picker, the Admin variant image field, native cross-colour reporting) for the colour-as-route ergonomic, and that ergonomic turned out to be replaceable by the ADR-0001 morph contract. Kept in the repo as historical context — do not implement.
 
 ## Context
 
