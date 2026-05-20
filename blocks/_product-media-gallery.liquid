@@ -1,7 +1,30 @@
-{% comment %} _product-media-gallery: scaffold — populate as needed. {% endcomment %}
-<div class="product-media-gallery">
-  {% content_for 'blocks' %}
-</div>
+{% doc %}
+  Renders the PDP featured image as an LCP-priority responsive image.
+
+  Used by `sections/main-product.liquid` via
+  `{% content_for 'block', type: '_product-media-gallery' %}`. A full gallery
+  (additional images, zoom, video) is intentionally deferred — see issue #17
+  acceptance criteria (PDP shell, slice 7).
+{% enddoc %}
+
+{% liquid
+  assign featured_image = product.featured_image
+%}
+
+{%- if featured_image != blank -%}
+  {{
+    featured_image
+    | image_url: width: 1200
+    | image_tag:
+      loading: 'eager',
+      fetchpriority: 'high',
+      sizes: '(min-width: 768px) 50vw, 100vw',
+      widths: '400, 600, 800, 1000, 1200',
+      class: 'h-auto w-full'
+  }}
+{%- else -%}
+  {{ 'product-1' | placeholder_svg_tag: 'h-auto w-full bg-fg/5' }}
+{%- endif -%}
 
 {% schema %}
 {

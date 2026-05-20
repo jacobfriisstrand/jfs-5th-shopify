@@ -1,6 +1,17 @@
-{% comment %} product-title: scaffold — populate as needed. {% endcomment %}
-<div class="product-title">
-</div>
+{% doc %}
+  Renders the product title as the PDP <h1>.
+
+  Used by `sections/main-product.liquid` via `{% content_for 'block', type: 'product-title' %}`.
+  The element id is derived from `section.id` so the parent section can reference
+  it via `aria-labelledby`.
+{% enddoc %}
+
+{% render 'heading',
+  text: product.title,
+  level: 1,
+  id: 'main-product-' | append: section.id | append: '-title',
+  class: 'text-2xl font-medium sm:text-3xl'
+%}
 
 {% schema %}
 {
