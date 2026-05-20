@@ -1,7 +1,7 @@
 {
   "sections": {
     "main": {
-      "type": "product-information",
+      "type": "main-product",
       "settings": {}
     }
   },

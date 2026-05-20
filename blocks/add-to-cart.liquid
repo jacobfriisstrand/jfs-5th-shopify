@@ -1,6 +1,58 @@
-{% comment %} add-to-cart: scaffold — populate as needed. {% endcomment %}
-<div class="add-to-cart">
-</div>
+{% doc %}
+  Renders the PDP add-to-cart form, wired to `<product-form-component>` for
+  client-side cart submission. Falls back to a native POST to `routes.cart_add_url`
+  when JavaScript is disabled.
+
+  Used by `sections/main-product.liquid` via
+  `{% content_for 'block', type: 'add-to-cart' %}`. Variant selection is
+  delegated to a future variant-picker block (slice 8); for now the form posts
+  the currently selected or first-available variant.
+{% enddoc %}
+
+{% liquid
+  assign variant = product.selected_or_first_available_variant
+  assign form_id = 'product-form-' | append: section.id | append: '-' | append: block.id
+%}
+
+<product-form-component class="block" data-product-id="{{ product.id }}">
+  <form
+    id="{{ form_id }}"
+    action="{{ routes.cart_add_url }}"
+    method="post"
+    enctype="multipart/form-data"
+    on:submit="product-form-component/handleSubmit"
+  >
+    <input type="hidden" name="form_type" value="product">
+    <input type="hidden" name="utf8" value="✓">
+    <input
+      ref="variantId"
+      type="hidden"
+      name="id"
+      value="{{ variant.id }}"
+    >
+
+    <button
+      type="submit"
+      class="bg-fg text-bg w-full rounded-input px-6 py-3 text-base font-medium disabled:opacity-50"
+      {% unless variant.available %}
+        disabled
+      {% endunless %}
+    >
+      {%- if variant.available -%}
+        {{ 'actions.add_to_cart' | t }}
+      {%- else -%}
+        {{ 'blocks.sold_out' | t }}
+      {%- endif -%}
+    </button>
+
+    <div
+      ref="liveRegion"
+      role="status"
+      aria-live="polite"
+      class="sr-only"
+    ></div>
+  </form>
+</product-form-component>
 
 {% schema %}
 {

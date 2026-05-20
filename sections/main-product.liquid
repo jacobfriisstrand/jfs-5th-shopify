@@ -1,0 +1,36 @@
+{%- comment -%}
+  Section-owned custom-element registrations. Required by <product-form-component>
+  and <product-price> elements emitted by the add-to-cart and price blocks. Loaded
+  here so routes that do not render a PDP do not pay the byte cost. See ADR-0003
+  pillar 7.
+{%- endcomment -%}
+<script src="{{ 'product-form.js'  | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'product-price.js' | asset_url }}" type="module" fetchpriority="low"></script>
+
+<section
+  class="grid-12 py-12 sm:py-16"
+  aria-labelledby="main-product-{{ section.id }}-title"
+>
+  <div class="col-content grid gap-8 md:grid-cols-2 md:gap-12">
+    <div>
+      {% content_for 'block', id: 'product-media-gallery', type: '_product-media-gallery' %}
+    </div>
+    <div class="flex flex-col gap-6">
+      {% content_for 'block', id: 'product-title', type: 'product-title' %}
+      {% content_for 'block', id: 'price', type: 'price' %}
+      {% content_for 'block', id: 'product-description', type: 'product-description' %}
+      {% content_for 'block', id: 'add-to-cart', type: 'add-to-cart' %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "t:names.product_information",
+  "enabled_on": {
+    "templates": [
+      "product"
+    ]
+  }
+}
+{% endschema %}

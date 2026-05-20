@@ -1,6 +1,8 @@
-{% comment %} product-description: scaffold — populate as needed. {% endcomment %}
-<div class="product-description">
-</div>
+{%- if product.description != blank -%}
+  <div class="text-base leading-relaxed">
+    {{ product.description }}
+  </div>
+{%- endif -%}
 
 {% schema %}
 {
