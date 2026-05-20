@@ -149,7 +149,7 @@ _Avoid_: Color variant (color is _not_ a variant in this model).
 The two skills below are **canonical** for any work in this repo that touches markup, scripts, or styles. Load and follow them **whenever you create or edit** a `.liquid`, `.ts`, `.js`, or `.css` file — not just when scaffolding something new:
 
 - [`.agents/skills/html/SKILL.md`](.agents/skills/html/SKILL.md) — semantic, accessible, low-noise markup. Governs element choice, landmarks, headings, forms, and replacement of custom controls with native HTML. Applies to `sections/`, `blocks/`, `snippets/`, `layout/`, and any HTML produced by `src/scripts/*.ts`.
-- [`.agents/skills/css-motion-systems/SKILL.md`](.agents/skills/css-motion-systems/SKILL.md) — motion design for any transitions, keyframes, `linear()` easing, transform strategy, and View Transitions usage. Applies to `src/styles/*.css`, Tailwind utility choices in liquid markup, and any animation-related JS.
+- [`.agents/skills/css-motion-systems/SKILL.md`](.agents/skills/css-motion-systems/SKILL.md) — motion design for any transitions, keyframes, `linear()` easing, and transform strategy. Applies to `src/styles/*.css`, Tailwind utility choices in liquid markup, and any animation-related JS.
 
 These are in addition to the topic-specific `*-accessibility.mdc` rules in [`docs/agent-reference/`](docs/agent-reference/), which remain the canonical accessibility reference for matching component categories (see AGENTS.md → "Accessibility canon"). The skills set the baseline; the `.mdc` files cover component-specific interaction patterns. Both apply.
 

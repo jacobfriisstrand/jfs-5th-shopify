@@ -45,12 +45,11 @@ src/
 │   ├── money-formatting.ts         # Format prices with currency rules
 │   ├── localization.ts             # Country / language selector
 │   ├── dialog.ts                    # Native `<dialog>` wrapper (cart drawer, modals)
-│   ├── view-transitions.ts          # Tags cross-document navigations with VT types
 │   └── theme-editor.ts              # Editor preview hooks (no-op outside design mode)
 │
 ├── styles/
 │   ├── app.css                     # Tailwind v4 entry, @source globs, token imports
-│   ├── base.css                    # Reset + sane defaults + .visually-hidden + cross-document view-transitions
+│   ├── base.css                    # Reset + sane defaults + .visually-hidden
 │   ├── colors.css                  # `--color-bg`, `--color-fg` → Tailwind tokens
 │   ├── typography.css              # `--font-primary` → Tailwind tokens
 │   └── radii.css                   # `--radius-input` → Tailwind tokens

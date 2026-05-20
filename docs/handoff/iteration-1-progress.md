@@ -73,20 +73,19 @@ The eight pillars iteration-1 must respect:
 2. Server-rendered HTML for state changes (variant updates etc.) — see
    ADR-0001.
 3. Section/block schema runtime (Shopify-native).
-4. View Transitions for navigation.
-5. **Perf-budget contract.** Per-route gzipped initial-paint static graph.
+4. **Perf-budget contract.** Per-route gzipped initial-paint static graph.
    Decimal-KB (50 KB = 50 000 bytes). Defined in `perf-budget.json`.
    Enforced by `scripts/check-budgets.ts`. Every PR runs it. Raising a
    budget requires editing `perf-budget.json` in the same PR.
-6. Accessibility canon: the `*-accessibility.mdc` files in
+5. Accessibility canon: the `*-accessibility.mdc` files in
    `docs/agent-reference/` are authoritative. Deviations require
    justification in the PR.
-7. **Section-owned defer-load.** Custom-element registration scripts live
+6. **Section-owned defer-load.** Custom-element registration scripts live
    with the section that emits them. The registration linter (3rd pass of
    `check-budgets.ts`) enforces this — every `<foo-component>` emitted in a
    route's liquid graph must have a matching `<script src>` ancestor in the
    same graph.
-8. AI-navigable architecture (CONTEXT.md + ADRs as ground truth).
+7. AI-navigable architecture (CONTEXT.md + ADRs as ground truth).
 
 ### Perf budget current state (`perf-budget.json`)
 

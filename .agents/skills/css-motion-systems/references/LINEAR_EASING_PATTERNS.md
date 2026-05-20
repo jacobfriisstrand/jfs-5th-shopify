@@ -67,16 +67,7 @@ Use CSS `linear()` when you need explicit control over velocity progression acro
 }
 ```
 
-### 3) Shared Element Settle (route/state continuity)
-
-```css
-::view-transition-group(card-image) {
-  animation-duration: 340ms;
-  animation-timing-function: var(--ease-linear-settle-gentle);
-}
-```
-
-### 4) CTA Emphasis Pulse (single, non-looping)
+### 3) CTA Emphasis Pulse (single, non-looping)
 
 ```css
 @keyframes cta-pulse {

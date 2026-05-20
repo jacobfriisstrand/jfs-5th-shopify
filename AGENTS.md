@@ -9,10 +9,10 @@ This repository is a **minimal Shopify theme starter** derived from Shopify's
 down to leave only the **core runtime** — meaning:
 
 - **Kept**: cart drawer, header/footer skeleton, product information, variant
-  picker, predictive search, view transitions, the section/block schema runtime,
+  picker, predictive search, the section/block schema runtime,
   and the JS components that power them.
 - **Removed**: Horizon's full design system in `assets/base.css` (~4,876 lines
-  reduced to ~205 lines of reset + utilities + view-transition rules), all
+  reduced to ~205 lines of reset + utilities), all
   marketing-style sections (`hero`, `featured-product`, `marquee`, etc.), and a
   long tail of optional features (`gift-card-recipient-form`, `local-pickup`,
   `recently-viewed-products`, `qr-code-generator`, `volume-pricing`,
@@ -104,8 +104,8 @@ something new:
   `sections/`, `blocks/`, `snippets/`, `layout/`, and any HTML produced by
   `src/scripts/*.ts`.
 - [`.agents/skills/css-motion-systems/SKILL.md`](./.agents/skills/css-motion-systems/SKILL.md)
-  — motion design for any transitions, keyframes, `linear()` easing, transform
-  strategy, and View Transitions usage. Applies to `src/styles/*.css`,
+  — motion design for any transitions, keyframes, `linear()` easing, and
+  transform strategy. Applies to `src/styles/*.css`,
   Tailwind utility choices in liquid markup, and any animation-related JS.
 
 These are **in addition to** the topic-specific `*-accessibility.mdc` rules in

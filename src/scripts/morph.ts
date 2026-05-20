@@ -92,16 +92,6 @@ export const MORPH_OPTIONS: MorphOptions = {
     for (const preserve of morphPreservers) {
       preserve(oldNode, newNode);
     }
-
-    // Preserve temporary view transition name (set by view-transitions.ts
-    // during a transition; the server response never carries it).
-    if (
-      oldNode instanceof HTMLElement &&
-      newNode instanceof HTMLElement &&
-      oldNode.style.viewTransitionName
-    ) {
-      newNode.style.viewTransitionName = oldNode.style.viewTransitionName;
-    }
   },
   onAfterUpdate(node: Node) {
     if (node instanceof Component) {
