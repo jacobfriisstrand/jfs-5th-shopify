@@ -265,6 +265,63 @@ const RE_CUSTOM_ELEMENT_DEFINE =
   /customElements\.define\s*\(\s*["']([a-z][a-z0-9-]*)["']/g;
 
 /**
+ * Match dynamic `import("@theme/<name>")` calls in source modules. These
+ * defer-loaded modules count toward the registration linter (the element
+ * IS reachable from the route via JS) but NOT toward the per-route size
+ * budget (that's the whole point of defer-loading per ADR-0003 pillar 7).
+ */
+const RE_DYNAMIC_IMPORT =
+  /import\s*\(\s*["']@theme\/([a-z][a-z0-9-]*)["']\s*\)/g;
+
+/**
+ * Build a map: `<source-script>.js` → set of `<target-script>.js` reached
+ * via dynamic `import("@theme/<target>")`. Used by the registration linter
+ * to follow defer-load chains.
+ */
+function discoverDynamicImports(): Map<string, Set<string>> {
+  const map = new Map<string, Set<string>>();
+  if (!existsSync(SRC_SCRIPTS_DIR)) return map;
+  for (const entry of readdirSync(SRC_SCRIPTS_DIR)) {
+    if (!entry.endsWith(".ts")) continue;
+    const full = join(SRC_SCRIPTS_DIR, entry);
+    if (!statSync(full).isFile()) continue;
+    const src = readFileSync(full, "utf8");
+    const sourceAsset = entry.replace(/\.ts$/, ".js");
+    const targets = new Set<string>();
+    for (const target of collectMatches(RE_DYNAMIC_IMPORT, src)) {
+      targets.add(`${target}.js`);
+    }
+    if (targets.size > 0) map.set(sourceAsset, targets);
+  }
+  return map;
+}
+
+/**
+ * Compute the transitive closure of `seedAssets` under the dynamic-import
+ * graph. Returns the full set of scripts reachable (statically OR via
+ * `import("@theme/...")` chains).
+ */
+function expandDynamicImports(
+  seedAssets: Set<string>,
+  importMap: Map<string, Set<string>>,
+): Set<string> {
+  const reachable = new Set(seedAssets);
+  const stack = [...seedAssets];
+  while (stack.length > 0) {
+    const next = stack.pop()!;
+    const targets = importMap.get(next);
+    if (!targets) continue;
+    for (const t of targets) {
+      if (!reachable.has(t)) {
+        reachable.add(t);
+        stack.push(t);
+      }
+    }
+  }
+  return reachable;
+}
+
+/**
  * Discover the element-name → script-asset mapping by scanning every
  * `src/scripts/*.ts` for `customElements.define(...)` calls. The script's
  * file name (with `.ts` → `.js`) is the asset that registers the element.
@@ -427,16 +484,23 @@ function main(): void {
   // ----- registration linter -----
   console.log("\nCustom-element registration linter:");
   const elementMap = discoverElementMap();
+  const dynamicImports = discoverDynamicImports();
   const gaps: RegistrationGap[] = [];
 
   for (const { route, visited, assetNames } of routeWalks) {
+    // For the linter only, expand the route's reachable scripts to include
+    // anything reached via dynamic `import("@theme/...")` chains. The size
+    // budget already accounted for the static graph above; defer-loaded
+    // modules don't count toward it, but they DO count toward "is this
+    // element registered somewhere reachable on this route?".
+    const reachableAssets = expandDynamicImports(assetNames, dynamicImports);
     for (const file of visited) {
       const src = readLiquid(file);
       if (src == null) continue;
       const elements = findElementsInLiquid(src, elementMap);
       for (const el of elements) {
         const expectedScript = elementMap.get(el)!;
-        if (!assetNames.has(expectedScript)) {
+        if (!reachableAssets.has(expectedScript)) {
           gaps.push({
             route,
             liquidFile: relative(ROOT, file),
