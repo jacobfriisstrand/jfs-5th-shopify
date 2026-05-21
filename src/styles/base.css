@@ -180,6 +180,49 @@ dialog::backdrop {
   }
 }
 
+/* Cart drawer: slide-in from the right (anchored, max-w-md) with backdrop
+   fade. Reuses `header-menu-backdrop-in/out` for the backdrop. Same
+   close-class pattern as the menu drawer. */
+#cart-drawer dialog[open]:not(.dialog-closing) {
+  animation: cart-drawer-in 240ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+#cart-drawer dialog[open]:not(.dialog-closing)::backdrop {
+  animation: header-menu-backdrop-in 200ms ease-out;
+}
+
+#cart-drawer dialog.dialog-closing {
+  animation: cart-drawer-out 200ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+#cart-drawer dialog.dialog-closing::backdrop {
+  animation: header-menu-backdrop-out 200ms ease-in forwards;
+}
+
+@keyframes cart-drawer-in {
+  from {
+    translate: 100% 0;
+    opacity: 0;
+  }
+
+  to {
+    translate: 0 0;
+    opacity: 1;
+  }
+}
+
+@keyframes cart-drawer-out {
+  from {
+    translate: 0 0;
+    opacity: 1;
+  }
+
+  to {
+    translate: 100% 0;
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
