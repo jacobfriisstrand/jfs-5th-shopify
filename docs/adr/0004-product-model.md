@@ -37,11 +37,11 @@ Each colour of a merchandiseable item is its own Shopify product (e.g. "Hoodie C
 
 A Shopify metaobject definition `color_group` with three fields:
 
-| Field             | Type                            | Purpose                                                |
-| ----------------- | ------------------------------- | ------------------------------------------------------ |
-| `name`            | Single line text                | Human label ("Hoodie Classic")                         |
-| `entries`         | List of product references      | All colour products in the group                       |
-| `primary_product` | Single product reference        | Which colour represents the group on collection grids  |
+| Field             | Type                       | Purpose                                               |
+| ----------------- | -------------------------- | ----------------------------------------------------- |
+| `name`            | Single line text           | Human label ("Hoodie Classic")                        |
+| `entries`         | List of product references | All colour products in the group                      |
+| `primary_product` | Single product reference   | Which colour represents the group on collection grids |
 
 Each colour product carries a single product metafield `color_group` of type "metaobject reference (color_group)". The metafield is the only edit each colour product needs.
 
