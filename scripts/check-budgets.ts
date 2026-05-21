@@ -289,18 +289,19 @@ function discoverElementMap(): Map<string, string> {
 
 /**
  * Find which custom-element tag names from `elementMap` appear as opening tags
- * in `src`. Skips occurrences inside `{% comment %}…{% endcomment %}` blocks
- * and inside `{%- comment -%}…{%- endcomment -%}` whitespace-trimmed variants.
+ * in `src`. Skips occurrences inside `{% comment %}…{% endcomment %}` blocks,
+ * `{%- comment -%}…{%- endcomment -%}` whitespace-trimmed variants, and
+ * `{% doc %}…{% enddoc %}` LiquidDoc blocks (which can mention element names
+ * in prose, e.g. "wrap in `<product-form-component>`").
  */
 function findElementsInLiquid(
   src: string,
   elementMap: Map<string, string>,
 ): Set<string> {
-  // Strip comment blocks so element names mentioned in prose don't false-positive.
-  const stripped = src.replace(
-    /\{%-?\s*comment\s*-?%\}[\s\S]*?\{%-?\s*endcomment\s*-?%\}/g,
-    "",
-  );
+  // Strip comment + doc blocks so element names mentioned in prose don't false-positive.
+  const stripped = src
+    .replace(/\{%-?\s*comment\s*-?%\}[\s\S]*?\{%-?\s*endcomment\s*-?%\}/g, "")
+    .replace(/\{%-?\s*doc\s*-?%\}[\s\S]*?\{%-?\s*enddoc\s*-?%\}/g, "");
   const found = new Set<string>();
   for (const name of elementMap.keys()) {
     // Match `<name ` or `<name>` or `<name/>` — not `<name-suffix>`.
