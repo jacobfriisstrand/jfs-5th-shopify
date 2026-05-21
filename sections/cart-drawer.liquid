@@ -1,0 +1,149 @@
+{%- comment -%}
+  Cart drawer (slice 11) — slide-over after-action affordance per ADR-0005.
+
+  Rendered once globally from `layout/theme.liquid`. Closed by default.
+  Opened by JS in two cases only:
+    1. Successful PDP add-to-cart (CartAddEvent with source =
+       "product-form-component").
+    2. Click on the header cart icon (`[data-header-cart]`).
+
+  The drawer is a SUBSET of `/cart`: line items, subtotal, View cart link,
+  Checkout button. No shipping calc, notes, discount, accelerated checkout.
+
+  Defer-load: the `<cart-drawer-component>` registration script is dynamic-
+  imported by `header-cart.js` on first hover/focus of the cart anchor (or
+  on first PDP add). The inner `<dialog-component>` is registered globally
+  in `snippets/scripts.liquid`, so the close button, backdrop click, and
+  Escape key work the moment the dialog is opened — even before the outer
+  wrapper has upgraded. Native `<dialog>.showModal()` provides the focus
+  trap automatically per the HTML spec.
+
+  The drawer wraps its contents in `<cart-form-component><form
+  action="/cart" method="post">` so quantity changes and per-line removal
+  work via the same code path as `/cart` (see `src/scripts/cart-form.ts`),
+  and the form posts cleanly with JS disabled.
+{%- endcomment -%}
+
+<script src="{{ 'component-quantity-selector.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'cart-form.js' | asset_url }}" type="module" fetchpriority="low"></script>
+
+{% liquid
+  assign drawer_title = 'content.cart_title' | t
+  assign close_label = 'actions.close' | t
+  assign subtotal_label = 'content.cart_subtotal' | t
+  assign taxes_note = 'content.taxes_at_checkout_shipping_at_checkout_without_policy_without_discounts' | t
+  assign view_cart_label = 'actions.view_cart' | t
+  assign checkout_label = 'content.checkout' | t
+  assign empty_heading = 'content.your_cart_is_empty' | t
+  assign continue_label = 'actions.continue_shopping' | t
+  assign form_id = 'cart-drawer-form-' | append: section.id
+%}
+
+<cart-drawer-component>
+  <dialog-component id="cart-drawer" class="contents">
+    <dialog
+      ref="dialog"
+      class="fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-full max-w-md bg-bg text-fg p-0"
+      aria-labelledby="cart-drawer-title"
+    >
+      <div class="flex h-full flex-col">
+        <header class="flex items-center justify-between gap-4 border-b border-current/15 p-4">
+          {% render 'heading',
+            text: drawer_title,
+            level: 2,
+            id: 'cart-drawer-title',
+            class: 'text-lg font-medium'
+          %}
+          <button
+            type="button"
+            on:click="dialog-component/closeDialog"
+            aria-label="{{ close_label }}"
+            class="-m-2 inline-flex p-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <line x1="6" y1="6" x2="18" y2="18" />
+              <line x1="18" y1="6" x2="6" y2="18" />
+            </svg>
+          </button>
+        </header>
+
+        {%- if cart.item_count == 0 -%}
+          <div class="flex flex-1 flex-col items-start justify-center gap-4 p-6">
+            {% render 'heading',
+              text: empty_heading,
+              level: 3,
+              class: 'text-xl font-medium'
+            %}
+            <a
+              href="{{ routes.root_url }}"
+              on:click="dialog-component/closeDialog"
+              class="text-fg underline underline-offset-4"
+            >
+              {{ continue_label }}
+            </a>
+          </div>
+        {%- else -%}
+          <cart-form-component class="flex flex-1 flex-col overflow-hidden">
+            <form
+              id="{{ form_id }}"
+              action="{{ routes.cart_url }}"
+              method="post"
+              novalidate
+              class="flex flex-1 flex-col overflow-hidden"
+            >
+              <div class="flex-1 overflow-y-auto px-4">
+                {% render '_cart-line-items', cart: cart %}
+              </div>
+
+              <footer class="border-t border-current/15 p-4 flex flex-col gap-4">
+                <dl class="flex items-baseline justify-between gap-4">
+                  <dt class="text-fg text-base font-medium">{{ subtotal_label }}</dt>
+                  <dd class="text-fg group text-lg font-medium" data-cart-subtotal>
+                    <span class="group-data-[updating=true]:hidden">{{ cart.total_price | money }}</span>
+                    <span
+                      aria-hidden="true"
+                      class="bg-fg/10 hidden h-5 w-20 animate-pulse rounded align-middle group-data-[updating=true]:inline-block"
+                    ></span>
+                  </dd>
+                </dl>
+                <p class="text-fg/70 text-xs">{{ taxes_note }}</p>
+                <div class="flex flex-col gap-3">
+                  <button
+                    type="submit"
+                    name="checkout"
+                    value=""
+                    class="rounded-input bg-fg text-bg hover:bg-fg/90 px-6 py-3 text-sm font-medium transition-colors"
+                  >
+                    {{ checkout_label }}
+                  </button>
+                  <a
+                    href="{{ routes.cart_url }}"
+                    class="rounded-input border border-current text-center hover:bg-fg hover:text-bg px-6 py-3 text-sm font-medium transition-colors"
+                  >
+                    {{ view_cart_label }}
+                  </a>
+                </div>
+              </footer>
+            </form>
+          </cart-form-component>
+        {%- endif -%}
+      </div>
+    </dialog>
+  </dialog-component>
+</cart-drawer-component>
+
+{% schema %}
+{
+  "name": "Cart drawer",
+  "tag": "aside"
+}
+{% endschema %}
