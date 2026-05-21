@@ -4,6 +4,8 @@
 @import "./typography.css";
 @import "./radii.css";
 @import "./layout.css";
+@import "./accordion.css";
+@import "./prose.css";
 
 @source "../../sections/**/*.liquid";
 @source "../../blocks/**/*.liquid";

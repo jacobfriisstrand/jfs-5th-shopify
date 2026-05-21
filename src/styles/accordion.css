@@ -1,0 +1,83 @@
+/* ==========================================================================
+   accordion.css — utilities for native <details>-based disclosure widgets.
+
+   Markup pattern:
+     <div class="accordion-group">
+       <details class="accordion-row">
+         <summary>Title</summary>
+         <div>…content…</div>
+       </details>
+       …
+     </div>
+
+   Animation uses the `::details-content` pseudo-element and
+   `interpolate-size: allow-keywords` so the content height animates from
+   `0` to `auto` natively, no JS. Falls back to an instant open in browsers
+   that don't yet support `::details-content`.
+
+   Honors `prefers-reduced-motion`.
+   ========================================================================== */
+
+@layer base {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+}
+
+@utility accordion-group {
+  display: flex;
+  flex-direction: column;
+  border-block-start: 1px solid currentColor;
+}
+
+@utility accordion-row {
+  border-block-end: 1px solid currentColor;
+
+  & > summary {
+    list-style: none;
+    cursor: pointer;
+    padding-block: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  & > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  & > summary::after {
+    content: "+";
+    font-size: 1.25em;
+    line-height: 1;
+    transition: rotate 200ms ease;
+  }
+
+  &[open] > summary::after {
+    rotate: 45deg;
+  }
+
+  & > :not(summary) {
+    padding-block-end: 1rem;
+  }
+
+  &::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition:
+      block-size 250ms ease,
+      content-visibility 250ms ease allow-discrete;
+  }
+
+  &[open]::details-content {
+    block-size: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    & > summary::after,
+    &::details-content {
+      transition: none;
+    }
+  }
+}

@@ -1,11 +1,26 @@
-{% comment %} accordion: scaffold — populate as needed. {% endcomment %}
-<div class="accordion">
+{% doc %}
+  Renders a group wrapper for one or more `_accordion-row` blocks.
+
+  Each child row is a native `<details>` element styled by the
+  `accordion-row` utility. The group adds a shared top border so stacked
+  rows read as a single component.
+
+  Use statically with hardcoded child rows, or let merchants add rows in
+  the theme editor via `{% content_for 'blocks' %}`.
+{% enddoc %}
+
+<div class="accordion-group">
+  {% content_for 'blocks' %}
 </div>
 
 {% schema %}
 {
   "name": "t:names.accordion",
   "tag": null,
-  "class": "accordion"
+  "blocks": [
+    {
+      "type": "_accordion-row"
+    }
+  ]
 }
 {% endschema %}
