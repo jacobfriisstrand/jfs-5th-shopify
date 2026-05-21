@@ -163,6 +163,11 @@
     "search_results_resource_pages": "Pages",
     "search_results_resource_products": "Products",
     "your_cart": "Your cart",
+    "cart_item_count": {
+      "one": "1 item",
+      "other": "{{ count }} items"
+    },
+    "update_cart": "Update cart",
     "items_added_to_cart": {
       "one": "1 item added to cart",
       "other": "{{ count }} items added to cart"

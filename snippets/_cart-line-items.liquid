@@ -10,21 +10,11 @@
   contract works: per-line `name="updates[<key>]"` inputs are posted to
   `/cart`, which updates quantities and redirects back.
 
-  The `variant` parameter is accepted today as a forward-compatible hook
-  for ADR-0005's "drawer hides line-item-level notes; page shows them"
-  rule. No line-item notes exist in scope yet, so 'page' and 'drawer'
-  currently render identically.
-
-  @param {cart} cart - The current cart. Required.
-  @param {string} [variant] - 'page' or 'drawer'. Defaults to 'page'.
+  @param {object} cart - The current cart. Required.
 
   @example
-  {% render '_cart-line-items', cart: cart, variant: 'page' %}
+  {% render '_cart-line-items', cart: cart %}
 {% enddoc %}
-
-{% liquid
-  assign surface = variant | default: 'page'
-%}
 
 <ul role="list" class="flex flex-col">
   {% for line in cart.items %}

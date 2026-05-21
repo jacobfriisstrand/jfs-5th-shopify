@@ -2,6 +2,26 @@
   "sections": {
     "main": {
       "type": "main-cart",
+      "blocks": {
+        "cart-title": {
+          "type": "_cart-title",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "cart-products": {
+          "type": "_cart-products",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "cart-summary": {
+          "type": "_cart-summary",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        }
+      },
       "settings": {}
     }
   },
