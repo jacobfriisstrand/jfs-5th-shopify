@@ -1,5 +1,9 @@
 import { Component } from "@theme/component";
-import { ThemeEvents, QuantitySelectorUpdateEvent } from "@theme/events";
+import {
+  ThemeEvents,
+  QuantitySelectorUpdateEvent,
+  CartUpdateEvent,
+} from "@theme/events";
 import { normalizeSectionId, sectionRenderer } from "@theme/section-renderer";
 
 /**
@@ -167,6 +171,14 @@ export class CartFormComponent extends Component {
     await sectionRenderer.renderSection(normalizeSectionId(section.id), {
       cache: false,
     });
+    // Notify other listeners (header cart count, future cart drawer, etc.)
+    // that the cart has changed. The section render only refreshes the
+    // cart section itself — the header lives in a separate section group.
+    this.dispatchEvent(
+      new CartUpdateEvent({}, this.id || "cart-form-component", {
+        source: "cart-form-component",
+      }),
+    );
   }
 
   #changeUrl() {
