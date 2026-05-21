@@ -1,6 +1,57 @@
-{% comment %} variant-picker: scaffold — populate as needed. {% endcomment %}
-<div class="variant-picker">
-</div>
+{% doc %}
+  Renders one picker row per product option (Color, Size, ...).
+
+  Each value in each option is an anchor pointing at
+  `{product.url}?variant=<id>` for the variant that keeps every other axis
+  on its current selection and swaps only this one. The currently selected
+  value renders as a non-interactive `<span aria-current="true">` so it is
+  announced as the current page and cannot be re-clicked.
+
+  Progressive enhancement: `<variant-picker-form>` (see
+  `src/scripts/variant-picker-form.ts`) intercepts every picker click and
+  swaps the section via the Section Rendering API instead of doing a full
+  page navigation. Color changes use `history.pushState` (so the back
+  button navigates between colors); other axes use `replaceState` (silent
+  URL update). Without JS every anchor navigates normally and the rest of
+  the PDP still updates via Shopify resolving `?variant=…` to
+  `product.selected_or_first_available_variant`.
+
+  Per-value lookup and rendering live in
+  `snippets/_variant-option-value.liquid`.
+
+  Used by `sections/main-product.liquid` via
+  `{% content_for 'block', type: 'variant-picker' %}`.
+{% enddoc %}
+
+{% liquid
+  assign current_variant = product.selected_or_first_available_variant
+%}
+
+{%- unless product.has_only_default_variant -%}
+  <variant-picker-form class="flex flex-col gap-4">
+    {%- for option in product.options_with_values -%}
+      <fieldset class="contents">
+        <legend class="text-fg/70 mb-2 text-sm font-medium">
+          {{ option.name }}:
+          <span class="text-fg">{{ current_variant.options[forloop.index0] }}</span>
+        </legend>
+        <ul class="flex flex-wrap gap-2">
+          {%- for value in option.values -%}
+            <li>
+              {% render '_variant-option-value',
+                product: product,
+                current_variant: current_variant,
+                option_index: forloop.parentloop.index0,
+                option_name: option.name,
+                value: value
+              %}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </fieldset>
+    {%- endfor -%}
+  </variant-picker-form>
+{%- endunless -%}
 
 {% schema %}
 {

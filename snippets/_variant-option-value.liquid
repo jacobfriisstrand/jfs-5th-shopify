@@ -1,0 +1,121 @@
+{% doc %}
+  Renders a single value within a variant option row (Color / Size / ...).
+
+  For the currently selected value, output is a non-interactive `<span>` with
+  `aria-current="true"`. For every other value, output is an `<a>` pointing
+  at `{product.url}?variant={target_variant.id}`, where `target_variant` is:
+
+    1. the variant whose options match the current selection on every axis
+       except `option_index`, with `option[option_index] == value`; or
+    2. failing that (combinatorial gap), the first variant whose
+       `option[option_index] == value`.
+
+  Sold-out targets are still linked so shoppers can land on the PDP and see
+  the sold-out CTA; the label is suffixed with "Sold out".
+
+  Shopify resolves `?variant=…` to `product.selected_or_first_available_variant`
+  on reload, so the rest of the PDP (price, add-to-cart, gallery) updates with
+  zero JavaScript.
+
+  @param {product} product - The current product.
+  @param {variant} current_variant - product.selected_or_first_available_variant
+  @param {number} option_index - 0-based index of the option being rendered.
+  @param {string} option_name - The option name (e.g. "Color", "Size").
+  @param {string} value - The option value (e.g. "White", "Medium").
+{% enddoc %}
+
+{% liquid
+  assign target_variant = null
+  assign first_match = null
+
+  for v in product.variants
+    assign value_matches = false
+    case option_index
+      when 0
+        if v.option1 == value
+          assign value_matches = true
+        endif
+      when 1
+        if v.option2 == value
+          assign value_matches = true
+        endif
+      when 2
+        if v.option3 == value
+          assign value_matches = true
+        endif
+    endcase
+
+    unless value_matches
+      continue
+    endunless
+
+    if first_match == null
+      assign first_match = v
+    endif
+
+    assign other_axes_match = true
+    if option_index != 0 and v.option1 != current_variant.option1
+      assign other_axes_match = false
+    endif
+    if option_index != 1 and v.option2 != current_variant.option2
+      assign other_axes_match = false
+    endif
+    if option_index != 2 and v.option3 != current_variant.option3
+      assign other_axes_match = false
+    endif
+
+    if other_axes_match
+      assign target_variant = v
+      break
+    endif
+  endfor
+
+  if target_variant == null
+    assign target_variant = first_match
+  endif
+
+  case option_index
+    when 0
+      assign is_current = false
+      if current_variant.option1 == value
+        assign is_current = true
+      endif
+    when 1
+      assign is_current = false
+      if current_variant.option2 == value
+        assign is_current = true
+      endif
+    when 2
+      assign is_current = false
+      if current_variant.option3 == value
+        assign is_current = true
+      endif
+  endcase
+
+  assign is_sold_out = false
+  if target_variant != null and target_variant.available == false
+    assign is_sold_out = true
+  endif
+%}
+
+{%- if target_variant == null -%}
+  {%- comment -%} No variant exposes this value (shouldn't happen). {%- endcomment -%}
+{%- elsif is_current -%}
+  <span
+    aria-current="true"
+    class="bg-fg text-bg rounded-input inline-flex items-center gap-2 border border-current px-4 py-2 text-sm font-medium"
+  >
+    <span aria-hidden="true">✓</span>
+    {{ value }}
+    {%- if is_sold_out %} — {{ 'products.product.sold_out' | t }}{% endif -%}
+  </span>
+{%- else -%}
+  <a
+    href="{{ product.url }}?variant={{ target_variant.id }}"
+    data-axis="{{ option_name | downcase }}"
+    class="text-fg rounded-input hover:bg-fg hover:text-bg inline-flex items-center border border-current px-4 py-2 text-sm font-medium {% if is_sold_out %}opacity-60{% endif %}"
+  >
+    {{ value }}
+    {%- if is_sold_out %} — {{ 'products.product.sold_out' | t }}{% endif -%}
+  </a>
+{%- endif -%}
