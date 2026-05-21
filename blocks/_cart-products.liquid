@@ -1,6 +1,13 @@
-{% comment %} _cart-products: scaffold — populate as needed. {% endcomment %}
-<div class="cart-products">
-  {% content_for 'blocks' %}
+{% doc %}
+  Cart line-item list, delegating to the shared `_cart-line-items` snippet
+  so the `/cart` page and the cart drawer render identical markup
+  (ADR-0005). Must sit inside the `<form>` opened by
+  `sections/main-cart.liquid` so its quantity inputs and remove buttons
+  submit to `/cart`.
+{% enddoc %}
+
+<div class="py-4">
+  {% render '_cart-line-items', cart: cart %}
 </div>
 
 {% schema %}

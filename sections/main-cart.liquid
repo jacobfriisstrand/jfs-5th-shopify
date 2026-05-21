@@ -1,14 +1,40 @@
-{% comment %} main-cart: scaffold — populate as needed. {% endcomment %}
-
 {%- comment -%}
-  Section-owned custom-element registration for the line-item <quantity-selector>.
-  See ADR-0003 pillar 7.
+  Section-owned custom-element registration for the line-item
+  <quantity-selector-component> and the form-level <cart-form-component>
+  that auto-submits quantity changes via /cart/change.js. See ADR-0003
+  pillar 7.
 {%- endcomment -%}
 <script src="{{ 'component-quantity-selector.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'cart-form.js' | asset_url }}" type="module" fetchpriority="low"></script>
 
-<div class="main-cart">
-  {% content_for 'blocks' %}
-</div>
+{% liquid
+  assign form_id = 'cart-form-' | append: section.id
+  assign empty_heading = 'content.your_cart_is_empty' | t
+  assign continue_label = 'actions.continue_shopping' | t
+%}
+
+<section class="grid-12 py-12 sm:py-16" aria-label="{{ 'content.cart_title' | t }}">
+  <div class="col-content">
+    {%- if cart.item_count == 0 -%}
+      <div class="flex flex-col items-start gap-4 py-12">
+        {% render 'heading',
+          text: empty_heading,
+          level: 1,
+          class: 'text-3xl font-medium sm:text-4xl'
+        %}
+        <a href="{{ routes.root_url }}" class="text-fg underline underline-offset-4">{{ continue_label }}</a>
+      </div>
+    {%- else -%}
+      <cart-form-component>
+        <form id="{{ form_id }}" action="{{ routes.cart_url }}" method="post" novalidate>
+          {% content_for 'block', id: 'cart-title', type: '_cart-title' %}
+          {% content_for 'block', id: 'cart-products', type: '_cart-products' %}
+          {% content_for 'block', id: 'cart-summary', type: '_cart-summary' %}
+        </form>
+      </cart-form-component>
+    {%- endif -%}
+  </div>
+</section>
 
 {% schema %}
 {

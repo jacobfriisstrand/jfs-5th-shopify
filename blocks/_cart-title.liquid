@@ -1,7 +1,22 @@
-{% comment %} _cart-title: scaffold — populate as needed. {% endcomment %}
-<div class="cart-title">
-  {% content_for 'blocks' %}
-</div>
+{% doc %}
+  Cart page header: large "Cart" heading + item count. Renders inside the
+  `<form>` opened by `sections/main-cart.liquid`; the form scope does not
+  affect this block's markup.
+{% enddoc %}
+
+{% liquid
+  assign heading_text = 'content.cart_title' | t
+  assign count_text = 'content.cart_item_count' | t: count: cart.item_count
+%}
+
+<header class="flex flex-col gap-1 pb-6">
+  {% render 'heading',
+    text: heading_text,
+    level: 1,
+    class: 'text-3xl font-medium sm:text-4xl'
+  %}
+  <p class="text-fg/70 text-sm" aria-live="polite">{{ count_text }}</p>
+</header>
 
 {% schema %}
 {

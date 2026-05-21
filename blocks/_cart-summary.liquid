@@ -1,7 +1,52 @@
-{% comment %} _cart-summary: scaffold — populate as needed. {% endcomment %}
-<div class="cart-summary">
-  {% content_for 'blocks' %}
-</div>
+{% doc %}
+  Cart summary: subtotal, tax/shipping note, "Update cart" and "Check out"
+  submit buttons. Renders inside the `<form>` opened by
+  `sections/main-cart.liquid` (action="/cart", method="post"), so the
+  buttons submit that form by default. `name="checkout"` redirects to the
+  checkout flow; `name="update"` posts updated `updates[<key>]` quantities
+  back to `/cart`.
+{% enddoc %}
+
+{% liquid
+  assign subtotal_label = 'content.cart_subtotal' | t
+  assign taxes_note = 'content.taxes_at_checkout_shipping_at_checkout_without_policy_without_discounts' | t
+  assign update_label = 'content.update_cart' | t
+  assign checkout_label = 'content.checkout' | t
+%}
+
+<section class="border-current/15 mt-6 flex flex-col gap-4 border-t pt-6">
+  <dl class="flex items-baseline justify-between gap-4">
+    <dt class="text-fg text-base font-medium">{{ subtotal_label }}</dt>
+    <dd class="text-fg group text-lg font-medium" data-cart-subtotal>
+      <span class="group-data-[updating=true]:hidden">{{ cart.total_price | money }}</span>
+      <span
+        aria-hidden="true"
+        class="bg-fg/10 hidden h-5 w-20 animate-pulse rounded align-middle group-data-[updating=true]:inline-block"
+      ></span>
+    </dd>
+  </dl>
+  <p class="text-fg/70 text-xs">{{ taxes_note }}</p>
+  <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+    <noscript>
+      <button
+        type="submit"
+        name="update"
+        value=""
+        class="rounded-input hover:bg-fg hover:text-bg border border-current px-6 py-3 text-sm font-medium transition-colors"
+      >
+        {{ update_label }}
+      </button>
+    </noscript>
+    <button
+      type="submit"
+      name="checkout"
+      value=""
+      class="rounded-input bg-fg text-bg hover:bg-fg/90 px-6 py-3 text-sm font-medium transition-colors"
+    >
+      {{ checkout_label }}
+    </button>
+  </div>
+</section>
 
 {% schema %}
 {
