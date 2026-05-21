@@ -72,7 +72,7 @@ Rationale: the boilerplate for a new schema-paired section spans 4 files (`liqui
 
 ### 5. Defer Vitest until first non-trivial pure function; vertical-slice iteration
 
-No test runner is configured. The first PR that introduces a pure function with branching logic (current candidate: `_resolve-primary.liquid`'s sibling-fallback rule, if it grows past one Liquid line) is the one that adds Vitest. Premature test infrastructure pollutes the repo with type definitions, watchers, and config that don't match how this codebase will actually be tested.
+No test runner is configured. The first PR that introduces a pure function with branching logic — candidate TBD as the iteration-2 PDP and collection slices land — is the one that adds Vitest. Premature test infrastructure pollutes the repo with type definitions, watchers, and config that don't match how this codebase will actually be tested.
 
 Iteration discipline: every iteration ships one route end-to-end before broadening. Iteration 1 = hero-only homepage. Iteration 2 = real PDP + collection. The opposite (broaden-first, finish-later) leaves every template half-built.
 

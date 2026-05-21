@@ -1,27 +1,165 @@
 {% doc %}
-  Renders the PDP featured image as an LCP-priority responsive image.
+  Renders the PDP media gallery as a Swiper-powered carousel, filtered to the
+  active variant.
 
   Used by `sections/main-product.liquid` via
-  `{% content_for 'block', type: '_product-media-gallery' %}`. A full gallery
-  (additional images, zoom, video) is intentionally deferred — see issue #17
-  acceptance criteria (PDP shell, slice 7).
+  `{% content_for 'block', type: '_product-media-gallery' %}`.
+
+  Per-variant filtering (see ADR-0009):
+  - Galleries are authored as **Variant gallery** metaobject entries
+    (fields: `color` — product variant reference, `images` — list of
+    file references).
+  - There is **no product metafield**. The block enumerates
+    `shop.metaobjects.variant_gallery.values` globally and matches by
+    **color option value** of the entry's referenced variant, so a single
+    gallery entry per color covers all size variants of that color.
+    The `color` reference can point at any one variant of that color
+    (typically the smallest size); the matcher reads its option value at
+    the Color axis and compares it to the active variant.
+  - The metaobject definition must have **Storefronts → Read** access
+    enabled for both the type and its fields.
+
+  Composition for the active variant:
+  1. The variant's primary image (`variant.featured_image`, set via the
+     native Admin variant Image field) is the first slide.
+  2. Any extra images from the matched **Variant gallery** entry follow.
+
+  Fallback chain:
+  - If the variant has no `featured_image`, fall back to
+    `product.featured_image`.
+  - If no entry matches (no metaobject for the variant, or empty
+    `images` list), the gallery shows only the primary image — no
+    `product.media` spillover (that would defeat per-variant filtering).
+  - If neither variant nor product has an image, render a placeholder
+    SVG.
+
+  Enhancement contract:
+  - With 2+ total images, the `<ul>` is progressively enhanced into a
+    `<swiper-carousel>` (one slide per view at every breakpoint, external
+    prev/next buttons). With 1 image or the placeholder fallback, the
+    snippet renders a single image — no Swiper bundle loaded.
+  - First image is `eager` + `fetchpriority: high` for LCP; subsequent
+    slides are `lazy`.
 {% enddoc %}
 
 {% liquid
-  assign featured_image = product.featured_image
+  assign variant = product.selected_or_first_available_variant
+  assign variant_galleries = shop.metaobjects.variant_gallery.values
+  assign target_color = variant.option1
+
+  assign matched_images = empty
+  if variant_galleries != blank and target_color != blank
+    for entry in variant_galleries
+      assign entry_variant = entry.color.value
+      if entry_variant == blank
+        continue
+      endif
+      if entry_variant.product.id != product.id
+        continue
+      endif
+      assign entry_images = entry.images.value
+      if entry_variant.option1 == target_color and entry_images.size > 0
+        assign matched_images = entry_images
+        break
+      endif
+    endfor
+  endif
+
+  assign primary = variant.featured_image
+  if primary == blank
+    assign primary = product.featured_image
+  endif
+
+  assign extras_count = 0
+  if matched_images != empty
+    assign extras_count = matched_images.size
+  endif
+
+  assign total_count = extras_count
+  if primary != blank
+    assign total_count = extras_count | plus: 1
+  endif
+
+  assign use_carousel = false
+  if total_count > 1
+    assign use_carousel = true
+  endif
 %}
 
-{%- if featured_image != blank -%}
-  {{
-    featured_image
-    | image_url: width: 1200
-    | image_tag:
-      loading: 'eager',
-      fetchpriority: 'high',
-      sizes: '(min-width: 768px) 50vw, 100vw',
-      widths: '400, 600, 800, 1000, 1200',
-      class: 'h-auto w-full'
-  }}
+{%- if total_count > 0 -%}
+  {%- if use_carousel -%}
+    <swiper-carousel
+      data-bundle-url="{{ 'swiper-element-bundle.js' | asset_url }}"
+      data-slides-per-view="1"
+      data-breakpoints='{"640":{"slidesPerView":1,"spaceBetween":0},"1024":{"slidesPerView":1,"spaceBetween":0},"1280":{"slidesPerView":1,"spaceBetween":0}}'
+      class="relative block"
+      aria-roledescription="carousel"
+      aria-label="Product images"
+    >
+  {%- endif -%}
+
+  <ul role="list" class="flex flex-col gap-4">
+    {%- if primary != blank -%}
+      <li>
+        {{
+          primary
+          | image_url: width: 1200
+          | image_tag:
+            loading: 'eager',
+            fetchpriority: 'high',
+            sizes: '(min-width: 768px) 50vw, 100vw',
+            widths: '400, 600, 800, 1000, 1200',
+            class: 'h-auto w-full'
+        }}
+      </li>
+    {%- endif -%}
+    {%- if matched_images != empty -%}
+      {%- for media in matched_images -%}
+        <li>
+          {{
+            media
+            | image_url: width: 1200
+            | image_tag:
+              loading: 'lazy',
+              sizes: '(min-width: 768px) 50vw, 100vw',
+              widths: '400, 600, 800, 1000, 1200',
+              class: 'h-auto w-full'
+          }}
+        </li>
+      {%- endfor -%}
+    {%- endif -%}
+  </ul>
+
+  {%- if use_carousel -%}
+    <div
+      class="mt-4 flex justify-end gap-2"
+      role="group"
+      aria-label="Gallery navigation"
+    >
+      <button
+        type="button"
+        data-carousel-prev
+        aria-label="Previous image"
+        class="border-fg/20 text-fg flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+      >
+        <span aria-hidden="true">&larr;</span>
+      </button>
+      <button
+        type="button"
+        data-carousel-next
+        aria-label="Next image"
+        class="border-fg/20 text-fg flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+      >
+        <span aria-hidden="true">&rarr;</span>
+      </button>
+    </div>
+    </swiper-carousel>
+    <script
+      src="{{ 'swiper-carousel.js' | asset_url }}"
+      type="module"
+      fetchpriority="low"
+    ></script>
+  {%- endif -%}
 {%- else -%}
   {{ 'product-1' | placeholder_svg_tag: 'h-auto w-full bg-fg/5' }}
 {%- endif -%}

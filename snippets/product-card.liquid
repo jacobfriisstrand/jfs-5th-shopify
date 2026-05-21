@@ -1,37 +1,65 @@
 {% doc %}
   Renders a single product card: featured image (or placeholder), title,
   price. Designed to be rendered inside a `for` loop over a collection's
-  products. The entire card is one `<a>` linking to the product page.
+  products (or over unique colour variants per product — see `variant`).
+  The entire card is one `<a>` linking to the product page.
 
   Wrap with whatever list semantics the caller needs (e.g. a `<li>` in a
   `<ul role="list">` grid, or a `<swiper-slide>` inside `<carousel>`).
 
   @param {product} product - The product to render. Required.
+  @param {variant} [variant] - Optional variant whose image, price, title
+    suffix (option1) and `?variant=<id>` URL anchor are used. Pass when the
+    caller is iterating per-colour to render one card per colour. Omit for
+    plain product-level cards.
   @param {number} [heading_level] - Heading level (2-6) for the product title.
     Defaults to 3 — appropriate when the card is nested under a section h2.
     Pass 2 when the card is the top item under a page-level h1 (e.g. PLP grid).
 
   @example
-  {%- comment -%} PLP grid — collection title is h1, so card titles are h2 {%- endcomment -%}
+  {%- comment -%} PLP grid — one card per colour, collection title is h1 {%- endcomment -%}
   <ul role="list" class="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
-    {%- for product in collection.products limit: 8 -%}
-      <li>{% render 'product-card', product: product, heading_level: 2 %}</li>
+    {%- for product in collection.products -%}
+      {%- assign seen_colors = '||' -%}
+      {%- for variant in product.variants -%}
+        {%- assign color_key = '|' | append: variant.option1 | append: '|' -%}
+        {%- unless seen_colors contains color_key -%}
+          {%- assign seen_colors = seen_colors | append: color_key -%}
+          <li>{% render 'product-card', product: product, variant: variant, heading_level: 2 %}</li>
+        {%- endunless -%}
+      {%- endfor -%}
     {%- endfor -%}
   </ul>
 {% enddoc %}
 
 {% liquid
   assign resolved_heading_level = heading_level | default: 3
+
+  assign card_image = product.featured_image
+  assign card_price = product.price
+  assign card_url = product.url
+  assign card_title = product.title
+
+  if variant != blank
+    if variant.featured_image != blank
+      assign card_image = variant.featured_image
+    endif
+    assign card_price = variant.price
+    assign card_url = product.url | append: '?variant=' | append: variant.id
+    if variant.option1 != blank
+      assign card_title = product.title | append: ' — ' | append: variant.option1
+    endif
+  endif
 %}
 
 <a
-  href="{{ product.url }}"
+  href="{{ card_url }}"
   class="group flex flex-col gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg"
 >
-  {%- if product.featured_image != blank -%}
+  {%- if card_image != blank -%}
     <div class="aspect-square w-full overflow-hidden rounded-input bg-fg/5">
       {{
-        product.featured_image
+        card_image
         | image_url: width: 800
         | image_tag:
           loading: 'lazy',
@@ -39,13 +67,13 @@
           sizes: '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw',
           widths: '200, 300, 400, 600, 800',
           class: 'h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]',
-          alt: product.featured_image.alt | default: product.title
+          alt: card_image.alt | default: card_title
       }}
     </div>
   {%- else -%}
     <div class="aspect-square w-full rounded-input bg-fg/5" aria-hidden="true"></div>
   {%- endif -%}
 
-  {% render 'heading', text: product.title, level: resolved_heading_level, class: 'text-base font-medium' %}
-  <p class="text-sm">{{ product.price | money }}</p>
+  {% render 'heading', text: card_title, level: resolved_heading_level, class: 'text-base font-medium' %}
+  <p class="text-sm">{{ card_price | money }}</p>
 </a>

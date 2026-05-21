@@ -49,6 +49,7 @@ function parseSlidesPerView(raw: string): number | "auto" {
 
 class SwiperCarousel extends HTMLElement {
   private observer: IntersectionObserver | null = null;
+  private morphObserver: MutationObserver | null = null;
   private upgraded = false;
 
   connectedCallback() {
@@ -68,10 +69,24 @@ class SwiperCarousel extends HTMLElement {
       { rootMargin: "200px 0px" },
     );
     this.observer.observe(this);
+
+    // After a Section Rendering morph, the upgraded <swiper-container>
+    // child is replaced with the server's fresh <ul>. Detect that and
+    // re-upgrade so the carousel doesn't collapse into a plain vertical
+    // list.
+    this.morphObserver = new MutationObserver(() => {
+      if (!this.upgraded) return;
+      if (!this.querySelector(":scope > ul")) return;
+      this.upgraded = false;
+      delete this.dataset.upgraded;
+      void this.upgrade(src);
+    });
+    this.morphObserver.observe(this, { childList: true });
   }
 
   disconnectedCallback() {
     this.observer?.disconnect();
+    this.morphObserver?.disconnect();
   }
 
   private async upgrade(src: string) {

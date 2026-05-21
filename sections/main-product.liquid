@@ -4,8 +4,26 @@
   here so routes that do not render a PDP do not pay the byte cost. See ADR-0003
   pillar 7.
 {%- endcomment -%}
+{% liquid
+  assign accordion_details = product.metafields.custom.details
+  assign accordion_product_specifications = product.metafields.custom.product_specifications
+  assign accordion_care = product.metafields.custom.care
+  assign accordion_size_guide = product.metafields.custom.size_guide
+  assign accordion_shipping = product.metafields.custom.shipping
+  assign has_accordion = false
+  if accordion_details != blank or accordion_product_specifications != blank or accordion_care != blank or accordion_size_guide != blank or accordion_shipping != blank
+    assign has_accordion = true
+  endif
+  assign accordion_label_details = 'products.product.accordion.details' | t
+  assign accordion_label_product_specifications = 'products.product.accordion.product_specifications' | t
+  assign accordion_label_care = 'products.product.accordion.care' | t
+  assign accordion_label_size_guide = 'products.product.accordion.size_guide' | t
+  assign accordion_label_shipping = 'products.product.accordion.shipping' | t
+%}
 <script src="{{ 'product-form.js'  | asset_url }}" type="module" fetchpriority="low"></script>
 <script src="{{ 'product-price.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'component-quantity-selector.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'variant-picker-form.js' | asset_url }}" type="module" fetchpriority="low"></script>
 
 <section
   class="grid-12 py-12 sm:py-16"
@@ -19,7 +37,73 @@
       {% content_for 'block', id: 'product-title', type: 'product-title' %}
       {% content_for 'block', id: 'price', type: 'price' %}
       {% content_for 'block', id: 'product-description', type: 'product-description' %}
+      {% content_for 'block', id: 'variant-picker', type: 'variant-picker' %}
+      {% content_for 'block', id: 'quantity', type: 'quantity' %}
       {% content_for 'block', id: 'add-to-cart', type: 'add-to-cart' %}
+      {%- if has_accordion -%}
+        <div class="accordion-group">
+          {%- if accordion_details != blank -%}
+            <details class="accordion-row">
+              <summary>
+                {% render 'heading',
+                  text: accordion_label_details,
+                  level: 3,
+                  class: 'text-base font-medium'
+                %}
+              </summary>
+              <div class="prose">{{ accordion_details | metafield_tag }}</div>
+            </details>
+          {%- endif -%}
+          {%- if accordion_product_specifications != blank -%}
+            <details class="accordion-row">
+              <summary>
+                {% render 'heading',
+                  text: accordion_label_product_specifications,
+                  level: 3,
+                  class: 'text-base font-medium'
+                %}
+              </summary>
+              <div class="prose">{{ accordion_product_specifications | metafield_tag }}</div>
+            </details>
+          {%- endif -%}
+          {%- if accordion_care != blank -%}
+            <details class="accordion-row">
+              <summary>
+                {% render 'heading',
+                  text: accordion_label_care,
+                  level: 3,
+                  class: 'text-base font-medium'
+                %}
+              </summary>
+              <div class="prose">{{ accordion_care | metafield_tag }}</div>
+            </details>
+          {%- endif -%}
+          {%- if accordion_size_guide != blank -%}
+            <details class="accordion-row">
+              <summary>
+                {% render 'heading',
+                  text: accordion_label_size_guide,
+                  level: 3,
+                  class: 'text-base font-medium'
+                %}
+              </summary>
+              <div class="prose">{{ accordion_size_guide | metafield_tag }}</div>
+            </details>
+          {%- endif -%}
+          {%- if accordion_shipping != blank -%}
+            <details class="accordion-row">
+              <summary>
+                {% render 'heading',
+                  text: accordion_label_shipping,
+                  level: 3,
+                  class: 'text-base font-medium'
+                %}
+              </summary>
+              <div class="prose">{{ accordion_shipping | metafield_tag }}</div>
+            </details>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
     </div>
   </div>
 </section>

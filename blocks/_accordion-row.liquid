@@ -1,11 +1,54 @@
-{% comment %} _accordion-row: scaffold — populate as needed. {% endcomment %}
-<div class="accordion-row">
-  {% content_for 'blocks' %}
-</div>
+{% doc %}
+  Renders a single accordion row as a native `<details>` disclosure widget.
+
+  The summary holds an `<h3>` (rendered via the heading snippet) so the
+  row title contributes to the document outline while the disclosure
+  remains keyboard- and screen-reader-accessible by default.
+
+  Open/close animation uses the `::details-content` pseudo-element plus
+  `interpolate-size: allow-keywords` — see `src/styles/accordion.css`.
+
+  @param {string} [summary] - The summary/title text. Required for the row
+    to render.
+  @param {string} [content] - Rich-text content shown when the row is open.
+    Required for the row to render.
+{% enddoc %}
+
+{% liquid
+  assign summary = block.settings.summary
+  assign content = block.settings.content
+%}
+
+{%- if summary != blank and content != blank -%}
+  <details class="accordion-row">
+    <summary>
+      {% render 'heading',
+        text: summary,
+        level: 3,
+        class: 'text-base font-medium'
+      %}
+    </summary>
+    <div>
+      {{ content }}
+    </div>
+  </details>
+{%- endif -%}
 
 {% schema %}
 {
   "name": "t:names.accordion_row",
-  "tag": null
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "summary",
+      "label": "t:content.summary"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "t:content.content_text"
+    }
+  ]
 }
 {% endschema %}

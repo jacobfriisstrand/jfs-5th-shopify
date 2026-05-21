@@ -1,8 +1,12 @@
 # ADR-0004 — Product model: color is a product, size is a variant; color products group via a `color_group` metaobject
 
+# ADR-0004 — Product model: color is a product, size is a variant; color products group via a `color_group` metaobject
+
 ## Status
 
-Accepted.
+Superseded by [ADR-0009](0009-product-model-standard-variants.md).
+
+Original status: Accepted. Superseded because the colour-as-product model traded too much native Shopify tooling (per-variant inventory in one product, the variant picker, the Admin variant image field, native cross-colour reporting) for the colour-as-route ergonomic, and that ergonomic turned out to be replaceable by the ADR-0001 morph contract. Kept in the repo as historical context — do not implement.
 
 ## Context
 
@@ -33,11 +37,11 @@ Each colour of a merchandiseable item is its own Shopify product (e.g. "Hoodie C
 
 A Shopify metaobject definition `color_group` with three fields:
 
-| Field             | Type                            | Purpose                                                |
-| ----------------- | ------------------------------- | ------------------------------------------------------ |
-| `name`            | Single line text                | Human label ("Hoodie Classic")                         |
-| `entries`         | List of product references      | All colour products in the group                       |
-| `primary_product` | Single product reference        | Which colour represents the group on collection grids  |
+| Field             | Type                       | Purpose                                               |
+| ----------------- | -------------------------- | ----------------------------------------------------- |
+| `name`            | Single line text           | Human label ("Hoodie Classic")                        |
+| `entries`         | List of product references | All colour products in the group                      |
+| `primary_product` | Single product reference   | Which colour represents the group on collection grids |
 
 Each colour product carries a single product metafield `color_group` of type "metaobject reference (color_group)". The metafield is the only edit each colour product needs.
 
