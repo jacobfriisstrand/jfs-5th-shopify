@@ -1,0 +1,96 @@
+{% doc %}
+  Renders the cart line-item list (image, title, variant title, quantity
+  selector, line price, remove button) for either the `/cart` page or the
+  cart drawer.
+
+  This is the single source of truth for cart line-item rendering, per
+  ADR-0005. The snippet does NOT render its own `<form>` — the caller is
+  responsible for wrapping it (and any sibling summary block) in
+  `<form action="{{ routes.cart_url }}" method="post">` so the JS-disabled
+  contract works: per-line `name="updates[<key>]"` inputs are posted to
+  `/cart`, which updates quantities and redirects back.
+
+  The `variant` parameter is accepted today as a forward-compatible hook
+  for ADR-0005's "drawer hides line-item-level notes; page shows them"
+  rule. No line-item notes exist in scope yet, so 'page' and 'drawer'
+  currently render identically.
+
+  @param {cart} cart - The current cart. Required.
+  @param {string} [variant] - 'page' or 'drawer'. Defaults to 'page'.
+
+  @example
+  {% render '_cart-line-items', cart: cart, variant: 'page' %}
+{% enddoc %}
+
+{% liquid
+  assign surface = variant | default: 'page'
+%}
+
+<ul role="list" class="flex flex-col">
+  {% for line in cart.items %}
+    {% liquid
+      assign qty_id = 'cart-qty-' | append: line.key
+      assign qty_name = 'updates[' | append: line.key | append: ']'
+      assign remove_label = 'accessibility.remove_item' | t: title: line.product.title
+    %}
+    <li class="flex gap-4 border-b border-current/15 py-4">
+      <a href="{{ line.url }}" class="block w-20 shrink-0 sm:w-24">
+        {%- if line.image -%}
+          {{
+            line.image
+            | image_url: width: 200
+            | image_tag:
+              loading: 'lazy',
+              width: line.image.width,
+              height: line.image.height,
+              widths: '100,200,400',
+              sizes: '(min-width: 640px) 96px, 80px',
+              alt: line.product.title,
+              class: 'rounded-input h-auto w-full object-cover'
+          }}
+        {%- endif -%}
+      </a>
+
+      <div class="flex flex-1 flex-col gap-2">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex flex-col gap-1">
+            <a href="{{ line.url }}" class="text-fg text-sm font-medium hover:underline sm:text-base">
+              {{ line.product.title }}
+            </a>
+            {%- unless line.product.has_only_default_variant -%}
+              <p class="text-fg/70 text-xs">{{ line.variant.title }}</p>
+            {%- endunless -%}
+            {%- if line.selling_plan_allocation -%}
+              <p class="text-fg/70 text-xs">{{ line.selling_plan_allocation.selling_plan.name }}</p>
+            {%- endif -%}
+          </div>
+          <p class="text-fg text-sm font-medium sm:text-base">{{ line.final_line_price | money }}</p>
+        </div>
+
+        <div class="flex items-center justify-between gap-3">
+          <quantity-selector-component class="inline-block">
+            <label for="{{ qty_id }}" class="sr-only">{{ 'accessibility.quantity' | t }}</label>
+            {% render 'quantity-input',
+              input_id: qty_id,
+              value: line.quantity,
+              min: 0,
+              step: 1,
+              name: qty_name,
+              cart_line: forloop.index
+            %}
+          </quantity-selector-component>
+
+          <button
+            type="submit"
+            name="updates[{{ line.key }}]"
+            value="0"
+            aria-label="{{ remove_label }}"
+            class="hover:text-fg text-fg/70 text-xs underline-offset-2 hover:underline"
+          >
+            {{ 'actions.remove' | t }}
+          </button>
+        </div>
+      </div>
+    </li>
+  {% endfor %}
+</ul>
