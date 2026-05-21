@@ -1,6 +1,17 @@
 #!/bin/bash
 set -euo pipefail
 
+# Load .env.local if present so vars like SHOPIFY_FLAG_STORE_PASSWORD are
+# available to the Shopify CLI invocations below. Without this, the comment
+# at step 1b ("set via .env.local") would be a lie — bash does not source
+# dotenv files automatically.
+if [[ -f ".env.local" ]]; then
+  set -a
+  # shellcheck disable=SC1091
+  source ".env.local"
+  set +a
+fi
+
 # Development script: builds schemas + scripts + CSS once, starts Shopify theme
 # dev, waits for its initial sync to complete, THEN starts file watchers.
 #
