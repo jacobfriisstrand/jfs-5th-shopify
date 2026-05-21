@@ -1,0 +1,77 @@
+{% doc %}
+  Renders a quantity stepper (− N +) inside a `<quantity-selector-component>`
+  custom element.
+
+  Markup contract is dictated by `src/scripts/component-quantity-selector.ts`:
+  the component requires `ref="minusButton"`, `ref="quantityInput"`, and
+  `ref="plusButton"` children, and binds methods via `on:click` / `on:input`
+  / `on:focus` / `on:blur` attributes (see `src/scripts/component.ts`'s
+  global event-delegation initializer).
+
+  Wrap this snippet in a parent that listens for `quantity-selector:update`
+  events — on the PDP that parent is `<product-form-component>`, in the cart
+  it will be the cart line-item form. The snippet itself contains no parent
+  wiring; reusing it elsewhere is a matter of placing it inside an
+  appropriate listener.
+
+  @param {string} input_id - DOM id for the `<input>` so an external `<label>`
+    can target it. Required (callers must guarantee uniqueness on the page).
+  @param {number} [value] - Initial quantity. Defaults to 1.
+  @param {number} [min] - Minimum quantity. Defaults to 1.
+  @param {number} [max] - Maximum quantity. Optional; no max if omitted.
+  @param {number} [step] - Step increment. Defaults to 1.
+  @param {string} [name] - Name of the form control (e.g. "quantity" on the
+    PDP, "updates[<line>]" in cart). Defaults to "quantity".
+  @param {number} [cart_line] - Cart line number, exposed as `data-cart-line`
+    so the change event identifies which line it belongs to. Optional.
+  @param {string} [form_id] - DOM id of a form to associate the input with via
+    the native `form="…"` attribute. Use this when the quantity stepper sits
+    outside the cart-add `<form>` it should submit with. Optional.
+{% enddoc %}
+
+{% liquid
+  assign qty_value = value | default: 1
+  assign qty_min = min | default: 1
+  assign qty_step = step | default: 1
+  assign qty_name = name | default: 'quantity'
+%}
+
+<div class="rounded-input inline-flex items-center border border-current text-sm font-medium">
+  <button
+    type="button"
+    ref="minusButton"
+    on:click="/decreaseQuantity"
+    aria-label="{{ 'products.product.decrease_quantity' | t }}"
+    class="hover:bg-fg hover:text-bg focus-visible:bg-fg focus-visible:text-bg disabled:opacity-40 px-3 py-2 transition-colors disabled:cursor-not-allowed"
+  >
+    <span aria-hidden="true">−</span>
+  </button>
+
+  <input
+    id="{{ input_id }}"
+    ref="quantityInput"
+    type="number"
+    name="{{ qty_name }}"
+    value="{{ qty_value }}"
+    min="{{ qty_min }}"
+    {% if max %}max="{{ max }}"{% endif %}
+    step="{{ qty_step }}"
+    {% if cart_line %}data-cart-line="{{ cart_line }}"{% endif %}
+    {% if form_id %}form="{{ form_id }}"{% endif %}
+    inputmode="numeric"
+    on:input="/setQuantity"
+    on:focus="/selectInputValue"
+    on:blur="/setQuantity"
+    class="w-10 border-x border-current bg-transparent py-2 text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+  >
+
+  <button
+    type="button"
+    ref="plusButton"
+    on:click="/increaseQuantity"
+    aria-label="{{ 'products.product.increase_quantity' | t }}"
+    class="hover:bg-fg hover:text-bg focus-visible:bg-fg focus-visible:text-bg disabled:opacity-40 px-3 py-2 transition-colors disabled:cursor-not-allowed"
+  >
+    <span aria-hidden="true">+</span>
+  </button>
+</div>

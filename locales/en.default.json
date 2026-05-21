@@ -218,13 +218,23 @@
       "quantity_error_max": "This item has a maximum of {{ maximum }}",
       "sold_out": "Sold out",
       "unavailable": "Unavailable",
+      "options": "Options",
       "quantity": "Quantity",
+      "increase_quantity": "Increase quantity",
+      "decrease_quantity": "Decrease quantity",
       "quantity_increments": "Increments of {{ increment }}",
       "quantity_minimum": "Minimum of {{ minimum }}",
       "quantity_maximum": "Maximum of {{ maximum }}",
       "in_cart": "in cart",
       "default_title": "Default Title",
-      "sticky_add_to_cart": "Quick add to cart bar"
+      "sticky_add_to_cart": "Quick add to cart bar",
+      "accordion": {
+        "details": "Details",
+        "product_specifications": "Product specifications",
+        "care": "Care",
+        "size_guide": "Size guide",
+        "shipping": "Shipping and returns"
+      }
     }
   },
   "sections": {
