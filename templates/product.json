@@ -1,7 +1,87 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
       "type": "main-product",
+      "blocks": {
+        "product-media-gallery": {
+          "type": "_product-media-gallery",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "product-title": {
+          "type": "product-title",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "price": {
+          "type": "price",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "product-description": {
+          "type": "product-description",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "variant-picker": {
+          "type": "variant-picker",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "quantity": {
+          "type": "quantity",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "add-to-cart": {
+          "type": "add-to-cart",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "accordion-row-1": {
+          "type": "_accordion-row",
+          "static": true,
+          "settings": {
+            "summary": "Accordion 1",
+            "content": "<p>Content</p>"
+          },
+          "blocks": {}
+        },
+        "accordion-row-2": {
+          "type": "_accordion-row",
+          "static": true,
+          "settings": {
+            "summary": "",
+            "content": ""
+          },
+          "blocks": {}
+        },
+        "accordion-row-3": {
+          "type": "_accordion-row",
+          "static": true,
+          "settings": {
+            "summary": "",
+            "content": ""
+          },
+          "blocks": {}
+        }
+      },
       "settings": {}
     }
   },

@@ -10,8 +10,12 @@
     (fields: `color` — product variant reference, `images` — list of
     file references).
   - There is **no product metafield**. The block enumerates
-    `shop.metaobjects.variant_gallery.values` globally and matches the
-    entry whose `color` references the active variant.
+    `shop.metaobjects.variant_gallery.values` globally and matches by
+    **color option value** of the entry's referenced variant, so a single
+    gallery entry per color covers all size variants of that color.
+    The `color` reference can point at any one variant of that color
+    (typically the smallest size); the matcher reads its option value at
+    the Color axis and compares it to the active variant.
   - The metaobject definition must have **Storefronts → Read** access
     enabled for both the type and its fields.
 
@@ -41,16 +45,20 @@
 {% liquid
   assign variant = product.selected_or_first_available_variant
   assign variant_galleries = shop.metaobjects.variant_gallery.values
-  assign variant_gid = 'gid://shopify/ProductVariant/' | append: variant.id
+  assign target_color = variant.option1
 
   assign matched_images = empty
-  if variant_galleries != blank
+  if variant_galleries != blank and target_color != blank
     for entry in variant_galleries
-      capture entry_color_gid
-        echo entry.color
-      endcapture
+      assign entry_variant = entry.color.value
+      if entry_variant == blank
+        continue
+      endif
+      if entry_variant.product.id != product.id
+        continue
+      endif
       assign entry_images = entry.images.value
-      if entry_color_gid == variant_gid and entry_images.size > 0
+      if entry_variant.option1 == target_color and entry_images.size > 0
         assign matched_images = entry_images
         break
       endif

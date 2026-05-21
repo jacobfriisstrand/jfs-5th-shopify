@@ -118,7 +118,7 @@ An attribute axis on a **Product** (Shopify supports up to three). The catalogue
 _Avoid_: Variant axis, option group.
 
 **Variant gallery** (metaobject `variant_gallery`):
-A Shopify metaobject with two fields — `color` (product variant reference, pointing at the specific variant the gallery belongs to) and `images` (list of image file references). Authored in Admin → Content → Metaobjects via the native file picker; no JSON, no media IDs. The metaobject definition must have **Storefronts → Read** access enabled (type + fields) so Liquid can read it. The PDP enumerates entries globally via `shop.metaobjects.variant_gallery.values` and matches the entry whose `color` references the active variant. There is **no product metafield** — entries link to variants directly. The matched entry's `images` follow `variant.featured_image` as additional slides; no `product.media` spillover. See [ADR-0009](docs/adr/0009-product-model-standard-variants.md).
+A Shopify metaobject with two fields — `color` (product variant reference, pointing at any one variant of the color the gallery belongs to) and `images` (list of image file references). Authored in Admin → Content → Metaobjects via the native file picker; no JSON, no media IDs. The metaobject definition must have **Storefronts → Read** access enabled (type + fields) so Liquid can read it. The PDP enumerates entries globally via `shop.metaobjects.variant_gallery.values` and matches by **color option value** (`variant.option1`) of the referenced variant, so a single entry per color covers every size variant of that color. There is **no product metafield** — entries link to variants directly. The matched entry's `images` follow `variant.featured_image` as additional slides; no `product.media` spillover. See [ADR-0009](docs/adr/0009-product-model-standard-variants.md).
 _Avoid_: Color gallery metaobject, variant image set, variant gallery metafield (the prior product-metafield approach is deprecated).
 
 ## Relationships
@@ -131,7 +131,7 @@ _Avoid_: Color gallery metaobject, variant image set, variant gallery metafield 
 - A **Custom element** imports peers via the **`@theme/*` specifier**
 - The **Schema build** writes into the `{% schema %}` tag of a **Section** or **Block** liquid file
 - A **Product** has many **Variant**s, each defined by one value per **Variant option**; option 1 is `Color`, option 2 is `Size`
-- A **Variant gallery** metaobject references a specific **Variant** via its `color` field; the PDP enumerates `shop.metaobjects.variant_gallery.values` and renders the `images` of the entry whose `color` matches the active variant
+- A **Variant gallery** metaobject references a specific **Variant** via its `color` field; the PDP enumerates `shop.metaobjects.variant_gallery.values` and renders the `images` of the entry whose referenced variant shares the same `Color` option value as the active variant (so one entry per color covers all sizes)
 - Every **Compiled asset** under `assets/` is constrained by the **Perf budget**; route-level totals follow the **Importmap runtime** + `<script>` graph
 
 ## Example dialogue

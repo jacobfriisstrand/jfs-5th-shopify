@@ -43,7 +43,7 @@ When a variant has more than one image, merchants author the gallery as a **meta
 **One-time setup (developer, in Admin → Settings → Custom data):**
 
 1. Define a metaobject **Variant gallery** (`variant_gallery`) with fields:
-   - `color` — **product variant reference** (not text). Points at the specific variant the gallery belongs to.
+   - `color` — **product variant reference** (not text). Points at any one variant of the color the gallery belongs to (typically the smallest size). The matcher keys off the variant's `option1` value, so one entry per color covers every size variant of that color.
    - `images` — file reference, **list of references**, restricted to images.
 2. On the metaobject definition, enable **Storefronts → Read** access for both the type and each field. Without storefront access, Liquid sees nothing.
 3. **No product metafield is involved.** Entries link to variants directly via the `color` field; the storefront enumerates them globally.
@@ -51,17 +51,17 @@ When a variant has more than one image, merchants author the gallery as a **meta
 **Per-variant merchant workflow (no JSON, no IDs):**
 
 1. Admin → Content → Metaobjects → **Variant gallery** → **Add entry**
-   - In the `color` picker, pick the product → then the specific variant.
+   - In the `color` picker, pick the product → then any one variant of the target color (e.g. the smallest size).
    - Click the `images` picker → multi-select images from the file library.
    - Save.
-2. Repeat for each variant that needs multiple images. One metaobject entry per (product, variant) pair.
+2. Repeat once per color that needs multiple images. **One metaobject entry per (product, color)** — not per variant. Adding new size variants under that color requires no metaobject change.
 
 **Storefront contract:**
 
 The PDP gallery ([`blocks/_product-media-gallery.liquid`](../../blocks/_product-media-gallery.liquid)) renders, for the active variant:
 
 1. The variant's primary image — `variant.featured_image`, set via the native Admin variant Image field.
-2. Any extras from the matched **Variant gallery** entry — found by enumerating `shop.metaobjects.variant_gallery.values` and matching the entry whose `color` (variant reference) equals the active variant's GID (`gid://shopify/ProductVariant/<id>`). The `images` list is read via `entry.images.value` (the `.value` accessor unwraps `MediaListDrop`; iterating `entry.images` directly yields nothing).
+2. Any extras from the matched **Variant gallery** entry — found by enumerating `shop.metaobjects.variant_gallery.values` and matching the entry whose referenced variant belongs to the same product and shares the active variant's `option1` (Color) value. The `images` list is read via `entry.images.value` (the `.value` accessor unwraps `MediaListDrop`; iterating `entry.images` directly yields nothing).
 
 Fallback rules:
 
