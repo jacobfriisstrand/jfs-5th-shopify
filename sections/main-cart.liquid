@@ -1,8 +1,11 @@
 {%- comment -%}
   Section-owned custom-element registration for the line-item
-  <quantity-selector-component>. See ADR-0003 pillar 7.
+  <quantity-selector-component> and the form-level <cart-form-component>
+  that auto-submits quantity changes via /cart/change.js. See ADR-0003
+  pillar 7.
 {%- endcomment -%}
 <script src="{{ 'component-quantity-selector.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'cart-form.js' | asset_url }}" type="module" fetchpriority="low"></script>
 
 {% liquid
   assign form_id = 'cart-form-' | append: section.id
@@ -22,11 +25,13 @@
         <a href="{{ routes.root_url }}" class="text-fg underline underline-offset-4">{{ continue_label }}</a>
       </div>
     {%- else -%}
-      <form id="{{ form_id }}" action="{{ routes.cart_url }}" method="post" novalidate>
-        {% content_for 'block', id: 'cart-title', type: '_cart-title' %}
-        {% content_for 'block', id: 'cart-products', type: '_cart-products' %}
-        {% content_for 'block', id: 'cart-summary', type: '_cart-summary' %}
-      </form>
+      <cart-form-component>
+        <form id="{{ form_id }}" action="{{ routes.cart_url }}" method="post" novalidate>
+          {% content_for 'block', id: 'cart-title', type: '_cart-title' %}
+          {% content_for 'block', id: 'cart-products', type: '_cart-products' %}
+          {% content_for 'block', id: 'cart-summary', type: '_cart-summary' %}
+        </form>
+      </cart-form-component>
     {%- endif -%}
   </div>
 </section>

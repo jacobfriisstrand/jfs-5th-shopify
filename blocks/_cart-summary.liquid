@@ -17,18 +17,26 @@
 <section class="border-current/15 mt-6 flex flex-col gap-4 border-t pt-6">
   <dl class="flex items-baseline justify-between gap-4">
     <dt class="text-fg text-base font-medium">{{ subtotal_label }}</dt>
-    <dd class="text-fg text-lg font-medium">{{ cart.total_price | money }}</dd>
+    <dd class="text-fg group text-lg font-medium" data-cart-subtotal>
+      <span class="group-data-[updating=true]:hidden">{{ cart.total_price | money }}</span>
+      <span
+        aria-hidden="true"
+        class="bg-fg/10 hidden h-5 w-20 animate-pulse rounded align-middle group-data-[updating=true]:inline-block"
+      ></span>
+    </dd>
   </dl>
   <p class="text-fg/70 text-xs">{{ taxes_note }}</p>
   <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-    <button
-      type="submit"
-      name="update"
-      value=""
-      class="rounded-input hover:bg-fg hover:text-bg border border-current px-6 py-3 text-sm font-medium transition-colors"
-    >
-      {{ update_label }}
-    </button>
+    <noscript>
+      <button
+        type="submit"
+        name="update"
+        value=""
+        class="rounded-input hover:bg-fg hover:text-bg border border-current px-6 py-3 text-sm font-medium transition-colors"
+      >
+        {{ update_label }}
+      </button>
+    </noscript>
     <button
       type="submit"
       name="checkout"

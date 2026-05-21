@@ -23,7 +23,7 @@
       assign qty_name = 'updates[' | append: line.key | append: ']'
       assign remove_label = 'accessibility.remove_item' | t: title: line.product.title
     %}
-    <li class="flex gap-4 border-b border-current/15 py-4">
+    <li class="group flex gap-4 border-b border-current/15 py-4" data-cart-line="{{ forloop.index }}">
       <a href="{{ line.url }}" class="block w-20 shrink-0 sm:w-24">
         {%- if line.image -%}
           {{
@@ -54,7 +54,13 @@
               <p class="text-fg/70 text-xs">{{ line.selling_plan_allocation.selling_plan.name }}</p>
             {%- endif -%}
           </div>
-          <p class="text-fg text-sm font-medium sm:text-base">{{ line.final_line_price | money }}</p>
+          <p class="text-fg text-sm font-medium sm:text-base">
+            <span class="group-data-[updating=true]:hidden">{{ line.final_line_price | money }}</span>
+            <span
+              aria-hidden="true"
+              class="bg-fg/10 hidden h-4 w-16 animate-pulse rounded align-middle group-data-[updating=true]:inline-block"
+            ></span>
+          </p>
         </div>
 
         <div class="flex items-center justify-between gap-3">
