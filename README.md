@@ -48,12 +48,12 @@ once the Shopify CLI dev server is bound to `:9292`.
 
 ## CI
 
-| Workflow            | Trigger                                 | Purpose                                                                                  |
-| ------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `theme-check.yml`   | `pull_request` / `push` (main, develop) | Runs `shopify theme check --fail-level=error` after `npm run build`.                     |
-| `perf-budget.yml`   | `pull_request` / `push`                 | Enforces `perf-budget.json`.                                                             |
-| `theme-preview.yml` | `pull_request` (main, develop)          | Pushes an unpublished preview theme on every PR push, posts the URL as a sticky comment, |
-|                     |                                         | and deletes the theme on PR close.                                                       |
+| Workflow                    | Trigger                                      | Purpose                                                                                     |
+| --------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `theme-check.yml`           | `pull_request` / `push` (main, develop)      | Runs `shopify theme check --fail-level=error` after `npm run build`.                        |
+| `perf-budget.yml`           | `pull_request` / `push`                      | Enforces `perf-budget.json`.                                                                |
+| `theme-preview.yml`         | `pull_request` (main, develop)               | Pushes an unpublished preview theme on every PR push and posts the URL as a sticky comment. |
+| `theme-preview-cleanup.yml` | `push` (main, develop) / daily cron / manual | Sweeps the store and deletes any `PR #N — …` themes whose PR is closed or merged.           |
 
 ### Required secrets
 

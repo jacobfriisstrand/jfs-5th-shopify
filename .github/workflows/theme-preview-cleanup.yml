@@ -1,0 +1,114 @@
+# Delete preview themes whose PRs are no longer open.
+#
+# This runs as a self-healing maintenance sweep:
+#   * On every push to `main` / `develop` — so merging a PR (including
+#     squash-merges that fire only `push`, not `pull_request: closed`) cleans
+#     up its preview within seconds.
+#   * On a daily schedule — so themes left behind by missed events, manually
+#     closed PRs, or failed cleanup runs do not accumulate against Shopify's
+#     100-theme-per-store limit.
+#   * On `workflow_dispatch` — for manual cleanup from the Actions UI.
+#
+# Strategy
+# --------
+# 1. List all themes on the store.
+# 2. Filter to those whose name matches the convention used by
+#    `theme-preview.yml`: `PR #<number> — <branch>`.
+# 3. For each, query the corresponding PR via the GitHub REST API. If the PR
+#    is closed (merged or not), delete the theme. Open PRs are left alone.
+#
+# Required repository secrets are the same as `theme-preview.yml`:
+# SHOPIFY_CLI_THEME_TOKEN and SHOPIFY_FLAG_STORE.
+
+name: theme-preview-cleanup
+
+on:
+  push:
+    branches: [main, develop]
+  schedule:
+    # Daily at 03:17 UTC — odd minute to avoid the top-of-hour cron stampede.
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+# Serialise cleanup runs so a push-triggered run and a scheduled run cannot
+# race on the same `theme delete` calls.
+concurrency:
+  group: theme-preview-cleanup
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    name: Delete previews for closed PRs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    env:
+      SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
+      SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_FLAG_STORE }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Delete previews whose PRs are closed
+        run: |
+          set -euo pipefail
+
+          # Pull all themes once. The CLI returns an array of
+          # `{ id, name, role, ... }`. Preview names follow the convention
+          # `PR #<number> — <branch>` from `theme-preview.yml`.
+          THEMES_JSON="$(npx shopify theme list --json)"
+
+          # Extract `id<TAB>pr_number` for every preview theme. The em dash
+          # (U+2014) in the name is the same character emitted by the deploy
+          # workflow, so this match is exact.
+          mapfile -t ENTRIES < <(
+            echo "$THEMES_JSON" \
+              | jq -r '.[] | select(.name | test("^PR #[0-9]+ — ")) | "\(.id)\t\(.name | capture("^PR #(?<n>[0-9]+) ").n)"'
+          )
+
+          if [ "${#ENTRIES[@]}" -eq 0 ]; then
+            echo "No preview themes found — nothing to do."
+            exit 0
+          fi
+
+          DELETED=0
+          KEPT=0
+
+          for ENTRY in "${ENTRIES[@]}"; do
+            THEME_ID="${ENTRY%%$'\t'*}"
+            PR_NUMBER="${ENTRY##*$'\t'}"
+
+            # `gh pr view` resolves the repo from the checked-out remote.
+            # `--json state` returns `"OPEN"`, `"CLOSED"`, or `"MERGED"`.
+            STATE="$(gh pr view "$PR_NUMBER" --json state --jq '.state' 2>/dev/null || echo "UNKNOWN")"
+
+            case "$STATE" in
+              OPEN)
+                echo "PR #$PR_NUMBER is OPEN — keeping theme $THEME_ID."
+                KEPT=$((KEPT + 1))
+                ;;
+              CLOSED|MERGED)
+                echo "PR #$PR_NUMBER is $STATE — deleting theme $THEME_ID."
+                npx shopify theme delete --force --theme "$THEME_ID"
+                DELETED=$((DELETED + 1))
+                ;;
+              *)
+                # PR doesn't exist (e.g. someone renamed a theme manually to
+                # match the convention, or the PR was hard-deleted). Leave
+                # the theme alone — a human can decide.
+                echo "PR #$PR_NUMBER state unknown ($STATE) — skipping theme $THEME_ID."
+                KEPT=$((KEPT + 1))
+                ;;
+            esac
+          done
+
+          echo "Sweep complete: $DELETED deleted, $KEPT kept."

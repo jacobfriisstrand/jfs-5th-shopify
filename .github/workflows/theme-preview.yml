@@ -5,8 +5,11 @@
 # A sticky comment on the PR is created/updated with the preview URL and the
 # theme-editor URL so reviewers can click through without running the CLI.
 #
-# When the PR is closed (merged or not), the preview theme is deleted to
-# avoid leaking against Shopify's hard limit of 100 themes per store.
+# Cleanup of merged/closed preview themes lives in
+# `.github/workflows/theme-preview-cleanup.yml`, which runs on push to the
+# default branches and on a daily schedule. Splitting deploy from cleanup
+# keeps this workflow's run history clean (no per-PR "skipped" cleanup job)
+# and makes cleanup self-healing across squash-merges and missed events.
 #
 # Required repository secrets
 # ---------------------------
@@ -29,7 +32,7 @@ name: theme-preview
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review, closed]
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: [main, develop]
 
 # Cancel an in-flight preview push if the user force-pushes again to the same
@@ -41,9 +44,7 @@ concurrency:
 jobs:
   deploy:
     name: Push preview theme
-    if: >-
-      github.event.action != 'closed' &&
-      github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -107,53 +108,5 @@ jobs:
             Theme: `${{ steps.name.outputs.theme_name }}` (id `${{ steps.push.outputs.theme_id }}`)
             Commit: `${{ github.event.pull_request.head.sha }}`
 
-            The preview is rebuilt on every push and deleted when this PR is
-            closed.
-
-  cleanup:
-    name: Delete preview theme
-    # Only run when the PR is merged. Closed-without-merge PRs keep their
-    # preview theme so reviewers can still inspect the abandoned work; clean
-    # those up manually with `shopify theme delete` if you want the slot back.
-    if: github.event.action == 'closed' && github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-    env:
-      SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
-      SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_FLAG_STORE }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Find and delete preview theme
-        run: |
-          set -euo pipefail
-          THEME_NAME="PR #${{ github.event.number }} — ${{ github.head_ref }}"
-          # `theme list --json` returns an array; match on stable name.
-          THEME_ID="$(npx shopify theme list --json \
-            | jq -r --arg name "$THEME_NAME" '.[] | select(.name == $name) | .id' \
-            | head -n1)"
-          if [ -z "$THEME_ID" ] || [ "$THEME_ID" = "null" ]; then
-            echo "No preview theme named \"$THEME_NAME\" found — nothing to delete."
-            exit 0
-          fi
-          npx shopify theme delete --force --theme "$THEME_ID"
-
-      - name: Update sticky comment
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          header: theme-preview
-          message: |
-            ### Theme preview removed
-
-            The preview theme for this PR has been deleted from the
-            playground store.
+            The preview is rebuilt on every push and deleted after this PR
+            is merged or closed (see `theme-preview-cleanup` workflow).
