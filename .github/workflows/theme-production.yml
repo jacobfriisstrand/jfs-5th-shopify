@@ -1,0 +1,105 @@
+# Deploy the theme to the named "Production" theme on the production store
+# whenever a PR is merged into `main`.
+#
+# Trigger
+# -------
+# * push: branches: [main]    — runs after any merge/commit to main
+# * workflow_dispatch          — manual re-run (e.g. rollback after revert)
+#
+# Required repository secrets
+# ---------------------------
+# SHOPIFY_PROD_CLI_THEME_TOKEN  Theme Access app token for the production
+#                               store (NOT an admin password).
+# SHOPIFY_PROD_FLAG_STORE       Production store domain, e.g.
+#                               my-store.myshopify.com
+#
+# One-time bootstrap (per store)
+# ------------------------------
+# This workflow pushes to a theme *named* `Production` so the deploy target
+# is explicit and cannot accidentally publish over an unrelated theme. You
+# must create that theme record once before the first deploy:
+#
+#   SHOPIFY_CLI_THEME_TOKEN=<token> \
+#   SHOPIFY_FLAG_STORE=<store>      \
+#     npx shopify theme push --unpublished --theme "Production"
+#
+# Then publish it via the Shopify admin (Online Store → Themes → Publish).
+# Subsequent deploys reuse the same theme record via `--theme "Production"`.
+#
+# Notes
+# -----
+# * `--allow-live` is required because the theme is the live one.
+# * `--nodelete` preserves files that exist only in the live theme (e.g.
+#   merchant-uploaded assets or theme-editor-only files we never commit).
+# * Compiled assets (`assets/app.css`, `assets/*.js`) are gitignored, so
+#   `npm run build` MUST run before `shopify theme push` or every
+#   `{{ '…' | asset_url }}` reference will 404.
+
+name: theme-production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Serialize deploys to the live theme. Two concurrent pushes can corrupt the
+# theme record; the second invocation waits instead of cancelling.
+concurrency:
+  group: theme-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Push to production theme
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_PROD_CLI_THEME_TOKEN }}
+      SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_PROD_FLAG_STORE }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build theme
+        run: npm run build
+
+      - name: Push to live theme
+        id: push
+        run: |
+          set -euo pipefail
+          OUTPUT="$(npx shopify theme push \
+            --theme "Production" \
+            --allow-live \
+            --nodelete \
+            --json)"
+          echo "$OUTPUT"
+          PREVIEW_URL="$(echo "$OUTPUT" | jq -r '.theme.preview_url // .preview_url // empty')"
+          EDITOR_URL="$(echo "$OUTPUT" | jq -r '.theme.editor_url // .editor_url // empty')"
+          THEME_ID="$(echo "$OUTPUT" | jq -r '.theme.id // .id // empty')"
+          {
+            echo "preview_url=$PREVIEW_URL"
+            echo "editor_url=$EDITOR_URL"
+            echo "theme_id=$THEME_ID"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Summary
+        run: |
+          {
+            echo "### Production deploy complete"
+            echo ""
+            echo "| | URL |"
+            echo "| --- | --- |"
+            echo "| Storefront | ${{ steps.push.outputs.preview_url }} |"
+            echo "| Theme editor | ${{ steps.push.outputs.editor_url }} |"
+            echo ""
+            echo "Theme id: \`${{ steps.push.outputs.theme_id }}\`"
+            echo "Commit: \`${{ github.sha }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
