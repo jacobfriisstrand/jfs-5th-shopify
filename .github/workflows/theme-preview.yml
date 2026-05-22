@@ -112,7 +112,10 @@ jobs:
 
   cleanup:
     name: Delete preview theme
-    if: github.event.action == 'closed'
+    # Only run when the PR is merged. Closed-without-merge PRs keep their
+    # preview theme so reviewers can still inspect the abandoned work; clean
+    # those up manually with `shopify theme delete` if you want the slot back.
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: read
