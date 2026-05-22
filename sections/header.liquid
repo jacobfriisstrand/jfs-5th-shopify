@@ -1,20 +1,15 @@
 {% comment %}
   Header section.
 
-  The outer `<header-component>` custom element owns the responsive layout
-  decision: it publishes `data-menu-style="menu|drawer"` on itself based on
-  touch capability + inline-menu overflow, and Tailwind's
-  `group-data-[menu-style=…]` variants on the children switch visibility
-  without any JS-driven `display:` toggling.
+  Responsive layout is CSS-first: the inline menu and hamburger are gated
+  by Tailwind's `md:` breakpoint inside `_header-menu`. No JS-driven
+  layout decision, so first paint matches the viewport — no FOUC.
 
-  Predictive search (slice 3) and the JS cart-drawer (slice 11) will drop
-  in as additional blocks/listeners later.
+  `<header-component>` still owns dialog open/close wiring for the menu
+  drawer and search dialog.
 {% endcomment %}
 
-<header-component
-  class="group grid-12"
-  data-menu-style="menu"
->
+<header-component class="grid-12">
   <div
     data-header-row
     class="col-content flex items-center justify-between gap-4 py-3"

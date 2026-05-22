@@ -1,11 +1,10 @@
 {% comment %}
-  Header navigation: inline horizontal menu on desktop + hamburger button
-  that opens a `<dialog-component>` drawer with the same items on mobile.
+  Header navigation: inline horizontal menu at `md` and up, hamburger
+  button that opens a `<dialog-component>` drawer below `md`.
 
-  The desktop/mobile decision is owned by the parent `<header-component>`
-  (data-menu-style="menu|drawer"), not by media queries. CSS switches
-  visibility via Tailwind's `group-data-[menu-style=…]` variants so no JS
-  drives `display:` toggling (per slice 2 AC).
+  The desktop/mobile decision is owned by CSS media queries (Tailwind's
+  `md:` variant) — no JS drives layout. This guarantees the correct
+  layout on first paint at any viewport (no FOUC).
 {% endcomment %}
 
 {%- assign linklist = linklists[block.settings.menu] -%}
@@ -13,7 +12,7 @@
   <nav
     data-inline-menu
     aria-label="{{ linklist.title | escape }}"
-    class="group-data-[menu-style=drawer]:hidden min-w-0 overflow-hidden"
+    class="hidden md:block min-w-0 overflow-hidden"
   >
     {%- render 'menu-list',
       linklist: linklist,
@@ -27,7 +26,7 @@
     aria-label="{{ 'actions.open_menu' | t }}"
     aria-controls="header-menu-drawer"
     aria-expanded="false"
-    class="group-data-[menu-style=menu]:hidden inline-flex items-center justify-center p-2"
+    class="md:hidden inline-flex items-center justify-center p-2"
   >
     <svg
       viewBox="0 0 24 24"
