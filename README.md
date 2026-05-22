@@ -23,11 +23,18 @@ automatically via the `copilot-instructions.md` symlink).
 
 ```sh
 npm install
-npm run dev          # bin/dev.sh — schema build + script watch + theme dev
+bash bin/setup-preview-secrets.sh   # one-time: set GitHub Actions secrets (see CI)
+npm run dev                         # bin/dev.sh — schema build + script watch + theme dev
 ```
 
 `bin/dev.sh` runs everything in parallel and auto-opens the dev theme editor
 once the Shopify CLI dev server is bound to `:9292`.
+
+> **Note**: `bin/setup-preview-secrets.sh` is required on every fresh clone /
+> new contributor setup. It sets the two GitHub Actions secrets used by the
+> PR preview workflow (`SHOPIFY_FLAG_STORE`, `SHOPIFY_CLI_THEME_TOKEN`).
+> Without them the `theme-preview` CI job fails fast on every PR. See
+> [CI → Required secrets](#required-secrets) for details.
 
 ## Common commands
 
@@ -38,6 +45,38 @@ once the Shopify CLI dev server is bound to `:9292`.
 | `npm run schemas`    | Compile `src/schemas/**/*.schema.ts` → JSON → inject into liquid      |
 | `npm run scripts`    | esbuild-strip `src/scripts/*.ts` → `assets/*.js`                      |
 | `npm run theme:push` | `npm run build && shopify theme push`                                 |
+
+## CI
+
+| Workflow            | Trigger                                 | Purpose                                                                                  |
+| ------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `theme-check.yml`   | `pull_request` / `push` (main, develop) | Runs `shopify theme check --fail-level=error` after `npm run build`.                     |
+| `perf-budget.yml`   | `pull_request` / `push`                 | Enforces `perf-budget.json`.                                                             |
+| `theme-preview.yml` | `pull_request` (main, develop)          | Pushes an unpublished preview theme on every PR push, posts the URL as a sticky comment, |
+|                     |                                         | and deletes the theme on PR close.                                                       |
+
+### Required secrets
+
+`theme-preview.yml` needs two repository secrets (Settings → Secrets and
+variables → Actions):
+
+| Secret                    | Value                                                                                                                                |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `SHOPIFY_CLI_THEME_TOKEN` | Theme Access app token for the playground store. **Never** an admin password. Generate via the Theme Access app or Shopify Partners. |
+| `SHOPIFY_FLAG_STORE`      | Playground store domain, e.g. `jfs-playground.myshopify.com`.                                                                        |
+
+Without these, the workflow fails fast on `shopify theme push`. Rotate the
+token immediately if it leaks.
+
+Fastest way to set them: run the interactive helper from the repo root:
+
+```sh
+bash bin/setup-preview-secrets.sh
+```
+
+It walks you through obtaining each value (including how to install the
+Theme Access app and generate the `shptka_…` token) and pipes them to
+`gh secret set` so the token never lands in your shell history.
 
 ## Layout
 

@@ -1,0 +1,159 @@
+# Auto-deploy a preview theme to the playground store for every PR.
+#
+# Every push to an open PR (targeting `develop` or `main`) builds the theme
+# and pushes it as an *unpublished* theme on the configured Shopify store.
+# A sticky comment on the PR is created/updated with the preview URL and the
+# theme-editor URL so reviewers can click through without running the CLI.
+#
+# When the PR is closed (merged or not), the preview theme is deleted to
+# avoid leaking against Shopify's hard limit of 100 themes per store.
+#
+# Required repository secrets
+# ---------------------------
+# SHOPIFY_CLI_THEME_TOKEN  Theme Access app token for the playground store
+#                          (NOT an admin password). Generate via the Theme
+#                          Access app or Shopify Partners.
+# SHOPIFY_FLAG_STORE       Playground store domain, e.g.
+#                          jfs-playground.myshopify.com
+#
+# Notes
+# -----
+# * Compiled assets (`assets/app.css`, `assets/*.js`) are gitignored, so
+#   `npm run build` MUST run before `shopify theme push` or every
+#   `{{ '…' | asset_url }}` reference will 404.
+# * The theme is named `PR #<number> — <branch>` so subsequent pushes reuse
+#   the same theme record instead of leaking a new one on every commit.
+# * Draft PRs are skipped to preserve theme slots.
+
+name: theme-preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, closed]
+    branches: [main, develop]
+
+# Cancel an in-flight preview push if the user force-pushes again to the same
+# PR. Without this, two CLI pushes can race on the same theme record.
+concurrency:
+  group: theme-preview-pr-${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Push preview theme
+    if: >-
+      github.event.action != 'closed' &&
+      github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
+      SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_FLAG_STORE }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build theme
+        run: npm run build
+
+      - name: Compute theme name
+        id: name
+        run: |
+          # Stable name so repeated pushes update the same theme record.
+          # GitHub's branch name is available as head_ref on PRs.
+          echo "theme_name=PR #${{ github.event.number }} — ${{ github.head_ref }}" >> "$GITHUB_OUTPUT"
+
+      - name: Push unpublished theme
+        id: push
+        run: |
+          set -euo pipefail
+          OUTPUT="$(npx shopify theme push \
+            --unpublished \
+            --json \
+            --theme "${{ steps.name.outputs.theme_name }}")"
+          echo "$OUTPUT"
+          # The CLI prints non-JSON status lines on stderr; --json keeps stdout
+          # to a single JSON object describing the theme.
+          PREVIEW_URL="$(echo "$OUTPUT" | jq -r '.theme.preview_url // .preview_url')"
+          EDITOR_URL="$(echo "$OUTPUT" | jq -r '.theme.editor_url // .editor_url')"
+          THEME_ID="$(echo "$OUTPUT" | jq -r '.theme.id // .id')"
+          {
+            echo "preview_url=$PREVIEW_URL"
+            echo "editor_url=$EDITOR_URL"
+            echo "theme_id=$THEME_ID"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Post sticky preview comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: theme-preview
+          message: |
+            ### Theme preview ready
+
+            | | URL |
+            | --- | --- |
+            | Storefront | ${{ steps.push.outputs.preview_url }} |
+            | Theme editor | ${{ steps.push.outputs.editor_url }} |
+
+            Theme: `${{ steps.name.outputs.theme_name }}` (id `${{ steps.push.outputs.theme_id }}`)
+            Commit: `${{ github.event.pull_request.head.sha }}`
+
+            The preview is rebuilt on every push and deleted when this PR is
+            closed.
+
+  cleanup:
+    name: Delete preview theme
+    # Only run when the PR is merged. Closed-without-merge PRs keep their
+    # preview theme so reviewers can still inspect the abandoned work; clean
+    # those up manually with `shopify theme delete` if you want the slot back.
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
+      SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_FLAG_STORE }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Find and delete preview theme
+        run: |
+          set -euo pipefail
+          THEME_NAME="PR #${{ github.event.number }} — ${{ github.head_ref }}"
+          # `theme list --json` returns an array; match on stable name.
+          THEME_ID="$(npx shopify theme list --json \
+            | jq -r --arg name "$THEME_NAME" '.[] | select(.name == $name) | .id' \
+            | head -n1)"
+          if [ -z "$THEME_ID" ] || [ "$THEME_ID" = "null" ]; then
+            echo "No preview theme named \"$THEME_NAME\" found — nothing to delete."
+            exit 0
+          fi
+          npx shopify theme delete --force --theme "$THEME_ID"
+
+      - name: Update sticky comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: theme-preview
+          message: |
+            ### Theme preview removed
+
+            The preview theme for this PR has been deleted from the
+            playground store.
