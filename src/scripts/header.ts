@@ -1,35 +1,19 @@
 import { Component } from "@theme/component";
 import { DialogCloseEvent, DialogOpenEvent } from "@theme/dialog";
-import { debounce } from "@theme/scheduling";
 
 /**
- * `<header-component>` owns the responsive layout decision for the header.
- * It publishes `data-menu-style="menu" | "drawer"` on itself and CSS (via
- * Tailwind's `group-data-[menu-style=…]` variants on children) flips
- * visibility — there is no JS-driven `display:` toggling.
- *
- * Mode selection: drawer when the device is touch-primary OR the inline
- * menu would overflow the header row. Otherwise, inline menu.
+ * `<header-component>` wires the hamburger button to the menu drawer and
+ * the search trigger to the search dialog. The responsive layout decision
+ * (inline menu vs drawer) is owned by CSS (`md:` breakpoint inside
+ * `_header-menu.liquid`), not JS, so first paint matches the viewport.
  */
 class HeaderComponent extends Component {
-  #ro: ResizeObserver | null = null;
-
   connectedCallback() {
     super.connectedCallback();
-
-    this.#evaluateLayout();
-    this.#ro = new ResizeObserver(this.#onResize);
-    this.#ro.observe(this);
 
     this.addEventListener("click", this.#onClick);
     this.addEventListener(DialogOpenEvent.eventName, this.#onDialogOpen);
     this.addEventListener(DialogCloseEvent.eventName, this.#onDialogClose);
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    this.#ro?.disconnect();
-    this.#ro = null;
   }
 
   get #trigger(): HTMLButtonElement | null {
@@ -51,43 +35,6 @@ class HeaderComponent extends Component {
       "dialog-component#header-search-dialog",
     );
   }
-
-  get #inlineMenu(): HTMLElement | null {
-    return this.querySelector<HTMLElement>("[data-inline-menu]");
-  }
-
-  #onResize = debounce(() => this.#evaluateLayout(), 100);
-
-  /**
-   * Probe the inline menu width in `menu` mode (so it is rendered and
-   * measurable), then decide. Touch capability forces drawer regardless.
-   */
-  #evaluateLayout = () => {
-    const inline = this.#inlineMenu;
-    if (!inline) {
-      // No menu items at all — nothing to switch.
-      this.dataset.menuStyle = "menu";
-      return;
-    }
-
-    const isTouch =
-      "ontouchstart" in window ||
-      (typeof navigator !== "undefined" && navigator.maxTouchPoints > 0);
-
-    // Force `menu` while we measure so the inline nav has a real width.
-    const previous = this.dataset.menuStyle;
-    this.dataset.menuStyle = "menu";
-    // Force layout flush so scrollWidth/clientWidth reflect "menu" mode.
-    void this.offsetWidth;
-    const overflows = inline.scrollWidth > inline.clientWidth + 1;
-
-    const next = isTouch || overflows ? "drawer" : "menu";
-    if (next !== previous) {
-      this.dataset.menuStyle = next;
-    } else {
-      this.dataset.menuStyle = previous ?? next;
-    }
-  };
 
   #onClick = (event: Event) => {
     const target = event.target as Element | null;
