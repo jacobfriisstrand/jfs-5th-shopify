@@ -72,7 +72,7 @@ if [[ ! "$STORE_DOMAIN" =~ \.myshopify\.com$ ]]; then
   [[ "$CONFIRM" =~ ^[Yy]$ ]] || { err "Aborted."; exit 1; }
 fi
 
-printf '%s' "$STORE_DOMAIN" | gh secret set SHOPIFY_FLAG_STORE --repo "$REPO" --body -
+printf '%s' "$STORE_DOMAIN" | gh secret set SHOPIFY_FLAG_STORE --repo "$REPO"
 ok "SHOPIFY_FLAG_STORE set."
 echo
 
@@ -128,7 +128,7 @@ if [[ ! "$THEME_TOKEN" =~ ^shptka_ ]]; then
   [[ "$CONFIRM" =~ ^[Yy]$ ]] || { err "Aborted."; exit 1; }
 fi
 
-printf '%s' "$THEME_TOKEN" | gh secret set SHOPIFY_CLI_THEME_TOKEN --repo "$REPO" --body -
+printf '%s' "$THEME_TOKEN" | gh secret set SHOPIFY_CLI_THEME_TOKEN --repo "$REPO"
 ok "SHOPIFY_CLI_THEME_TOKEN set."
 echo
 
