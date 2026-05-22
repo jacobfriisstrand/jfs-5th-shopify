@@ -23,11 +23,18 @@ automatically via the `copilot-instructions.md` symlink).
 
 ```sh
 npm install
-npm run dev          # bin/dev.sh — schema build + script watch + theme dev
+bash bin/setup-preview-secrets.sh   # one-time: set GitHub Actions secrets (see CI)
+npm run dev                         # bin/dev.sh — schema build + script watch + theme dev
 ```
 
 `bin/dev.sh` runs everything in parallel and auto-opens the dev theme editor
 once the Shopify CLI dev server is bound to `:9292`.
+
+> **Note**: `bin/setup-preview-secrets.sh` is required on every fresh clone /
+> new contributor setup. It sets the two GitHub Actions secrets used by the
+> PR preview workflow (`SHOPIFY_FLAG_STORE`, `SHOPIFY_CLI_THEME_TOKEN`).
+> Without them the `theme-preview` CI job fails fast on every PR. See
+> [CI → Required secrets](#required-secrets) for details.
 
 ## Common commands
 
