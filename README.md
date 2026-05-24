@@ -50,6 +50,7 @@ once the Shopify CLI dev server is bound to `:9292`.
 
 | Workflow                    | Trigger                                      | Purpose                                                                                     |
 | --------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `theme-develop.yml`         | `push` (`develop`) / manual                  | Pushes a fixed unpublished `Develop` theme for branch-level QA before release to `main`.    |
 | `theme-check.yml`           | `pull_request` / `push` (main, develop)      | Runs `shopify theme check --fail-level=error` after `npm run build`.                        |
 | `perf-budget.yml`           | `pull_request` / `push`                      | Enforces `perf-budget.json`.                                                                |
 | `theme-preview.yml`         | `pull_request` (main, develop)               | Pushes an unpublished preview theme on every PR push and posts the URL as a sticky comment. |
@@ -57,7 +58,7 @@ once the Shopify CLI dev server is bound to `:9292`.
 
 ### Required secrets
 
-`theme-preview.yml` needs two repository secrets (Settings → Secrets and
+`theme-preview.yml` and `theme-develop.yml` need two repository secrets (Settings → Secrets and
 variables → Actions):
 
 | Secret                    | Value                                                                                                                                |
@@ -67,6 +68,14 @@ variables → Actions):
 
 Without these, the workflow fails fast on `shopify theme push`. Rotate the
 token immediately if it leaks.
+
+These same secrets power both unpublished QA targets on that store:
+
+- `theme-develop.yml` updates a fixed `Develop` theme on every push to `develop`
+- `theme-preview.yml` creates per-PR themes named `PR #<number> — <branch>`
+
+If you move previews/QA to a different store later, re-run the helper below with
+the new store domain and new Theme Access token.
 
 Fastest way to set them: run the interactive helper from the repo root:
 

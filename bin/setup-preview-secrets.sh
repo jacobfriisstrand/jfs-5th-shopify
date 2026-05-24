@@ -3,7 +3,7 @@
 # bin/setup-preview-secrets.sh
 #
 # Interactive helper to set the two GitHub Actions secrets required by
-# `.github/workflows/theme-preview.yml`:
+# `.github/workflows/theme-preview.yml` and `.github/workflows/theme-develop.yml`:
 #
 #   SHOPIFY_CLI_THEME_TOKEN  Theme Access app password for the playground store
 #   SHOPIFY_FLAG_STORE       Playground store domain (e.g. jfs-playground.myshopify.com)
@@ -41,7 +41,7 @@ if ! gh auth status >/dev/null 2>&1; then
   exit 1
 fi
 
-bold "GitHub Actions secrets setup for theme-preview workflow"
+bold "GitHub Actions secrets setup for preview and develop workflows"
 echo "Target repo: $REPO"
 echo
 
@@ -140,6 +140,12 @@ echo
 dim "Verify with:"
 dim "  gh secret list --repo $REPO"
 echo
-dim "The next PR push to develop or main will trigger theme-preview.yml and"
-dim "comment the preview URL on the PR. If anything fails, check the workflow"
-dim "logs and confirm the token has not expired or been revoked."
+dim "These secrets power both preview lanes on the configured store:"
+dim "  - theme-develop.yml      -> fixed unpublished 'Develop' theme on push to develop"
+dim "  - theme-preview.yml      -> per-PR unpublished preview themes"
+echo
+dim "If you point the repo at a new store later, re-run this script."
+dim "The next push to develop updates the 'Develop' theme; the next PR push"
+dim "to develop or main creates/updates the PR preview theme."
+dim "If anything fails, check the workflow logs and confirm the token has not"
+dim "expired or been revoked."
