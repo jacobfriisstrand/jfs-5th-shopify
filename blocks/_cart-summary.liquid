@@ -19,10 +19,7 @@
     <dt class="text-fg text-base font-medium">{{ subtotal_label }}</dt>
     <dd class="text-fg group text-lg font-medium" data-cart-subtotal>
       <span class="group-data-[updating=true]:hidden">{{ cart.total_price | money }}</span>
-      <span
-        aria-hidden="true"
-        class="bg-fg/10 hidden h-5 w-20 animate-pulse rounded align-middle group-data-[updating=true]:inline-block"
-      ></span>
+      {% render 'skeleton', class: 'hidden h-5 w-20 align-middle group-data-[updating=true]:inline-block' %}
     </dd>
   </dl>
   <p class="text-fg/70 text-xs">{{ taxes_note }}</p>

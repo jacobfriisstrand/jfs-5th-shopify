@@ -56,10 +56,7 @@
           </div>
           <p class="text-fg text-sm font-medium sm:text-base">
             <span class="group-data-[updating=true]:hidden">{{ line.final_line_price | money }}</span>
-            <span
-              aria-hidden="true"
-              class="bg-fg/10 hidden h-4 w-16 animate-pulse rounded align-middle group-data-[updating=true]:inline-block"
-            ></span>
+            {% render 'skeleton', class: 'hidden h-4 w-16 align-middle group-data-[updating=true]:inline-block' %}
           </p>
         </div>
 
