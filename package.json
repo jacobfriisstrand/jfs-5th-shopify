@@ -9,8 +9,10 @@
     "schemas": "tsx src/schemas/build.ts",
     "scripts": "tsx src/scripts/build.ts",
     "vendor": "tsx scripts/vendor-swiper.ts",
+    "check:schema-drift": "tsx scripts/check-schema-drift.ts",
+    "check:fix": "vp check --fix && npm run check:schema-drift",
     "lint": "vp lint",
-    "check": "vp check",
+    "check": "vp check && npm run check:schema-drift",
     "theme:check": "shopify theme check --fail-level=error",
     "theme:push": "npm run build && shopify theme push",
     "prepare": "vp config"

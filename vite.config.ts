@@ -10,7 +10,7 @@ const isWatch = process.argv.includes("--watch");
 
 export default defineConfig({
   staged: {
-    "*": "vp check --fix",
+    "*": "npm run check:fix",
   },
   fmt: {
     printWidth: 80,

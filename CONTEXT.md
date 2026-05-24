@@ -35,6 +35,10 @@ _Avoid_: Settings, config, manifest.
 **Schema build**:
 The `tsx src/schemas/build.ts` step that compiles schemas and writes them into liquid files only when JSON content actually changed.
 
+**Schema drift check**:
+The read-only validator `scripts/check-schema-drift.ts` that compares `templates/*.json` and `config/settings_data.json` against the TypeScript schema source of truth. It reports orphaned setting ids and exits non-zero, but never rewrites merchant-owned JSON. Run via `npm run check` or directly with `npx tsx scripts/check-schema-drift.ts`.
+_Avoid_: Auto-fix, cleaner.
+
 **vp / vite-plus**:
 The build tool wrapping Vite. Used for CSS (Tailwind v4), schema hot-reload, and the project's `vp check` / `vp fmt` standards. `vp` is the canonical CLI; do not invoke `vite` directly.
 _Avoid_: Vite (when referring to the project's build entry point).
@@ -130,6 +134,7 @@ _Avoid_: Color gallery metaobject, variant image set, variant gallery metafield 
 - A **Section** or **Block** loads a **Custom element** by `<script type="module">` whose imports resolve through the **Importmap runtime**
 - A **Custom element** imports peers via the **`@theme/*` specifier**
 - The **Schema build** writes into the `{% schema %}` tag of a **Section** or **Block** liquid file
+- The **Schema drift check** reports stale setting ids in merchant-owned template/config JSON after schema changes; it does not rewrite those files
 - A **Product** has many **Variant**s, each defined by one value per **Variant option**; option 1 is `Color`, option 2 is `Size`
 - A **Variant gallery** metaobject references a specific **Variant** via its `color` field; the PDP enumerates `shop.metaobjects.variant_gallery.values` and renders the `images` of the entry whose referenced variant shares the same `Color` option value as the active variant (so one entry per color covers all sizes)
 - Every **Compiled asset** under `assets/` is constrained by the **Perf budget**; route-level totals follow the **Importmap runtime** + `<script>` graph
