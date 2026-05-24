@@ -11,7 +11,7 @@
 {% endcomment %}
 
 {%- liquid
-  assign products = predictive_search.resources.results.products
+  assign products = predictive_search.resources.products
   assign terms = predictive_search.terms
   assign performed = predictive_search.performed
 -%}
@@ -26,6 +26,9 @@
   {%- else -%}
     <ul class="flex flex-col gap-2">
       {%- for product in products -%}
+        {%- liquid
+          assign result_image = product.featured_media.preview_image | default: product.featured_image
+        -%}
         <li
           id="predictive-search-result-{{ forloop.index0 }}"
           role="option"
@@ -36,12 +39,19 @@
             href="{{ product.url }}"
             class="flex items-center gap-3 p-2 rounded-input hover:bg-fg/5 focus-visible:outline-2 focus-visible:outline-offset-2 aria-selected:bg-fg/10"
           >
-            {%- if product.featured_image -%}
-              {{
-                product.featured_image
-                | image_url: width: 96
-                | image_tag: width: 48, height: 48, loading: 'lazy', class: 'object-cover rounded-input'
-              }}
+            {%- if result_image -%}
+              <span class="relative h-12 w-12 shrink-0 overflow-hidden rounded-input">
+                {% render 'skeleton', class: 'absolute inset-0 rounded-none bg-fg/8 animate-pulse' %}
+                {{
+                  result_image
+                  | image_url: width: 96
+                  | image_tag:
+                    width: 48,
+                    height: 48,
+                    loading: 'lazy',
+                    class: 'relative z-10 h-full w-full object-cover'
+                }}
+              </span>
             {%- endif -%}
             <span class="flex-1 min-w-0">
               <span class="block truncate text-sm font-medium">{{ product.title }}</span>
