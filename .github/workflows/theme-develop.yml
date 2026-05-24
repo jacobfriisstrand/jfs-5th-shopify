@@ -1,0 +1,77 @@
+# Auto-deploy the current `develop` branch to a fixed unpublished theme.
+#
+# This gives the branch a stable QA target between per-PR previews and the
+# published `Production` theme deployed from `main`.
+#
+# Required repository secrets are the same as `theme-preview.yml`:
+#   SHOPIFY_CLI_THEME_TOKEN  Theme Access app token for the preview store
+#   SHOPIFY_FLAG_STORE       Preview store domain
+
+name: theme-develop
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+# Serialize deploys to the shared Develop theme. A force-push or rapid follow-up
+# commit should replace the in-flight deploy instead of racing it.
+concurrency:
+  group: theme-develop
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Push develop theme
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
+      SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_FLAG_STORE }}
+      THEME_NAME: Develop
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build theme
+        run: npm run build
+
+      - name: Push unpublished theme
+        id: push
+        run: |
+          set -euo pipefail
+          OUTPUT="$(npx shopify theme push \
+            --unpublished \
+            --json \
+            --theme "$THEME_NAME")"
+          echo "$OUTPUT"
+          PREVIEW_URL="$(echo "$OUTPUT" | jq -r '.theme.preview_url // .preview_url')"
+          EDITOR_URL="$(echo "$OUTPUT" | jq -r '.theme.editor_url // .editor_url')"
+          THEME_ID="$(echo "$OUTPUT" | jq -r '.theme.id // .id')"
+          {
+            echo "preview_url=$PREVIEW_URL"
+            echo "editor_url=$EDITOR_URL"
+            echo "theme_id=$THEME_ID"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Summary
+        run: |
+          {
+            echo "### Develop theme updated"
+            echo ""
+            echo "| | URL |"
+            echo "| --- | --- |"
+            echo "| Storefront | ${{ steps.push.outputs.preview_url }} |"
+            echo "| Theme editor | ${{ steps.push.outputs.editor_url }} |"
+            echo ""
+            echo "Theme: \`${THEME_NAME}\` (id \`${{ steps.push.outputs.theme_id }}\`)"
+            echo "Commit: \`${{ github.sha }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
