@@ -243,11 +243,11 @@
       "in_cart": "in cart",
       "default_title": "Default Title",
       "sticky_add_to_cart": "Quick add to cart bar",
+      "size_guide": "Size guide",
       "accordion": {
         "details": "Details",
         "product_specifications": "Product specifications",
         "care": "Care",
-        "size_guide": "Size guide",
         "shipping": "Shipping and returns"
       }
     }

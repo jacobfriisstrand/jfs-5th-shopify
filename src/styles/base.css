@@ -73,153 +73,162 @@ dialog::backdrop {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Header menu drawer: full-viewport slide-in from the right with backdrop
-   fade. The closing animation is triggered by the `.dialog-closing` class
-   that <dialog-component> adds before awaiting `animationend` and calling
-   dialog.close(). The `:not(.dialog-closing)` guard prevents the entry
-   animation from re-running while the exit animation plays. */
-#header-menu-drawer dialog[open]:not(.dialog-closing) {
-  animation: header-menu-drawer-in 240ms cubic-bezier(0.2, 0, 0, 1);
+/* Drawer animation system                                                    */
+/*                                                                            */
+/* Any `<dialog>` with a `data-drawer="<side>"` attribute (where side is one  */
+/* of `right`, `left`, `top`, `bottom`) gets the shared slide-in/out          */
+/* animation. The exit is triggered by the `.dialog-closing` class that       */
+/* `<dialog-component>` adds before awaiting `animationend` and calling       */
+/* `dialog.close()`. The `:not(.dialog-closing)` guard prevents the entry     */
+/* animation from re-running while the exit animation plays.                  */
+/*                                                                            */
+/* Positioning (anchor side, sizing) stays in the markup as Tailwind          */
+/* utilities — this layer only owns motion.                                   */
+/* -------------------------------------------------------------------------- */
+
+dialog[data-drawer][open]:not(.dialog-closing)::backdrop {
+  animation: drawer-backdrop-in 200ms ease-out;
 }
 
-#header-menu-drawer dialog[open]:not(.dialog-closing)::backdrop {
-  animation: header-menu-backdrop-in 200ms ease-out;
+dialog[data-drawer].dialog-closing::backdrop {
+  animation: drawer-backdrop-out 200ms ease-in forwards;
 }
 
-#header-menu-drawer dialog.dialog-closing {
-  animation: header-menu-drawer-out 200ms cubic-bezier(0.4, 0, 1, 1) forwards;
+dialog[data-drawer="right"][open]:not(.dialog-closing) {
+  animation: drawer-in-right 240ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-#header-menu-drawer dialog.dialog-closing::backdrop {
-  animation: header-menu-backdrop-out 200ms ease-in forwards;
+dialog[data-drawer="right"].dialog-closing {
+  animation: drawer-out-right 200ms cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
-@keyframes header-menu-drawer-in {
+dialog[data-drawer="left"][open]:not(.dialog-closing) {
+  animation: drawer-in-left 240ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+dialog[data-drawer="left"].dialog-closing {
+  animation: drawer-out-left 200ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+dialog[data-drawer="top"][open]:not(.dialog-closing) {
+  animation: drawer-in-top 220ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+dialog[data-drawer="top"].dialog-closing {
+  animation: drawer-out-top 180ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+dialog[data-drawer="bottom"][open]:not(.dialog-closing) {
+  animation: drawer-in-bottom 220ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+dialog[data-drawer="bottom"].dialog-closing {
+  animation: drawer-out-bottom 180ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes drawer-in-right {
   from {
     translate: 100% 0;
     opacity: 0;
   }
-
   to {
     translate: 0 0;
     opacity: 1;
   }
 }
 
-@keyframes header-menu-drawer-out {
+@keyframes drawer-out-right {
   from {
     translate: 0 0;
     opacity: 1;
   }
-
   to {
     translate: 100% 0;
     opacity: 0;
   }
 }
 
-@keyframes header-menu-backdrop-in {
+@keyframes drawer-in-left {
+  from {
+    translate: -100% 0;
+    opacity: 0;
+  }
+  to {
+    translate: 0 0;
+    opacity: 1;
+  }
+}
+
+@keyframes drawer-out-left {
+  from {
+    translate: 0 0;
+    opacity: 1;
+  }
+  to {
+    translate: -100% 0;
+    opacity: 0;
+  }
+}
+
+@keyframes drawer-in-top {
+  from {
+    translate: 0 -100%;
+    opacity: 0;
+  }
+  to {
+    translate: 0 0;
+    opacity: 1;
+  }
+}
+
+@keyframes drawer-out-top {
+  from {
+    translate: 0 0;
+    opacity: 1;
+  }
+  to {
+    translate: 0 -100%;
+    opacity: 0;
+  }
+}
+
+@keyframes drawer-in-bottom {
+  from {
+    translate: 0 100%;
+    opacity: 0;
+  }
+  to {
+    translate: 0 0;
+    opacity: 1;
+  }
+}
+
+@keyframes drawer-out-bottom {
+  from {
+    translate: 0 0;
+    opacity: 1;
+  }
+  to {
+    translate: 0 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes drawer-backdrop-in {
   from {
     background-color: rgb(0 0 0 / 0);
   }
-
   to {
     background-color: rgb(0 0 0 / 0.4);
   }
 }
 
-@keyframes header-menu-backdrop-out {
+@keyframes drawer-backdrop-out {
   from {
     background-color: rgb(0 0 0 / 0.4);
   }
-
   to {
     background-color: rgb(0 0 0 / 0);
-  }
-}
-
-/* Header search dialog: full-viewport slide-in from the top with backdrop
-   fade. Same close-class pattern as the menu drawer. */
-#header-search-dialog dialog[open]:not(.dialog-closing) {
-  animation: header-search-in 220ms cubic-bezier(0.2, 0, 0, 1);
-}
-
-#header-search-dialog dialog[open]:not(.dialog-closing)::backdrop {
-  animation: header-menu-backdrop-in 200ms ease-out;
-}
-
-#header-search-dialog dialog.dialog-closing {
-  animation: header-search-out 180ms cubic-bezier(0.4, 0, 1, 1) forwards;
-}
-
-#header-search-dialog dialog.dialog-closing::backdrop {
-  animation: header-menu-backdrop-out 200ms ease-in forwards;
-}
-
-@keyframes header-search-in {
-  from {
-    translate: 0 -100%;
-    opacity: 0;
-  }
-
-  to {
-    translate: 0 0;
-    opacity: 1;
-  }
-}
-
-@keyframes header-search-out {
-  from {
-    translate: 0 0;
-    opacity: 1;
-  }
-
-  to {
-    translate: 0 -100%;
-    opacity: 0;
-  }
-}
-
-/* Cart drawer: slide-in from the right (anchored, max-w-md) with backdrop
-   fade. Reuses `header-menu-backdrop-in/out` for the backdrop. Same
-   close-class pattern as the menu drawer. */
-#cart-drawer dialog[open]:not(.dialog-closing) {
-  animation: cart-drawer-in 240ms cubic-bezier(0.2, 0, 0, 1);
-}
-
-#cart-drawer dialog[open]:not(.dialog-closing)::backdrop {
-  animation: header-menu-backdrop-in 200ms ease-out;
-}
-
-#cart-drawer dialog.dialog-closing {
-  animation: cart-drawer-out 200ms cubic-bezier(0.4, 0, 1, 1) forwards;
-}
-
-#cart-drawer dialog.dialog-closing::backdrop {
-  animation: header-menu-backdrop-out 200ms ease-in forwards;
-}
-
-@keyframes cart-drawer-in {
-  from {
-    translate: 100% 0;
-    opacity: 0;
-  }
-
-  to {
-    translate: 0 0;
-    opacity: 1;
-  }
-}
-
-@keyframes cart-drawer-out {
-  from {
-    translate: 0 0;
-    opacity: 1;
-  }
-
-  to {
-    translate: 100% 0;
-    opacity: 0;
   }
 }
 

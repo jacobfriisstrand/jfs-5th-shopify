@@ -1,0 +1,149 @@
+{% doc %}
+  Renders the size guide trigger button and dialog for a product. The dialog
+  shows the intro rich text and size chart sourced from the
+  `custom.size_chart` metaobject reference. Renders nothing if no chart is set.
+
+  Expected metaobject shape:
+
+  - `size_chart` (referenced by `custom.size_chart`)
+    - `name`: single-line text (used as the metaobject display name in admin
+      so editors can identify each chart when picking on a product; not
+      rendered)
+    - `intro`: rich text (shown above the table; optional)
+    - `headers`: list of single-line text (column headers)
+    - `size_chart_rows`: list of references to `size_chart_row`
+  - `size_chart_row`
+    - `cells`: list of single-line text (one entry per column; the first cell
+      is rendered as a row header)
+
+  @param {object} product - The product whose size guide metaobject reference will be rendered.
+  @param {string} section_id - The id of the parent section, used to scope the dialog id.
+
+  @example
+  {% render 'product-size-guide', product: product, section_id: section.id %}
+{% enddoc %}
+
+{% liquid
+  assign size_chart = product.metafields.custom.size_chart.value
+  assign dialog_id = 'size-guide-dialog-' | append: section_id
+  assign dialog_title_id = dialog_id | append: '-title'
+  assign size_guide_label = 'products.product.size_guide' | t
+  assign close_dialog_label = 'accessibility.close_dialog' | t
+  assign intro = size_chart.intro
+  assign headers = size_chart.headers.value
+  assign rows = size_chart.size_chart_rows.value
+%}
+
+{%- if size_chart != blank -%}
+  <size-guide-component class="block">
+    <button
+      type="button"
+      data-size-guide-trigger
+      aria-controls="{{ dialog_id }}"
+      aria-expanded="false"
+      class="text-fg/70 underline-offset-4 hover:text-fg self-start text-sm underline"
+    >
+      {{ size_guide_label }}
+    </button>
+
+    <dialog-component id="{{ dialog_id }}" class="contents">
+      <dialog
+        ref="dialog"
+        data-drawer="right"
+        aria-labelledby="{{ dialog_title_id }}"
+        class="fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-full max-w-md bg-bg text-fg p-0"
+      >
+        <div class="flex h-full flex-col">
+          <header class="flex items-center justify-between gap-4 border-b border-current/15 p-4">
+            {% render 'heading',
+              text: size_guide_label,
+              level: 2,
+              id: dialog_title_id,
+              class: 'text-lg font-medium'
+            %}
+            <button
+              type="button"
+              on:click="dialog-component/closeDialog"
+              aria-label="{{ close_dialog_label }}"
+              class="text-fg/70 hover:text-fg -m-2 inline-flex p-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <line x1="6" y1="6" x2="18" y2="18" />
+                <line x1="18" y1="6" x2="6" y2="18" />
+              </svg>
+            </button>
+          </header>
+
+          <div class="flex flex-1 flex-col gap-6 overflow-y-auto p-4">
+          {%- if intro != blank -%}
+            <div class="prose max-w-none">
+              {{ intro | metafield_tag }}
+            </div>
+          {%- endif -%}
+
+          {%- if rows != blank -%}
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse text-left text-sm">
+                {%- if headers != blank -%}
+                  {%- liquid
+                    assign headers_string = headers | join: ','
+                    assign header_cells = headers_string | split: ','
+                  -%}
+                  <thead>
+                    <tr>
+                      {%- for header in header_cells -%}
+                        {%- assign header_text = header | strip -%}
+                        <th scope="col" class="border-fg/10 border-b px-3 py-2 font-medium">
+                          {{ header_text }}
+                        </th>
+                      {%- endfor -%}
+                    </tr>
+                  </thead>
+                {%- endif -%}
+                <tbody>
+                  {%- for row in rows -%}
+                    {%- liquid
+                      assign raw_cells = row.cells.value | default: row.cells
+                      assign cells_string = raw_cells | join: ','
+                      assign cells = cells_string | split: ','
+                    -%}
+                    <tr>
+                      {%- for cell in cells -%}
+                        {%- assign cell_text = cell | strip -%}
+                        {%- if forloop.first -%}
+                          <th scope="row" class="border-fg/10 border-b px-3 py-2 font-medium">
+                            {{ cell_text }}
+                          </th>
+                        {%- else -%}
+                          <td class="border-fg/10 border-b px-3 py-2">{{ cell_text }}</td>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </tr>
+                  {%- endfor -%}
+                </tbody>
+              </table>
+            </div>
+          {%- endif -%}
+
+          {%- if intro == blank and rows == blank -%}
+            <p class="text-fg/60 text-sm">
+              The linked size chart metaobject has no <code>intro</code> or
+              <code>size_chart_rows</code> populated. Check the metaobject entry
+              in the Shopify admin (Content → Metaobjects → Size chart).
+            </p>
+          {%- endif -%}
+          </div>
+        </div>
+      </dialog>
+    </dialog-component>
+  </size-guide-component>
+{%- endif -%}
