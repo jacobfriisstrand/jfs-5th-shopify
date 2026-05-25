@@ -177,6 +177,62 @@ export class DialogCloseEvent extends CustomEvent<unknown> {
   static eventName = "dialog:close";
 }
 
+class SizeGuideComponent extends Component {
+  connectedCallback() {
+    super.connectedCallback();
+
+    this.addEventListener("click", this.#onClick);
+    this.addEventListener(DialogOpenEvent.eventName, this.#onDialogOpen);
+    this.addEventListener(DialogCloseEvent.eventName, this.#onDialogClose);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+
+    this.removeEventListener("click", this.#onClick);
+    this.removeEventListener(DialogOpenEvent.eventName, this.#onDialogOpen);
+    this.removeEventListener(DialogCloseEvent.eventName, this.#onDialogClose);
+  }
+
+  get #trigger(): HTMLButtonElement | null {
+    return this.querySelector<HTMLButtonElement>("[data-size-guide-trigger]");
+  }
+
+  get #dialog():
+    | (HTMLElement & { showDialog?: () => void; closeDialog?: () => void })
+    | null {
+    return this.querySelector<
+      HTMLElement & { showDialog?: () => void; closeDialog?: () => void }
+    >("dialog-component");
+  }
+
+  #onClick = (event: Event) => {
+    const target = event.target as Element | null;
+    if (!target?.closest("[data-size-guide-trigger]")) return;
+
+    this.#dialog?.showDialog?.();
+  };
+
+  #onDialogOpen = (event: Event) => {
+    if (event.target !== this.#dialog) return;
+    this.#trigger?.setAttribute("aria-expanded", "true");
+  };
+
+  #onDialogClose = (event: Event) => {
+    if (event.target !== this.#dialog) return;
+
+    const trigger = this.#trigger;
+    if (!trigger) return;
+
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.focus();
+  };
+}
+
+if (!customElements.get("size-guide-component")) {
+  customElements.define("size-guide-component", SizeGuideComponent);
+}
+
 document.addEventListener(
   "toggle",
   (event) => {
