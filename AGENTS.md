@@ -754,6 +754,8 @@ around accessibility, schema authoring, and section/block composition.
 
 Issues live in GitHub Issues at `jacobfriisstrand/jfs-5th-shopify`, accessed via the `gh` CLI. See [`docs/agents/issue-tracker.md`](./docs/agents/issue-tracker.md).
 
+**Pull requests always target `develop`, never `main`.** `main` is the production branch and only receives merges from `develop` via release PRs. When opening a PR with `gh pr create`, always pass `--base develop` explicitly.
+
 ### Triage labels
 
 Default canonical labels (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See [`docs/agents/triage-labels.md`](./docs/agents/triage-labels.md).
