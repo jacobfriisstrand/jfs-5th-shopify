@@ -46,44 +46,19 @@
       {{ size_guide_label }}
     </button>
 
-    <dialog-component id="{{ dialog_id }}" class="contents">
-      <dialog
-        ref="dialog"
-        data-drawer="right"
-        aria-labelledby="{{ dialog_title_id }}"
-        class="fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-full max-w-md bg-bg text-fg p-0"
-      >
-        <div class="flex h-full flex-col">
-          <header class="flex items-center justify-between gap-4 border-b border-current/15 p-4">
-            {% render 'heading',
-              text: size_guide_label,
-              level: 2,
-              id: dialog_title_id,
-              class: 'text-lg font-medium'
-            %}
-            <button
-              type="button"
-              on:click="dialog-component/closeDialog"
-              aria-label="{{ close_dialog_label }}"
-              class="text-fg/70 hover:text-fg -m-2 inline-flex p-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                aria-hidden="true"
-              >
-                <line x1="6" y1="6" x2="18" y2="18" />
-                <line x1="18" y1="6" x2="6" y2="18" />
-              </svg>
-            </button>
-          </header>
+    {%- capture size_guide_body -%}
+      <div class="flex h-full flex-col">
+        <header class="flex items-center justify-between gap-4 border-b border-current/15 p-4">
+          {% render 'heading',
+            text: size_guide_label,
+            level: 2,
+            id: dialog_title_id,
+            class: 'text-lg font-medium'
+          %}
+          {%- render 'drawer-close-button', label: close_dialog_label -%}
+        </header>
 
-          <div class="flex flex-1 flex-col gap-6 overflow-y-auto p-4">
+        <div class="flex flex-1 flex-col gap-6 overflow-y-auto p-4">
           {%- if intro != blank -%}
             <div class="prose max-w-none">
               {{ intro | metafield_tag }}
@@ -141,9 +116,14 @@
               in the Shopify admin (Content → Metaobjects → Size chart).
             </p>
           {%- endif -%}
-          </div>
         </div>
-      </dialog>
-    </dialog-component>
+      </div>
+    {%- endcapture -%}
+
+    {%- render 'drawer',
+      id: dialog_id,
+      aria_labelledby: dialog_title_id,
+      content: size_guide_body
+    -%}
   </size-guide-component>
 {%- endif -%}

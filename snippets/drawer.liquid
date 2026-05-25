@@ -1,0 +1,89 @@
+{% doc %}
+  Reusable drawer shell. Wraps a `<dialog-component>` around a native
+  `<dialog>` that animates from a chosen side via the `data-drawer`
+  attribute system (see
+  [ADR-0010](../docs/adr/0010-drawer-data-attribute-system.md)).
+
+  Defaults handle positioning, sizing, and surface colors — callers only
+  pick a `side` and (optionally) a `size`. Surface colors and backdrop
+  styling come from the global `dialog[data-drawer]` rules in
+  `src/styles/base.css`; this snippet does not re-declare them.
+
+  The caller owns the body markup (header, content, footer) and passes
+  it via a captured string in the `content` parameter. Pair with the
+  [`drawer-close-button`](./drawer-close-button.liquid) snippet for the
+  standard X button.
+
+  @param {string} id - Used for the `<dialog-component id>`. Triggers
+    reference this via `aria-controls`.
+  @param {string} [side] - One of `right`, `left`, `top`, `bottom`.
+    Default `right`. Sets `data-drawer="<side>"` and the anchor edge.
+  @param {string} [size] - CSS length controlling the drawer's main
+    axis (width for `right`/`left`, height for `top`/`bottom`).
+    Defaults: `min(100vw, 28rem)` for side drawers, `66dvh` (~2/3 of
+    the viewport) for top or bottom sheets.
+  @param {string} [class] - Extra utility classes on the `<dialog>`.
+    Defaults to `p-0`; pass e.g. `'p-6'` to add padding inside the
+    dialog itself.
+  @param {string} [aria_labelledby] - ID of the element labelling the
+    dialog. Use this when there is a visible heading inside the body.
+  @param {string} [aria_label] - Explicit accessible name. Use this
+    when there is no visible heading (e.g. search dialog). Caller is
+    responsible for escaping user-supplied strings.
+  @param {string} content - Captured drawer body markup.
+
+  @example
+  {%- capture cart_body -%}
+    <div>…line items, footer…</div>
+  {%- endcapture -%}
+
+  {%- render 'drawer',
+    id: 'cart-drawer',
+    aria_labelledby: 'cart-drawer-title',
+    content: cart_body
+  -%}
+{% enddoc %}
+
+{%- liquid
+  assign drawer_side = side | default: 'right'
+  assign extra_class = class | default: 'p-0'
+
+  case drawer_side
+    when 'left'
+      assign position_class = 'fixed inset-y-0 left-0 right-auto m-0 h-dvh max-h-none'
+      assign default_size = 'min(100vw, 28rem)'
+      assign size_axis = 'width'
+    when 'top'
+      assign position_class = 'fixed inset-x-0 top-0 bottom-auto m-0 w-screen max-w-none'
+      assign default_size = '66dvh'
+      assign size_axis = 'height'
+    when 'bottom'
+      assign position_class = 'fixed inset-x-0 bottom-0 top-auto m-0 w-screen max-w-none'
+      assign default_size = '66dvh'
+      assign size_axis = 'height'
+    else
+      assign drawer_side = 'right'
+      assign position_class = 'fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none'
+      assign default_size = 'min(100vw, 28rem)'
+      assign size_axis = 'width'
+  endcase
+
+  assign drawer_size = size | default: default_size
+-%}
+
+<dialog-component id="{{ id }}" class="contents">
+  <dialog
+    ref="dialog"
+    data-drawer="{{ drawer_side }}"
+    class="{{ position_class }} {{ extra_class }}"
+    style="{{ size_axis }}: {{ drawer_size }};"
+    {% if aria_labelledby -%}
+      aria-labelledby="{{ aria_labelledby }}"
+    {%- endif %}
+    {% if aria_label -%}
+      aria-label="{{ aria_label }}"
+    {%- endif %}
+  >
+    {{ content }}
+  </dialog>
+</dialog-component>

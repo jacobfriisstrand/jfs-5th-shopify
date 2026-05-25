@@ -102,15 +102,49 @@ dialog[data-drawer].dialog-closing::backdrop {
 
 ### Adding a new drawer
 
-1. Wrap the surface in `<dialog-component>` with a unique `id`.
-2. Inside, render a `<dialog ref="dialog" data-drawer="<side>" …>` with
-   Tailwind classes that pin it to the chosen edge and size it.
-3. Done. Animation, backdrop fade, scroll lock, and close-on-escape all
-   work.
+Use the [`drawer`](../../snippets/drawer.liquid) snippet — it owns the
+`<dialog-component>` + `<dialog data-drawer>` shell, picks sensible
+defaults for the anchor edge and axis size based on `side`, and pulls
+surface colors + backdrop from the global `dialog[data-drawer]` rules
+in `base.css`. Callers usually only supply `id` and the body markup.
 
+```liquid
+{%- capture body -%}
+  <header class="…">
+    {%- render 'drawer-close-button', label: 'actions.close' | t -%}
+  </header>
+  <div class="…">…</div>
+{%- endcapture -%}
+
+{%- render 'drawer',
+  id: 'my-drawer',
+  aria_labelledby: 'my-drawer-title',
+  content: body
+-%}
+```
+
+Tunable props:
+
+- `side` — `right` (default), `left`, `top`, `bottom`. Picks the anchor
+  edge and which axis `size` controls (width for side drawers, height
+  for top/bottom sheets).
+- `size` — a CSS length for that axis. Defaults to
+  `min(100vw, 28rem)` for side drawers and `66dvh` (~2/3 of the
+  viewport) for top/bottom sheets. Pass `'100vw'` for a full-width side
+  drawer, `'100dvh'` to make a sheet take the whole screen, etc.
+- `class` — extra utilities on the `<dialog>` (default `p-0`). Use this
+  for inside-the-dialog padding when the body does not own it.
+
+Animation, backdrop fade, scroll lock, and close-on-escape all work.
 No CSS changes are required to ship a new drawer that slides from a
-supported side. New *sides* (e.g. a corner toast that scales in) get one
-shared `[data-drawer="<new-side>"]` block plus two keyframes.
+supported side. New *sides* (e.g. a corner toast that scales in) get
+one shared `[data-drawer="<new-side>"]` block plus two keyframes in
+`base.css`.
+
+Hand-rolling `<dialog-component>` + `<dialog>` markup is permitted only
+when the snippet cannot express what you need (e.g. a drawer that needs
+extra attributes on the `<dialog>`). Prefer extending the snippet over
+duplicating its shell.
 
 ## Consequences
 
