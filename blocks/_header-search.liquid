@@ -23,71 +23,52 @@
   {%- render 'icon', icon: 'search', size: 24 -%}
 </button>
 
-<dialog-component id="header-search-dialog" class="contents">
-  <dialog
-    ref="dialog"
-    data-drawer="top"
-    aria-label="{{ 'content.search' | t }}"
-    class="fixed inset-x-0 top-0 m-0 h-dvh w-screen max-w-none bg-bg text-fg p-0"
-  >
-    <predictive-search class="flex flex-col h-full">
-      <div class="flex items-center gap-2 border-b border-fg/10 p-4">
-        <form
-          action="{{ routes.search_url }}"
-          method="get"
-          role="search"
-          class="flex-1"
+{%- capture search_drawer_body -%}
+  <predictive-search class="flex flex-col h-full">
+    <div class="flex items-center gap-2 border-b border-fg/10 p-4">
+      <form
+        action="{{ routes.search_url }}"
+        method="get"
+        role="search"
+        class="flex-1"
+      >
+        <label for="header-search-input" class="sr-only">
+          {{- 'content.search_input_label' | t -}}
+        </label>
+        <input
+          ref="input"
+          id="header-search-input"
+          type="search"
+          name="q"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="{{ 'placeholders.search' | t }}"
+          role="combobox"
+          aria-controls="header-search-results"
+          aria-expanded="false"
+          aria-autocomplete="list"
+          class="w-full bg-transparent border-0 outline-none text-lg py-2 focus-visible:outline-2 focus-visible:outline-offset-2"
         >
-          <label for="header-search-input" class="sr-only">
-            {{- 'content.search_input_label' | t -}}
-          </label>
-          <input
-            ref="input"
-            id="header-search-input"
-            type="search"
-            name="q"
-            autocomplete="off"
-            spellcheck="false"
-            placeholder="{{ 'placeholders.search' | t }}"
-            role="combobox"
-            aria-controls="header-search-results"
-            aria-expanded="false"
-            aria-autocomplete="list"
-            class="w-full bg-transparent border-0 outline-none text-lg py-2 focus-visible:outline-2 focus-visible:outline-offset-2"
-          >
-        </form>
-        <button
-          type="button"
-          on:click="dialog-component/closeDialog"
-          aria-label="{{ 'actions.close_search' | t }}"
-          class="p-2"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            aria-hidden="true"
-          >
-            <line x1="6" y1="6" x2="18" y2="18" />
-            <line x1="18" y1="6" x2="6" y2="18" />
-          </svg>
-        </button>
-      </div>
+      </form>
+      {%- render 'drawer-close-button', label: 'actions.close_search' | t -%}
+    </div>
 
-      <div
-        ref="results"
-        id="header-search-results"
-        role="listbox"
-        aria-label="{{ 'content.search_results_label' | t }}"
-        class="flex-1 overflow-auto p-4"
-      ></div>
-    </predictive-search>
-  </dialog>
-</dialog-component>
+    <div
+      ref="results"
+      id="header-search-results"
+      role="listbox"
+      aria-label="{{ 'content.search_results_label' | t }}"
+      class="flex-1 overflow-auto p-4"
+    ></div>
+  </predictive-search>
+{%- endcapture -%}
+
+{%- render 'drawer',
+  id: 'header-search-dialog',
+  side: 'top',
+  aria_label: 'content.search' | t,
+  content: search_drawer_body
+-%}
 
 {% schema %}
 {

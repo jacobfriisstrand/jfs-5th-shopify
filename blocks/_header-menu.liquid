@@ -44,42 +44,27 @@
     </svg>
   </button>
 
-  <dialog-component id="header-menu-drawer" class="contents">
-    <dialog
-      ref="dialog"
-      data-drawer="right"
-      class="fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-screen max-w-none bg-bg text-fg p-6"
-      aria-label="{{ linklist.title | escape }}"
-    >
-      <button
-        type="button"
-        on:click="dialog-component/closeDialog"
-        aria-label="{{ 'actions.close_menu' | t }}"
-        class="ml-auto block p-2"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          width="24"
-          height="24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          aria-hidden="true"
-        >
-          <line x1="6" y1="6" x2="18" y2="18" />
-          <line x1="18" y1="6" x2="6" y2="18" />
-        </svg>
-      </button>
+  {%- capture menu_drawer_body -%}
+    {%- render 'drawer-close-button',
+      label: 'actions.close_menu' | t,
+      class: 'ml-auto'
+    -%}
 
-      <nav data-drawer-menu class="mt-4">
-        {%- render 'menu-list',
-          linklist: linklist,
-          list_classes: 'flex flex-col gap-4 text-base'
-        -%}
-      </nav>
-    </dialog>
-  </dialog-component>
+    <nav data-drawer-menu class="mt-4">
+      {%- render 'menu-list',
+        linklist: linklist,
+        list_classes: 'flex flex-col gap-4 text-base'
+      -%}
+    </nav>
+  {%- endcapture -%}
+
+  {%- render 'drawer',
+    id: 'header-menu-drawer',
+    size: '100vw',
+    class: 'p-6',
+    aria_label: linklist.title | escape,
+    content: menu_drawer_body
+  -%}
 {%- endif -%}
 
 {% schema %}

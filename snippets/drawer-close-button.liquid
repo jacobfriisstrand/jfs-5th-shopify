@@ -1,0 +1,23 @@
+{% doc %}
+  Standard close button for a drawer/dialog. Wires `closeDialog` on the
+  enclosing `<dialog-component>` and renders an X icon.
+
+  @param {string} label - Accessible label (e.g. "Close menu", "Close").
+  @param {string} [class] - Extra CSS classes appended to the default.
+  @param {number} [size] - Icon pixel size. Defaults to 24.
+
+  @example
+  {%- render 'drawer-close-button', label: 'actions.close' | t -%}
+{% enddoc %}
+
+{%- assign extra_class = class | default: '' -%}
+{%- assign icon_size = size | default: 24 -%}
+
+<button
+  type="button"
+  on:click="dialog-component/closeDialog"
+  aria-label="{{ label }}"
+  class="text-fg/70 hover:text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg -m-2 inline-flex p-2 {{ extra_class }}"
+>
+  {%- render 'icon', icon: 'close', size: icon_size -%}
+</button>
