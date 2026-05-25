@@ -113,11 +113,4 @@ if (document.readyState === "loading") {
 
 document.addEventListener(ThemeEvents.cartUpdate, (event) => {
   void refresh();
-
-  const detail = (event as CustomEvent).detail as
-    | { data?: { source?: string } }
-    | undefined;
-  if (detail?.data?.source === "product-form-component") {
-    void openDrawer();
-  }
 });

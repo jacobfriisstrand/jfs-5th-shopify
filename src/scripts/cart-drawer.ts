@@ -6,12 +6,9 @@ import { normalizeSectionId, sectionRenderer } from "@theme/section-renderer";
  * `<cart-drawer-component>` — slide-over cart drawer per ADR-0005.
  *
  * Mounted once globally by `sections/cart-drawer.liquid` (rendered from
- * `layout/theme.liquid`). Closed by default. Opens in two cases only:
+ * `layout/theme.liquid`). Closed by default. Opens only when explicitly asked:
  *
- *   1. Successful PDP add-to-cart — listens for `cart:update` events with
- *      `data.source === "product-form-component"` and opens the drawer
- *      after re-rendering its host section.
- *   2. Header cart icon click — `header-cart.ts` defer-imports this module
+ *   1. Header cart icon click — `header-cart.ts` defer-imports this module
  *      on first hover/focus, then calls `show()` on click.
  *
  * On any cart change (including edits made on `/cart`), the drawer re-
@@ -35,15 +32,8 @@ export class CartDrawerComponent extends Component {
     document.removeEventListener(ThemeEvents.cartUpdate, this.#onCartUpdate);
   }
 
-  #onCartUpdate = (event: Event) => {
-    const detail = (event as CustomEvent).detail as
-      | { data?: { source?: string } }
-      | undefined;
-    const source = detail?.data?.source;
-
-    void this.#rerenderSection().then(() => {
-      if (source === "product-form-component") this.#openDialog();
-    });
+  #onCartUpdate = () => {
+    void this.#rerenderSection();
   };
 
   /**

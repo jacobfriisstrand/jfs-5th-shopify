@@ -6,6 +6,7 @@ import {
   CartAddEvent,
   CartErrorEvent,
   CartUpdateEvent,
+  ToastEvent,
   VariantUpdateEvent,
 } from "@theme/events";
 import { morph } from "@theme/morph";
@@ -453,6 +454,13 @@ class ProductFormComponent extends Component {
       .then((response) => response.json())
       .then(async (response) => {
         if (response.status) {
+          document.dispatchEvent(
+            new ToastEvent({
+              message: response.message || Theme.translations.cart_add_failed,
+              variant: "error",
+            }),
+          );
+
           this.dispatchEvent(
             new CartErrorEvent(
               form.getAttribute("id") || "",
@@ -527,6 +535,31 @@ class ProductFormComponent extends Component {
             }, SUCCESS_MESSAGE_DISPLAY_DURATION);
           }
 
+          const productTitle =
+            this.dataset.productTitle ||
+            response.product_title ||
+            response.title ||
+            "";
+          const variantTitle = response.variant_title || "";
+          const colorVariantTitle = variantTitle.split("/")[0]?.trim() || "";
+          const hasVariantTitle =
+            colorVariantTitle &&
+            colorVariantTitle.toLowerCase() !== "default title";
+          const displayTitle = hasVariantTitle
+            ? `${productTitle} (${colorVariantTitle})`
+            : productTitle;
+          const messageTemplate = Theme.translations.cart_added;
+          const successMessage = messageTemplate.includes("__PRODUCT_TITLE__")
+            ? messageTemplate.replace("__PRODUCT_TITLE__", displayTitle)
+            : messageTemplate;
+
+          document.dispatchEvent(
+            new ToastEvent({
+              message: successMessage,
+              variant: "success",
+            }),
+          );
+
           // Fetch the updated cart to get the actual total quantity for this variant
           await this.#fetchAndUpdateCartQuantity();
 
@@ -544,6 +577,12 @@ class ProductFormComponent extends Component {
       })
       .catch((error) => {
         console.error(error);
+        document.dispatchEvent(
+          new ToastEvent({
+            message: Theme.translations.cart_add_failed,
+            variant: "error",
+          }),
+        );
       })
       .finally(() => {
         if (event) {
@@ -589,6 +628,13 @@ class ProductFormComponent extends Component {
       .then((response) => response.json())
       .then(async (response) => {
         if (response.status) {
+          document.dispatchEvent(
+            new ToastEvent({
+              message: response.message || Theme.translations.cart_add_failed,
+              variant: "error",
+            }),
+          );
+
           this.dispatchEvent(
             new CartErrorEvent(
               this.id,
@@ -651,6 +697,28 @@ class ProductFormComponent extends Component {
           );
         }
 
+        const productTitle =
+          this.dataset.productTitle || response.items?.[0]?.product_title || "";
+        const variantTitle = response.items?.[0]?.variant_title || "";
+        const colorVariantTitle = variantTitle.split("/")[0]?.trim() || "";
+        const hasVariantTitle =
+          colorVariantTitle &&
+          colorVariantTitle.toLowerCase() !== "default title";
+        const displayTitle = hasVariantTitle
+          ? `${productTitle} (${colorVariantTitle})`
+          : productTitle;
+        const messageTemplate = Theme.translations.cart_added;
+        const successMessage = messageTemplate.includes("__PRODUCT_TITLE__")
+          ? messageTemplate.replace("__PRODUCT_TITLE__", displayTitle)
+          : messageTemplate;
+
+        document.dispatchEvent(
+          new ToastEvent({
+            message: successMessage,
+            variant: "success",
+          }),
+        );
+
         await this.#fetchAndUpdateCartQuantity();
 
         const totalQuantity = items.reduce(
@@ -668,6 +736,12 @@ class ProductFormComponent extends Component {
       })
       .catch((error) => {
         console.error(error);
+        document.dispatchEvent(
+          new ToastEvent({
+            message: Theme.translations.cart_add_failed,
+            variant: "error",
+          }),
+        );
       });
   }
 

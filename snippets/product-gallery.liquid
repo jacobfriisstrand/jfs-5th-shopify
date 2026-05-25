@@ -50,6 +50,11 @@
   if total_count > 1
     assign use_carousel = true
   endif
+
+  assign gallery_list_class = 'flex flex-col gap-4'
+  if use_carousel
+    assign gallery_list_class = gallery_list_class | append: ' [&>li:not(:first-child)]:hidden'
+  endif
 %}
 
 {%- if total_count > 0 -%}
@@ -64,7 +69,7 @@
     >
   {%- endif -%}
 
-  <ul role="list" class="flex flex-col gap-4">
+  <ul role="list" class="{{ gallery_list_class }}">
     {%- if primary != blank -%}
       <li>
         {{

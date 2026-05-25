@@ -1,0 +1,33 @@
+{% doc %}
+  Renders a global toast notification host used by `<toast-notifications>`.
+
+  Events are dispatched as `ThemeEvents.toast` with detail:
+  `{ message, variant, duration }`.
+{% enddoc %}
+
+<toast-notifications class="pointer-events-none fixed inset-x-0 bottom-0 z-50 grid justify-center gap-2 px-4 pb-[5vh]">
+  <section data-toast-list class="pointer-events-none grid justify-center gap-2"></section>
+
+  <template data-toast-template>
+    <output
+      data-toast-item
+      class="pointer-events-auto border-fg/20 bg-bg text-fg rounded-input border px-4 py-3 shadow-lg"
+      role="status"
+      aria-live="polite"
+      style="max-inline-size: min(40ch, 90vw);"
+    >
+      <div class="flex items-start justify-between gap-3">
+        <p data-toast-message class="text-sm leading-5"></p>
+        <button
+          type="button"
+          data-toast-close
+          class="text-fg/70 hover:text-fg text-xs font-medium"
+          aria-label="{{ 'actions.close' | t | escape }}"
+        >
+          {{ 'actions.close' | t }}
+        </button>
+      </div>
+    </output>
+  </template>
+</toast-notifications>
+<script src="{{ 'toast.js' | asset_url }}" type="module" fetchpriority="low"></script>
