@@ -1,0 +1,207 @@
+{% doc %}
+  Renders a global toast notification host used by `<toast-notifications>`.
+
+  Events are dispatched as `ThemeEvents.toast` with detail:
+  `{ message, variant, duration }`.
+{% enddoc %}
+
+<toast-notifications class="pointer-events-none fixed inset-x-0 bottom-0 z-50 grid justify-center gap-2 px-4 pb-[5vh]">
+  <section data-toast-list class="pointer-events-none grid justify-center gap-2"></section>
+
+  <template data-toast-template>
+    <output
+      data-toast-item
+      class="pointer-events-auto border-fg/20 bg-bg text-fg rounded-input border px-4 py-3 shadow-lg"
+      role="status"
+      aria-live="polite"
+      style="max-inline-size: min(40ch, 90vw);"
+    >
+      <div class="flex items-start justify-between gap-3">
+        <p data-toast-message class="text-sm leading-5"></p>
+        <button
+          type="button"
+          data-toast-close
+          class="text-fg/70 hover:text-fg text-xs font-medium"
+          aria-label="{{ 'actions.close' | t | escape }}"
+        >
+          {{ 'actions.close' | t }}
+        </button>
+      </div>
+    </output>
+  </template>
+</toast-notifications>
+
+<script type="module">
+  const DEFAULT_DURATION = 4000;
+  const MAX_VISIBLE_TOASTS = 3;
+  const ENTER_MS = 180;
+  const EXIT_MS = 180;
+
+  if (!customElements.get("toast-notifications")) {
+    class ToastNotifications extends HTMLElement {
+      #reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      #active = new Map();
+
+      connectedCallback() {
+        document.addEventListener("toast:show", this.#onToast);
+        document.addEventListener("keydown", this.#onKeyDown);
+      }
+
+      disconnectedCallback() {
+        document.removeEventListener("toast:show", this.#onToast);
+        document.removeEventListener("keydown", this.#onKeyDown);
+      }
+
+      #onToast = (event) => {
+        const detail = event.detail;
+        if (!detail?.message) return;
+        this.#show(detail);
+      };
+
+      #onKeyDown = (event) => {
+        if (event.key !== "Escape") return;
+        const latest = this.#list?.lastElementChild;
+        if (!(latest instanceof HTMLElement)) return;
+        this.#dismiss(latest);
+      };
+
+      #show(detail) {
+        const list = this.#list;
+        const template = this.#template;
+        if (!list || !template) return;
+
+        const toast = this.#createToast(detail, template);
+        if (!toast) return;
+
+        const motionOK = this.#motionOK;
+
+        while (list.children.length >= MAX_VISIBLE_TOASTS) {
+          const oldest = list.firstElementChild;
+          if (!(oldest instanceof HTMLElement)) break;
+          this.#dismiss(oldest, { immediate: true });
+        }
+
+        if (list.children.length && motionOK) {
+          this.#flipIn(toast, list);
+        } else {
+          list.appendChild(toast);
+        }
+
+        const duration = detail.duration || DEFAULT_DURATION;
+        this.#playLifecycle(toast, duration);
+
+        if (!motionOK) {
+          toast.style.opacity = "1";
+          toast.style.transform = "none";
+        }
+      }
+
+      #createToast(detail, template) {
+        const fragment = template.content.cloneNode(true);
+        const item = fragment.querySelector("[data-toast-item]");
+        const message = fragment.querySelector("[data-toast-message]");
+        const closeButton = fragment.querySelector("[data-toast-close]");
+        if (!(item instanceof HTMLOutputElement)) return null;
+        if (!(message instanceof HTMLElement)) return null;
+        if (!(closeButton instanceof HTMLButtonElement)) return null;
+
+        message.textContent = detail.message;
+
+        const variant = detail.variant || "info";
+        if (variant === "error") {
+          item.setAttribute("role", "alert");
+          item.setAttribute("aria-live", "assertive");
+          item.style.borderColor = "color-mix(in oklab, currentColor 35%, transparent)";
+        } else {
+          item.setAttribute("role", "status");
+          item.setAttribute("aria-live", "polite");
+        }
+
+        closeButton.addEventListener("click", () => this.#dismiss(item));
+
+        return item;
+      }
+
+      #flipIn(toast, list) {
+        const first = list.offsetHeight;
+        list.appendChild(toast);
+        const last = list.offsetHeight;
+        const invert = last - first;
+        if (!invert) return;
+
+        list.animate(
+          [
+            { transform: `translateY(${invert}px)` },
+            { transform: "translateY(0)" },
+          ],
+          {
+            duration: 150,
+            easing: "ease-out",
+          },
+        );
+      }
+
+      async #playLifecycle(item, duration) {
+        if (this.#motionOK) {
+          item.animate(
+            [
+              { opacity: 0, transform: "translateY(12px)" },
+              { opacity: 1, transform: "translateY(0)" },
+            ],
+            {
+              duration: ENTER_MS,
+              easing: "ease-out",
+              fill: "forwards",
+            },
+          );
+        }
+
+        const timeoutId = window.setTimeout(() => this.#dismiss(item), duration);
+        this.#active.set(item, timeoutId);
+      }
+
+      #dismiss(item, options = {}) {
+        const timeoutId = this.#active.get(item);
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          this.#active.delete(item);
+        }
+
+        if (options.immediate || !this.#motionOK) {
+          item.remove();
+          return;
+        }
+
+        const animation = item.animate(
+          [
+            { opacity: 1, transform: "translateY(0)" },
+            { opacity: 0, transform: "translateY(8px)" },
+          ],
+          {
+            duration: EXIT_MS,
+            easing: "ease-in",
+            fill: "forwards",
+          },
+        );
+
+        animation.finished.finally(() => {
+          item.remove();
+        });
+      }
+
+      get #list() {
+        return this.querySelector("[data-toast-list]");
+      }
+
+      get #template() {
+        return this.querySelector("[data-toast-template]");
+      }
+
+      get #motionOK() {
+        return !this.#reducedMotionQuery.matches;
+      }
+    }
+
+    customElements.define("toast-notifications", ToastNotifications);
+  }
+</script>

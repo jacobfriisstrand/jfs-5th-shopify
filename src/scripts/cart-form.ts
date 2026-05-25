@@ -3,6 +3,7 @@ import {
   ThemeEvents,
   QuantitySelectorUpdateEvent,
   CartUpdateEvent,
+  ToastEvent,
 } from "@theme/events";
 import { normalizeSectionId, sectionRenderer } from "@theme/section-renderer";
 
@@ -128,12 +129,24 @@ export class CartFormComponent extends Component {
         body,
       });
       if (!response.ok) {
+        document.dispatchEvent(
+          new ToastEvent({
+            message: Theme.translations.cart_update_failed,
+            variant: "error",
+          }),
+        );
         this.#markLineUpdating(line, false);
         return;
       }
       await this.#rerenderSection();
     } catch {
       // Swallow network errors; the next interaction will retry.
+      document.dispatchEvent(
+        new ToastEvent({
+          message: Theme.translations.cart_update_failed,
+          variant: "error",
+        }),
+      );
       this.#markLineUpdating(line, false);
     } finally {
       this.#inFlight = Math.max(0, this.#inFlight - 1);

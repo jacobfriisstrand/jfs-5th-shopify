@@ -14,7 +14,11 @@
   assign form_id = 'product-form-' | append: section.id | append: '-' | append: block.id
 %}
 
-<product-form-component class="block" data-product-id="{{ product.id }}">
+<product-form-component
+  class="block"
+  data-product-id="{{ product.id }}"
+  data-product-title="{{ product.title | escape }}"
+>
   <form
     id="{{ form_id }}"
     action="{{ routes.cart_add_url }}"

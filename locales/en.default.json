@@ -42,6 +42,7 @@
     "slideshow": "Slideshow",
     "slideshow_pause": "Pause slideshow",
     "slideshow_play": "Play slideshow",
+    "notifications": "Notifications",
     "unit_price": "Unit price",
     "find_country": "Find country"
   },
@@ -78,6 +79,12 @@
     "enter_using_password": "Enter using password",
     "submit": "Submit",
     "sort": "Sort"
+  },
+  "cart": {
+    "added": "Added {{ title }} to cart",
+    "add_failed": "Could not add item to cart",
+    "removed": "Removed item from cart",
+    "update_failed": "Could not update cart"
   },
   "blocks": {
     "filter": "Filter",

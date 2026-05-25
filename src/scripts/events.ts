@@ -27,7 +27,17 @@ export class ThemeEvents {
   static readonly discountUpdate = "discount:update" as const;
   /** Event triggered when changing collection filters */
   static readonly FilterUpdate = "filter:update" as const;
+  /** Event triggered when showing a toast notification */
+  static readonly toast = "toast:show" as const;
 }
+
+export type ToastVariant = "success" | "error" | "info";
+
+export type ToastEventDetail = {
+  message: string;
+  variant?: ToastVariant;
+  duration?: number;
+};
 
 /**
  * Event fired when a variant is selected
@@ -294,6 +304,18 @@ export class FilterUpdateEvent extends Event {
   }
 }
 
+/** Event class for toast notifications */
+export class ToastEvent extends Event {
+  /** @param {ToastEventDetail} detail */
+  constructor(detail) {
+    super(ThemeEvents.toast, { bubbles: true });
+    this.detail = detail;
+  }
+
+  /** @type {ToastEventDetail} */
+  detail;
+}
+
 /**
  * Augment the global event maps so `addEventListener(ThemeEvents.variantUpdate, …)`
  * infers the correct event type for the handler parameter — without each
@@ -314,6 +336,7 @@ declare global {
     [ThemeEvents.zoomMediaSelected]: ZoomMediaSelectedEvent;
     [ThemeEvents.discountUpdate]: DiscountUpdateEvent;
     [ThemeEvents.FilterUpdate]: FilterUpdateEvent;
+    [ThemeEvents.toast]: ToastEvent;
     [SlideshowSelectEvent.eventName]: SlideshowSelectEvent;
   }
 
