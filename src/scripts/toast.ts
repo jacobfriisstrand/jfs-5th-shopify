@@ -2,6 +2,8 @@ import { ThemeEvents } from "@theme/events";
 
 const DEFAULT_DURATION = 4000;
 const MAX_VISIBLE_TOASTS = 3;
+const ENTER_MS = 180;
+const EXIT_MS = 180;
 
 type ToastVariant = "success" | "error" | "info";
 
@@ -12,24 +14,23 @@ type ToastDetail = {
 };
 
 class ToastNotifications extends HTMLElement {
-  #abortController = new AbortController();
   #reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  #active = new Map<HTMLElement, number>();
 
   connectedCallback() {
-    const { signal } = this.#abortController;
-
     document.addEventListener(
       ThemeEvents.toast,
       this.#onToast as EventListener,
-      {
-        signal,
-      },
     );
-    document.addEventListener("keydown", this.#onKeyDown, { signal });
+    document.addEventListener("keydown", this.#onKeyDown);
   }
 
   disconnectedCallback() {
-    this.#abortController.abort();
+    document.removeEventListener(
+      ThemeEvents.toast,
+      this.#onToast as EventListener,
+    );
+    document.removeEventListener("keydown", this.#onKeyDown);
   }
 
   #onToast = (event: Event) => {
@@ -40,13 +41,8 @@ class ToastNotifications extends HTMLElement {
 
   #onKeyDown = (event: KeyboardEvent) => {
     if (event.key !== "Escape") return;
-
-    const list = this.#list;
-    if (!list) return;
-
-    const latest = list.lastElementChild;
+    const latest = this.#list?.lastElementChild;
     if (!(latest instanceof HTMLElement)) return;
-
     this.#dismiss(latest);
   };
 
@@ -55,18 +51,40 @@ class ToastNotifications extends HTMLElement {
     const template = this.#template;
     if (!list || !template) return;
 
+    const toast = this.#createToast(detail, template);
+    if (!toast) return;
+
+    const motionOK = this.#motionOK;
+
     while (list.children.length >= MAX_VISIBLE_TOASTS) {
       const oldest = list.firstElementChild;
       if (!(oldest instanceof HTMLElement)) break;
       this.#dismiss(oldest, { immediate: true });
     }
 
+    if (list.children.length && motionOK) {
+      this.#flipIn(toast, list);
+    } else {
+      list.appendChild(toast);
+    }
+
+    const duration = detail.duration ?? DEFAULT_DURATION;
+    this.#playLifecycle(toast, duration);
+
+    if (!motionOK) {
+      toast.style.opacity = "1";
+      toast.style.transform = "none";
+    }
+  }
+
+  #createToast(detail: ToastDetail, template: HTMLTemplateElement) {
     const fragment = template.content.cloneNode(true) as DocumentFragment;
-    const item = fragment.querySelector<HTMLElement>("[data-toast-item]");
-    const message = fragment.querySelector<HTMLElement>("[data-toast-message]");
-    const closeButton =
-      fragment.querySelector<HTMLButtonElement>("[data-toast-close]");
-    if (!item || !message || !closeButton) return;
+    const item = fragment.querySelector("[data-toast-item]");
+    const message = fragment.querySelector("[data-toast-message]");
+    const closeButton = fragment.querySelector("[data-toast-close]");
+    if (!(item instanceof HTMLOutputElement)) return null;
+    if (!(message instanceof HTMLElement)) return null;
+    if (!(closeButton instanceof HTMLButtonElement)) return null;
 
     message.textContent = detail.message;
 
@@ -74,62 +92,95 @@ class ToastNotifications extends HTMLElement {
     if (variant === "error") {
       item.setAttribute("role", "alert");
       item.setAttribute("aria-live", "assertive");
-      item.dataset.variant = "error";
+      item.style.borderColor =
+        "color-mix(in oklab, currentColor 35%, transparent)";
     } else {
       item.setAttribute("role", "status");
       item.setAttribute("aria-live", "polite");
-      item.dataset.variant = variant;
     }
 
     closeButton.addEventListener("click", () => this.#dismiss(item));
 
-    const duration = detail.duration ?? DEFAULT_DURATION;
-    const timeoutId = window.setTimeout(() => this.#dismiss(item), duration);
-    item.dataset.timeoutId = String(timeoutId);
+    return item;
+  }
 
-    list.appendChild(fragment);
+  #flipIn(toast: HTMLElement, list: HTMLElement) {
+    const first = list.offsetHeight;
+    list.appendChild(toast);
+    const last = list.offsetHeight;
+    const invert = last - first;
+    if (!invert) return;
 
-    if (this.#reducedMotionQuery.matches) {
-      item.style.opacity = "1";
-      item.style.transform = "none";
-      return;
+    list.animate(
+      [
+        { transform: `translateY(${invert}px)` },
+        { transform: "translateY(0)" },
+      ],
+      {
+        duration: 150,
+        easing: "ease-out",
+      },
+    );
+  }
+
+  #playLifecycle(item: HTMLElement, duration: number) {
+    if (this.#motionOK) {
+      item.animate(
+        [
+          { opacity: 0, transform: "translateY(12px)" },
+          { opacity: 1, transform: "translateY(0)" },
+        ],
+        {
+          duration: ENTER_MS,
+          easing: "ease-out",
+          fill: "forwards",
+        },
+      );
     }
 
-    requestAnimationFrame(() => {
-      item.style.opacity = "1";
-      item.style.transform = "none";
-    });
+    const timeoutId = window.setTimeout(() => this.#dismiss(item), duration);
+    this.#active.set(item, timeoutId);
   }
 
   #dismiss(item: HTMLElement, options?: { immediate?: boolean }) {
-    const timeoutId = Number(item.dataset.timeoutId);
-    if (Number.isFinite(timeoutId) && timeoutId > 0) {
+    const timeoutId = this.#active.get(item);
+    if (timeoutId) {
       clearTimeout(timeoutId);
+      this.#active.delete(item);
     }
 
-    if (options?.immediate || this.#reducedMotionQuery.matches) {
+    if (options?.immediate || !this.#motionOK) {
       item.remove();
       return;
     }
 
-    item.style.opacity = "0";
-    item.style.transform = "translateY(8px)";
+    const animation = item.animate(
+      [
+        { opacity: 1, transform: "translateY(0)" },
+        { opacity: 0, transform: "translateY(8px)" },
+      ],
+      {
+        duration: EXIT_MS,
+        easing: "ease-in",
+        fill: "forwards",
+      },
+    );
 
-    const remove = () => {
-      item.removeEventListener("transitionend", remove);
+    animation.finished.finally(() => {
       item.remove();
-    };
-
-    item.addEventListener("transitionend", remove);
-    window.setTimeout(remove, 220);
+    });
   }
 
   get #list() {
-    return this.querySelector<HTMLOListElement>("[data-toast-list]");
+    return this.querySelector<HTMLElement>("[data-toast-list]");
   }
 
   get #template() {
     return this.querySelector<HTMLTemplateElement>("[data-toast-template]");
+  }
+
+  get #motionOK() {
+    return !this.#reducedMotionQuery.matches;
   }
 }
 
