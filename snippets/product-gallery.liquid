@@ -1,0 +1,126 @@
+{% doc %}
+  Renders the PDP media gallery using variant_gallery metaobjects and the shared
+  `<swiper-carousel>` behavior used elsewhere in the theme.
+
+  @param {product} product - Product object used to resolve variant-specific media.
+
+  @example
+  {% render 'product-gallery', product: product %}
+{% enddoc %}
+
+{% liquid
+  assign variant = product.selected_or_first_available_variant
+  assign variant_galleries = shop.metaobjects.variant_gallery.values
+  assign target_color = variant.option1
+
+  assign matched_images = empty
+  if variant_galleries != blank and target_color != blank
+    for entry in variant_galleries
+      assign entry_variant = entry.color.value
+      if entry_variant == blank
+        continue
+      endif
+      if entry_variant.product.id != product.id
+        continue
+      endif
+      assign entry_images = entry.images.value
+      if entry_variant.option1 == target_color and entry_images.size > 0
+        assign matched_images = entry_images
+        break
+      endif
+    endfor
+  endif
+
+  assign primary = variant.featured_image
+  if primary == blank
+    assign primary = product.featured_image
+  endif
+
+  assign extras_count = 0
+  if matched_images != empty
+    assign extras_count = matched_images.size
+  endif
+
+  assign total_count = extras_count
+  if primary != blank
+    assign total_count = extras_count | plus: 1
+  endif
+
+  assign use_carousel = false
+  if total_count > 1
+    assign use_carousel = true
+  endif
+%}
+
+{%- if total_count > 0 -%}
+  {%- if use_carousel -%}
+    <swiper-carousel
+      data-bundle-url="{{ 'swiper-element-bundle.js' | asset_url }}"
+      data-slides-per-view="1"
+      data-breakpoints='{"640":{"slidesPerView":1,"spaceBetween":0},"1024":{"slidesPerView":1,"spaceBetween":0},"1280":{"slidesPerView":1,"spaceBetween":0}}'
+      class="relative block"
+      aria-roledescription="carousel"
+      aria-label="{{ 'accessibility.product_images' | t | escape }}"
+    >
+  {%- endif -%}
+
+  <ul role="list" class="flex flex-col gap-4">
+    {%- if primary != blank -%}
+      <li>
+        {{
+          primary
+          | image_url: width: 1200
+          | image_tag:
+            loading: 'eager',
+            fetchpriority: 'high',
+            sizes: '(min-width: 768px) 50vw, 100vw',
+            widths: '400, 600, 800, 1000, 1200',
+            class: 'h-auto w-full'
+        }}
+      </li>
+    {%- endif -%}
+    {%- if matched_images != empty -%}
+      {%- for media in matched_images -%}
+        <li>
+          {{
+            media
+            | image_url: width: 1200
+            | image_tag:
+              loading: 'lazy',
+              sizes: '(min-width: 768px) 50vw, 100vw',
+              widths: '400, 600, 800, 1000, 1200',
+              class: 'h-auto w-full'
+          }}
+        </li>
+      {%- endfor -%}
+    {%- endif -%}
+  </ul>
+
+  {%- if use_carousel -%}
+    <div
+      class="mt-6 flex justify-end gap-2 sm:mt-8"
+      role="group"
+      aria-label="{{ 'accessibility.product_gallery_navigation' | t | escape }}"
+    >
+      <button
+        type="button"
+        data-carousel-prev
+        aria-label="{{ 'content.pagination.previous' | t | escape }}"
+        class="border-fg/20 text-fg flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+      >
+        <span aria-hidden="true">&larr;</span>
+      </button>
+      <button
+        type="button"
+        data-carousel-next
+        aria-label="{{ 'content.pagination.next' | t | escape }}"
+        class="border-fg/20 text-fg flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+      >
+        <span aria-hidden="true">&rarr;</span>
+      </button>
+    </div>
+    </swiper-carousel>
+  {%- endif -%}
+{%- else -%}
+  {{ 'product-1' | placeholder_svg_tag: 'h-auto w-full bg-fg/5' }}
+{%- endif -%}

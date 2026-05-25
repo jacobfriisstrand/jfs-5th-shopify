@@ -24,6 +24,7 @@
 <script src="{{ 'product-price.js' | asset_url }}" type="module" fetchpriority="low"></script>
 <script src="{{ 'component-quantity-selector.js' | asset_url }}" type="module" fetchpriority="low"></script>
 <script src="{{ 'variant-picker-form.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'swiper-carousel.js' | asset_url }}" type="module" fetchpriority="low"></script>
 
 <section
   class="grid-12 py-12 sm:py-16"
@@ -31,7 +32,7 @@
 >
   <div class="col-content grid gap-8 md:grid-cols-2 md:gap-12">
     <div>
-      {% content_for 'block', id: 'product-media-gallery', type: '_product-media-gallery' %}
+      {% render 'product-gallery', product: product %}
     </div>
     <div class="flex flex-col gap-6">
       {% content_for 'block', id: 'product-title', type: 'product-title' %}
