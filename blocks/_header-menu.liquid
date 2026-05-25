@@ -47,7 +47,8 @@
   <dialog-component id="header-menu-drawer" class="contents">
     <dialog
       ref="dialog"
-      class="m-0 h-dvh w-screen max-w-none bg-bg text-fg p-6"
+      data-drawer="right"
+      class="fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-screen max-w-none bg-bg text-fg p-6"
       aria-label="{{ linklist.title | escape }}"
     >
       <button

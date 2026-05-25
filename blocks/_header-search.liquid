@@ -26,8 +26,9 @@
 <dialog-component id="header-search-dialog" class="contents">
   <dialog
     ref="dialog"
+    data-drawer="top"
     aria-label="{{ 'content.search' | t }}"
-    class="m-0 h-dvh w-screen max-w-none bg-bg text-fg p-0"
+    class="fixed inset-x-0 top-0 m-0 h-dvh w-screen max-w-none bg-bg text-fg p-0"
   >
     <predictive-search class="flex flex-col h-full">
       <div class="flex items-center gap-2 border-b border-fg/10 p-4">
