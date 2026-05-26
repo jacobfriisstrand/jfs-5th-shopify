@@ -42,6 +42,12 @@ rg "\.metafields\." -t liquid
 - **Used by:** `sections/main-product.liquid` (accordion row "Shipping and returns")
 - **Notes:** Same accordion as above. Hidden if blank.
 
+### `custom.bundle_offer_pill` — _optional_
+
+- **Type:** Single line text
+- **Used by:** `snippets/_bundle-offer-pill.liquid`, rendered on PDP (`blocks/bundle-offer-pill.liquid`, between product title and price), on product cards (`snippets/product-card.liquid`, overlaid top-left of the image), and on cart line items (`snippets/_cart-line-items.liquid`).
+- **Notes:** Pure merchandising copy for a "Buy X get Y" offer, e.g. `Buy 3, save 50 kr`. The theme renders the pill verbatim and does not compute prices. Pair it with a matching native **Buy X Get Y** automatic discount under **Discounts** in the admin — the pill copy and the discount configuration are kept in sync manually. Pill is hidden entirely when blank.
+
 ### `custom.size_chart` — _optional_
 
 - **Type:** Metaobject reference → `size_chart` (see below)
