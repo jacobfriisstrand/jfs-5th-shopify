@@ -1,0 +1,181 @@
+{% doc %}
+  Megamenu trigger. Renders as a single `<li>` containing two
+  presentations:
+
+    - Desktop (md+): a button that opens a full-width modal `<dialog>`
+      with a grid of `_header-menu-column` blocks plus an optional
+      featured image and call-to-action. Uses `<dialog-component>` so
+      it inherits the standard drawer behaviour (backdrop, body scroll
+      lock, escape-to-close, click-outside-to-close, slide-down
+      animation via `data-drawer="top"`).
+    - Mobile (<md): a native `<details>` disclosure with the same columns
+      stacked vertically.
+
+  Columns are captured once and re-emitted in both presentations.
+
+  @param {string} [label] - Trigger text. Required for the megamenu to render.
+  @param {image} [image] - Optional featured image shown beside the columns.
+  @param {string} [image_link_url] - Optional link wrapping the featured image.
+  @param {string} [cta_text] - Optional call-to-action text below the image.
+  @param {string} [cta_url] - Optional call-to-action destination.
+{% enddoc %}
+
+{% liquid
+  assign label = block.settings.label
+  assign image = block.settings.image
+  assign image_link_url = block.settings.image_link_url
+  assign cta_text = block.settings.cta_text
+  assign cta_url = block.settings.cta_url
+  assign dialog_id = 'header-megamenu-' | append: block.id
+%}
+
+{%- capture columns -%}
+  {% content_for 'blocks' %}
+{%- endcapture -%}
+
+{%- capture featured -%}
+  {%- if image != blank -%}
+    {%- if image_link_url != blank -%}
+      <a href="{{ image_link_url }}" class="block">
+        {{ image | image_url: width: 640 | image_tag: loading: 'lazy', widths: '320,640', sizes: '(min-width: 768px) 256px, 100vw' }}
+      </a>
+    {%- else -%}
+      {{ image | image_url: width: 640 | image_tag: loading: 'lazy', widths: '320,640', sizes: '(min-width: 768px) 256px, 100vw' }}
+    {%- endif -%}
+  {%- endif -%}
+  {%- if cta_text != blank and cta_url != blank -%}
+    <a href="{{ cta_url }}" class="inline-flex mt-3 underline">
+      {{ cta_text | escape }}
+    </a>
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- if label != blank -%}
+  <li class="header-menu-item">
+    {%- comment -%}
+      Trigger renders at all breakpoints. Mobile = full-width drawer row.
+      Desktop = inline button with a chevron. Both open the same
+      `<dialog-component>` below; CSS owns the per-breakpoint slide.
+    {%- endcomment -%}
+    <button
+      type="button"
+      data-megamenu-trigger
+      aria-controls="{{ dialog_id }}"
+      aria-expanded="false"
+      class="inline-flex items-center gap-1 py-2 max-md:flex max-md:w-full max-md:justify-between max-md:gap-3 max-md:min-h-12 max-md:px-4 max-md:py-3 max-md:rounded-lg max-md:text-left max-md:hover:bg-black/5 cursor-pointer bg-transparent border-0"
+    >
+      <span>{{ label | escape }}</span>
+      <svg
+        viewBox="0 0 24 24"
+        width="12"
+        height="12"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        aria-hidden="true"
+        class="max-md:-rotate-90"
+      >
+        <polyline points="6 9 12 15 18 9" />
+      </svg>
+    </button>
+
+    <dialog-component id="{{ dialog_id }}" class="contents" data-non-modal>
+      <dialog
+        ref="dialog"
+        data-drawer="top"
+        aria-label="{{ label | escape }}"
+        class="header-menu-megamenu"
+      >
+        <div class="header-menu-megamenu-mobile-header md:hidden sticky top-0 z-10 flex items-center gap-2 p-4 border-b">
+          <button
+            type="button"
+            data-megamenu-back
+            aria-label="{{ 'actions.close_menu' | t }}"
+            class="header-menu-megamenu-back inline-flex items-center gap-2"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            <span>{{ label | escape }}</span>
+          </button>
+        </div>
+        <div class="header-menu-megamenu-inner grid-12 py-8 max-md:py-4">
+          <div class="col-content lg:span-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            {{ columns }}
+          </div>
+          {%- if image != blank or cta_text != blank -%}
+            <div class="header-menu-megamenu-featured md:col-content lg:cs-9 lg:span-4">
+              {{ featured }}
+            </div>
+          {%- endif -%}
+        </div>
+      </dialog>
+    </dialog-component>
+  </li>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.header_megamenu",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "t:content.label"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:content.image"
+    },
+    {
+      "type": "url",
+      "id": "image_link_url",
+      "label": "t:content.image_link_url"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "t:content.cta_text"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "t:content.cta_url"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "_header-menu-column"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.header_megamenu",
+      "blocks": [
+        {
+          "type": "_header-menu-column"
+        },
+        {
+          "type": "_header-menu-column"
+        },
+        {
+          "type": "_header-menu-column"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

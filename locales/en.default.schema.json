@@ -153,7 +153,13 @@
     "width": "Width",
     "width_is_automatically_optimized": "Width is automatically optimized for mobile.",
     "app_required_for_ratings": "An app is required for product ratings. [Learn more](https://help.shopify.com/manual/apps)",
-    "navigation": "Navigation"
+    "navigation": "Navigation",
+    "label": "Label",
+    "url": "URL",
+    "column_heading": "Column heading",
+    "cta_text": "Call to action text",
+    "cta_url": "Call to action link",
+    "image_link_url": "Image link"
   },
   "html_defaults": {
     "join_our_email_list": "<h2>Join our email list</h2>",
@@ -351,6 +357,9 @@
     "media": "Media",
     "media_with_text": "Media with text",
     "menu": "Menu",
+    "header_menu_link": "Menu link",
+    "header_megamenu": "Megamenu",
+    "header_menu_column": "Megamenu column",
     "mobile_layout": "Mobile layout",
     "multicolumn": "Multicolumn",
     "rich_text_section": "Rich text",

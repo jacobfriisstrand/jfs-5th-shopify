@@ -1,0 +1,50 @@
+{% doc %}
+  Single navigation link rendered as a list item.
+
+  Designed to be a child of `_header-menu` (top level) or
+  `_header-menu-column` (inside a megamenu column).
+
+  @param {string} [label] - Visible link text. Required for the link to render.
+  @param {string} [url] - Destination. Required for the link to render.
+{% enddoc %}
+
+{% liquid
+  assign label = block.settings.label
+  assign url = block.settings.url
+%}
+
+{%- if label != blank and url != blank -%}
+  <li>
+    <a
+      href="{{ url }}"
+      class="block py-1 hover:underline"
+      {% if request.path == url %}aria-current="page"{% endif %}
+    >
+      {{ label | escape }}
+    </a>
+  </li>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.header_menu_link",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "t:content.label"
+    },
+    {
+      "type": "url",
+      "id": "url",
+      "label": "t:content.url"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.header_menu_link"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,58 @@
+{% doc %}
+  Single column inside a `_header-megamenu` panel. Renders an optional
+  heading and a vertical list of child links.
+
+  @param {string} [column_heading] - Optional column heading.
+{% enddoc %}
+
+{% liquid
+  assign column_heading = block.settings.column_heading
+%}
+
+<div class="flex flex-col gap-2">
+  {%- if column_heading != blank -%}
+    {% render 'heading',
+      text: column_heading,
+      level: 3,
+      class: 'text-sm font-medium'
+    %}
+  {%- endif -%}
+  <ul class="flex flex-col gap-1">
+    {% content_for 'blocks' %}
+  </ul>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.header_menu_column",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "column_heading",
+      "label": "t:content.column_heading"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "_header-menu-link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.header_menu_column",
+      "blocks": [
+        {
+          "type": "_header-menu-link"
+        },
+        {
+          "type": "_header-menu-link"
+        },
+        {
+          "type": "_header-menu-link"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
