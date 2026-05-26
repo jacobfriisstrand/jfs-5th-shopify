@@ -109,6 +109,7 @@
   },
   "content": {
     "discount": "Discount",
+    "discount_savings": "You save",
     "account_title": "Account",
     "terms_and_policies": "Terms and Policies",
     "blog_details_separator": "|",

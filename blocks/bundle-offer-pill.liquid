@@ -1,0 +1,14 @@
+{% doc %}
+  PDP bundle-offer pill block. Statically rendered in
+  `sections/main-product.liquid` between the product title and price.
+  Pulls copy from the product metafield `custom.bundle_offer_pill` via
+  the shared `_bundle-offer-pill` snippet; renders nothing when blank.
+{% enddoc %}
+
+{% render '_bundle-offer-pill', product: product %}
+
+{% schema %}
+{
+  "name": "t:names.bundle_offer_pill"
+}
+{% endschema %}

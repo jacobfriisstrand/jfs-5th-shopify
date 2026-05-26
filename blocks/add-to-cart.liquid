@@ -11,7 +11,7 @@
 
 {% liquid
   assign variant = product.selected_or_first_available_variant
-  assign form_id = 'product-form-' | append: section.id | append: '-' | append: block.id
+  assign form_id = 'product-form-' | append: section.id
 %}
 
 <product-form-component
