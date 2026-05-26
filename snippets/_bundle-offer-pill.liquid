@@ -1,0 +1,27 @@
+{% doc %}
+  Renders a "Buy N for X" merchandising pill from the product metafield
+  `custom.bundle_offer_pill` (single_line_text). Renders nothing when
+  the metafield is blank.
+
+  Shared by the PDP (`blocks/bundle-offer-pill.liquid`), the product
+  card (`snippets/product-card.liquid`), and the cart line items
+  (`snippets/_cart-line-items.liquid`) so all three surfaces render
+  identical markup (ADR-0005-style single source of truth).
+
+  @param {product} product - The product whose metafield is read. Required.
+  @param {string} [class] - Extra utility classes appended to the pill,
+    e.g. positioning utilities for an image overlay.
+
+  @example
+  {% render '_bundle-offer-pill', product: product %}
+{% enddoc %}
+
+{% liquid
+  assign pill_text = product.metafields.custom.bundle_offer_pill
+%}
+
+{%- if pill_text != blank -%}
+  <span class="inline-flex items-center rounded-full bg-fg px-2 py-1 text-xs font-medium text-bg {{ class }}">
+    {{ pill_text }}
+  </span>
+{%- endif -%}
