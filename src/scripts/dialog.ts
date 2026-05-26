@@ -40,6 +40,33 @@ export class DialogComponent extends Component {
   }, 50);
 
   #previousScrollY = 0;
+  #inertedElements: Element[] = [];
+
+  /**
+   * Marks every body child except this component as `inert` so keyboard
+   * focus and pointer events are trapped inside the non-modal dialog.
+   * Native `<dialog>` modal mode does this automatically; non-modal mode
+   * does not, so we emulate it.
+   */
+  #applyInertOutside() {
+    this.#inertedElements = [];
+    for (const el of Array.from(document.body.children)) {
+      if (el === this) continue;
+      if (el.hasAttribute("inert")) continue;
+      // Allow opt-out: elements like a shared dialog backdrop must
+      // remain interactive while the dialog is open.
+      if (el.hasAttribute("data-dialog-passthrough")) continue;
+      el.setAttribute("inert", "");
+      this.#inertedElements.push(el);
+    }
+  }
+
+  #removeInertOutside() {
+    for (const el of this.#inertedElements) {
+      el.removeAttribute("inert");
+    }
+    this.#inertedElements = [];
+  }
 
   /**
    * Shows the dialog.
@@ -52,17 +79,36 @@ export class DialogComponent extends Component {
     const scrollY = window.scrollY;
     this.#previousScrollY = scrollY;
 
+    const nonModal = this.hasAttribute("data-non-modal");
+
     // Prevent layout thrashing by separating DOM reads from DOM writes
     requestAnimationFrame(() => {
       document.body.style.width = "100%";
       document.body.style.position = "fixed";
       document.body.style.top = `-${scrollY}px`;
 
-      dialog.showModal();
+      if (nonModal) {
+        dialog.show();
+        this.#applyInertOutside();
+        // Move focus into the dialog so Tab cycles its interactive
+        // descendants. Without this, focus stays on the (now-inert)
+        // trigger and Tab falls through to <body>.
+        const firstFocusable = (dialog as HTMLElement).querySelector(
+          'a, button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ) as HTMLElement | null;
+        firstFocusable?.focus();
+      } else {
+        dialog.showModal();
+      }
       this.dispatchEvent(new DialogOpenEvent());
 
-      this.addEventListener("click", this.#handleClick);
-      this.addEventListener("keydown", this.#handleKeyDown);
+      if (nonModal) {
+        document.addEventListener("click", this.#handleDocumentClick, true);
+        document.addEventListener("keydown", this.#handleKeyDown);
+      } else {
+        this.addEventListener("click", this.#handleClick);
+        this.addEventListener("keydown", this.#handleKeyDown);
+      }
     });
   }
 
@@ -73,9 +119,15 @@ export class DialogComponent extends Component {
     const { dialog } = this.refs;
 
     if (!dialog.open) return;
+    // Idempotent: if already animating closed, skip so we don't restart
+    // the exit animation when multiple handlers (e.g. dialog's own
+    // document click + a parent component's backdrop click) both fire.
+    if (dialog.classList.contains("dialog-closing")) return;
 
     this.removeEventListener("click", this.#handleClick);
     this.removeEventListener("keydown", this.#handleKeyDown);
+    document.removeEventListener("click", this.#handleDocumentClick, true);
+    document.removeEventListener("keydown", this.#handleKeyDown);
 
     // Force browser to restart animation by resetting it
     // Temporarily remove any existing animation state
@@ -99,6 +151,7 @@ export class DialogComponent extends Component {
 
     dialog.close();
     dialog.classList.remove("dialog-closing");
+    this.#removeInertOutside();
 
     this.dispatchEvent(new DialogCloseEvent());
   };
@@ -126,6 +179,26 @@ export class DialogComponent extends Component {
       this.closeDialog();
     }
   }
+
+  /**
+   * Closes a non-modal dialog when the user clicks outside it. Skips clicks on
+   * the trigger so the trigger's own toggle handler can take over (otherwise
+   * the dialog would close here, then re-open on the trigger click).
+   */
+  #handleDocumentClick = (event: MouseEvent) => {
+    const { dialog } = this.refs;
+    const target = event.target as Element | null;
+    if (!target) return;
+    if (dialog.contains(target)) return;
+    const triggerId = this.id;
+    if (
+      triggerId &&
+      target.closest(`[aria-controls="${CSS.escape(triggerId)}"]`)
+    ) {
+      return;
+    }
+    this.closeDialog();
+  };
 
   /**
    * Closes the dialog when the user presses the escape key.
@@ -163,7 +236,7 @@ if (!customElements.get("dialog-component"))
 
 export class DialogOpenEvent extends CustomEvent<unknown> {
   constructor() {
-    super(DialogOpenEvent.eventName);
+    super(DialogOpenEvent.eventName, { bubbles: true, composed: true });
   }
 
   static eventName = "dialog:open";
@@ -171,7 +244,7 @@ export class DialogOpenEvent extends CustomEvent<unknown> {
 
 export class DialogCloseEvent extends CustomEvent<unknown> {
   constructor() {
-    super(DialogCloseEvent.eventName);
+    super(DialogCloseEvent.eventName, { bubbles: true, composed: true });
   }
 
   static eventName = "dialog:close";
