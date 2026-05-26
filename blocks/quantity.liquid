@@ -5,11 +5,11 @@
   live as its own block while still being submitted with cart-add.
 
   The `form_id` here MUST match the form id constructed in
-  `blocks/add-to-cart.liquid` (`product-form-<section.id>-<add-to-cart block id>`).
-  Since the add-to-cart block id is not knowable from here, this block scans
-  the section's blocks for one of type `add-to-cart` and uses its id. If
-  none exists the `form` attribute is omitted; the stepper still works
-  visually but the posted quantity will default to 1.
+  `blocks/add-to-cart.liquid` (`product-form-<section.id>`). We deliberately
+  do NOT include `block.id` in the form id, because statically rendered
+  blocks get an auto-generated suffix (e.g. `Ad1RWT2ZsNGNSNS9FS__add-to-cart`)
+  that differs between the two blocks. A section-scoped id is stable and
+  unique enough since there is only one add-to-cart form per product section.
 {% enddoc %}
 
 {% liquid
@@ -19,15 +19,8 @@
     assign max_qty = variant.inventory_quantity
   endif
 
-  assign form_id = nil
-  for b in section.blocks
-    if b.type == 'add-to-cart'
-      assign form_id = 'product-form-' | append: section.id | append: '-' | append: b.id
-      break
-    endif
-  endfor
-
-  assign input_id = 'quantity-' | append: section.id | append: '-' | append: block.id
+  assign form_id = 'product-form-' | append: section.id
+  assign input_id = 'quantity-' | append: section.id
 %}
 
 <div class="flex flex-col gap-2">
