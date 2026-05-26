@@ -1,82 +1,101 @@
 {% comment %}
-  Header navigation: inline horizontal menu at `md` and up, hamburger
-  button that opens a `<dialog-component>` drawer below `md`.
+  Header navigation container.
 
-  The desktop/mobile decision is owned by CSS media queries (Tailwind's
-  `md:` variant) — no JS drives layout. This guarantees the correct
-  layout on first paint at any viewport (no FOUC).
+  Renders nested child blocks (links, dropdowns, megamenus) exactly once.
+  The same DOM serves both viewports:
+    - md+: inline horizontal list with popover-driven dropdowns.
+    - <md: an off-canvas drawer that slides in from the left, backed by
+      a blurred backdrop. Body scroll is locked while open (handled by
+      `<header-component>`). Layout is owned by CSS so first paint matches
+      the viewport (no FOUC).
+
+  The hamburger button toggles `data-open` on the nav and on the
+  backdrop; CSS handles the slide + fade transitions, the icon
+  morph (lines → X), and the desktop reset.
 {% endcomment %}
 
-{%- assign linklist = linklists[block.settings.menu] -%}
-{%- if linklist != blank and linklist.links.size > 0 -%}
-  <nav
-    data-inline-menu
-    aria-label="{{ linklist.title | escape }}"
-    class="hidden md:block min-w-0 overflow-hidden"
-  >
-    {%- render 'menu-list',
-      linklist: linklist,
-      list_classes: 'flex flex-nowrap gap-4 text-sm whitespace-nowrap'
-    -%}
-  </nav>
+<button
+  type="button"
+  data-menu-trigger
+  aria-label="{{ 'actions.open_menu' | t }}"
+  aria-controls="header-nav"
+  aria-expanded="false"
+  class="header-menu-trigger md:hidden"
+>
+  <span class="header-menu-trigger-icon" aria-hidden="true">
+    <span></span>
+    <span></span>
+    <span></span>
+  </span>
+</button>
 
-  <button
-    type="button"
-    data-menu-trigger
-    aria-label="{{ 'actions.open_menu' | t }}"
-    aria-controls="header-menu-drawer"
-    aria-expanded="false"
-    class="md:hidden inline-flex items-center justify-center p-2"
-  >
-    <svg
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      aria-hidden="true"
+<div data-header-nav-backdrop data-dialog-passthrough data-open="false" hidden aria-hidden="true"></div>
+
+<nav
+  id="header-nav"
+  data-header-nav
+  data-open="false"
+  aria-label="{{ 'accessibility.header_navigation_label' | t }}"
+  class="header-nav md:block min-w-0"
+>
+  {%- comment -%}
+    The site header (with its hamburger that morphs into an X) remains
+    visible above the drawer on mobile, so an in-drawer close button is
+    redundant. Kept in the DOM (but `hidden`) so the `data-menu-close`
+    hook is still available for future variants.
+  {%- endcomment -%}
+  <div class="header-nav-header" hidden>
+    <button
+      type="button"
+      data-menu-close
+      aria-label="{{ 'actions.close_menu' | t }}"
+      class="header-menu-close ml-auto"
     >
-      <line x1="4" y1="6"  x2="20" y2="6" />
-      <line x1="4" y1="12" x2="20" y2="12" />
-      <line x1="4" y1="18" x2="20" y2="18" />
-    </svg>
-  </button>
+      <svg
+        viewBox="0 0 24 24"
+        width="24"
+        height="24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <line x1="6" y1="6" x2="18" y2="18" />
+        <line x1="18" y1="6" x2="6" y2="18" />
+      </svg>
+    </button>
+  </div>
 
-  {%- capture menu_drawer_body -%}
-    {%- render 'drawer-close-button',
-      label: 'actions.close_menu' | t,
-      class: 'ml-auto'
-    -%}
-
-    <nav data-drawer-menu class="mt-4">
-      {%- render 'menu-list',
-        linklist: linklist,
-        list_classes: 'flex flex-col gap-4 text-base'
-      -%}
-    </nav>
-  {%- endcapture -%}
-
-  {%- render 'drawer',
-    id: 'header-menu-drawer',
-    size: '100vw',
-    class: 'p-6',
-    aria_label: linklist.title | escape,
-    content: menu_drawer_body
-  -%}
-{%- endif -%}
+  <ul class="header-nav-list flex flex-col md:flex-row md:flex-nowrap md:items-center md:gap-4 md:whitespace-nowrap text-base md:text-sm">
+    {% content_for 'blocks' %}
+  </ul>
+</nav>
 
 {% schema %}
 {
   "name": "t:names.menu",
   "tag": null,
-  "settings": [
+  "settings": [],
+  "blocks": [
     {
-      "type": "link_list",
-      "id": "menu",
-      "label": "t:content.menu",
-      "default": "main-menu"
+      "type": "_header-menu-link"
+    },
+    {
+      "type": "_header-megamenu"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.menu",
+      "blocks": [
+        {
+          "type": "_header-menu-link"
+        },
+        {
+          "type": "_header-megamenu"
+        }
+      ]
     }
   ]
 }
