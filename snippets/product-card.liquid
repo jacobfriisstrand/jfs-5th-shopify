@@ -57,7 +57,7 @@
   class="group flex flex-col gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg"
 >
   {%- if card_image != blank -%}
-    <div class="aspect-square w-full overflow-hidden rounded-input bg-fg/5">
+    <div class="grid aspect-square w-full place-items-start overflow-hidden rounded-input bg-fg/5">
       {{
         card_image
         | image_url: width: 800
@@ -66,12 +66,15 @@
           decoding: 'async',
           sizes: '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw',
           widths: '200, 300, 400, 600, 800',
-          class: 'h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]',
+          class: '[grid-area:1/1] h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]',
           alt: card_image.alt | default: card_title
       }}
+      {% render '_bundle-offer-pill', product: product, class: '[grid-area:1/1] m-2' %}
     </div>
   {%- else -%}
-    <div class="aspect-square w-full rounded-input bg-fg/5" aria-hidden="true"></div>
+    <div class="grid aspect-square w-full place-items-start rounded-input bg-fg/5" aria-hidden="true">
+      {% render '_bundle-offer-pill', product: product, class: '[grid-area:1/1] m-2' %}
+    </div>
   {%- endif -%}
 
   {% render 'heading', text: card_title, level: resolved_heading_level, class: 'text-base font-medium' %}

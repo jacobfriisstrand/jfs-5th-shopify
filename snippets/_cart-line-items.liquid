@@ -22,6 +22,10 @@
       assign qty_id = 'cart-qty-' | append: line.key
       assign qty_name = 'updates[' | append: line.key | append: ']'
       assign remove_label = 'accessibility.remove_item' | t: title: line.product.title
+      assign has_line_discount = false
+      if line.original_line_price > line.final_line_price
+        assign has_line_discount = true
+      endif
     %}
     <li class="group flex gap-4 border-b border-current/15 py-4" data-cart-line="{{ forloop.index }}">
       <a href="{{ line.url }}" class="block w-20 shrink-0 sm:w-24">
@@ -53,9 +57,15 @@
             {%- if line.selling_plan_allocation -%}
               <p class="text-fg/70 text-xs">{{ line.selling_plan_allocation.selling_plan.name }}</p>
             {%- endif -%}
+            {% render '_bundle-offer-pill', product: line.product %}
           </div>
-          <p class="text-fg text-sm font-medium sm:text-base">
-            <span class="group-data-[updating=true]:hidden">{{ line.final_line_price | money }}</span>
+          <p class="text-fg flex flex-col items-end gap-0.5 text-sm font-medium sm:text-base">
+            <span class="group-data-[updating=true]:hidden">
+              {%- if has_line_discount -%}
+                <span class="text-fg/50 mr-1 line-through">{{ line.original_line_price | money }}</span>
+              {%- endif -%}
+              {{ line.final_line_price | money }}
+            </span>
             {% render 'skeleton', class: 'hidden h-4 w-16 align-middle group-data-[updating=true]:inline-block' %}
           </p>
         </div>
