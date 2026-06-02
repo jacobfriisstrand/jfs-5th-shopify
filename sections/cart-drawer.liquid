@@ -111,20 +111,18 @@
               </dl>
               <p class="text-fg/70 text-xs">{{ taxes_note }}</p>
               <div class="flex flex-col gap-3">
-                <button
-                  type="submit"
-                  name="checkout"
-                  value=""
-                  class="rounded-input bg-fg text-bg hover:bg-fg/90 px-6 py-3 text-sm font-medium transition-colors"
-                >
-                  {{ checkout_label }}
-                </button>
-                <a
-                  href="{{ routes.cart_url }}"
-                  class="rounded-input border border-current text-center hover:bg-fg hover:text-bg px-6 py-3 text-sm font-medium transition-colors"
-                >
-                  {{ view_cart_label }}
-                </a>
+                {% render 'button',
+                  text: checkout_label,
+                  type: 'submit',
+                  name: 'checkout',
+                  value: '',
+                  variant: 'primary'
+                %}
+                {% render 'button',
+                  text: view_cart_label,
+                  href: routes.cart_url,
+                  variant: 'secondary'
+                %}
               </div>
             </footer>
           </form>

@@ -43,23 +43,21 @@
   <p class="text-fg/70 text-xs">{{ taxes_note }}</p>
   <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
     <noscript>
-      <button
-        type="submit"
-        name="update"
-        value=""
-        class="rounded-input hover:bg-fg hover:text-bg border border-current px-6 py-3 text-sm font-medium transition-colors"
-      >
-        {{ update_label }}
-      </button>
+      {% render 'button',
+        text: update_label,
+        type: 'submit',
+        name: 'update',
+        value: '',
+        variant: 'secondary'
+      %}
     </noscript>
-    <button
-      type="submit"
-      name="checkout"
-      value=""
-      class="rounded-input bg-fg text-bg hover:bg-fg/90 px-6 py-3 text-sm font-medium transition-colors"
-    >
-      {{ checkout_label }}
-    </button>
+    {% render 'button',
+      text: checkout_label,
+      type: 'submit',
+      name: 'checkout',
+      value: '',
+      variant: 'primary'
+    %}
   </div>
 </section>
 

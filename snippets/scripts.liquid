@@ -12,6 +12,17 @@
     3. if it registers a custom element used in liquid, add a <script src=…>
 {% endcomment %}
 
+<script>
+  /* Focus-visible: suppress focus rings when navigating with a pointer.
+     Sets data-focus-source="pointer" on <html> after any pointerdown;
+     clears it on any keydown so Tab/arrow key navigation restores rings. */
+  (function () {
+    var d = document.documentElement;
+    document.addEventListener('pointerdown', function () { d.dataset.focusSource = 'pointer'; }, true);
+    document.addEventListener('keydown', function () { delete d.dataset.focusSource; }, true);
+  }());
+</script>
+
 <script type="importmap">
   {
     "imports": {
