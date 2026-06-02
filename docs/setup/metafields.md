@@ -62,12 +62,12 @@ rg "\.metafields\." -t liquid
 
 A single size guide (intro paragraph + table). One product references one `size_chart`. The chart can be reused across many products.
 
-| Field              | Type                                             | Required | Purpose                                                                                |
-| ------------------ | ------------------------------------------------ | -------- | -------------------------------------------------------------------------------------- |
-| `name`             | Single line text                                 | Yes      | Display name shown in the admin metaobject picker (set this as the "display name" too) |
-| `intro`            | Rich text                                        | No       | Paragraph(s) shown above the table in the dialog                                       |
-| `headers`          | Single line text                                 | Yes      | Column headers as a **comma-separated string**, e.g. `Size, Chest (cm), Waist (cm)`    |
-| `size_chart_rows`  | List of metaobject references → `size_chart_row` | Yes      | Body rows, in order. First cell of each row becomes a `<th scope="row">`               |
+| Field             | Type                                             | Required | Purpose                                                                                |
+| ----------------- | ------------------------------------------------ | -------- | -------------------------------------------------------------------------------------- |
+| `name`            | Single line text                                 | Yes      | Display name shown in the admin metaobject picker (set this as the "display name" too) |
+| `intro`           | Rich text                                        | No       | Paragraph(s) shown above the table in the dialog                                       |
+| `headers`         | Single line text                                 | Yes      | Column headers as a **comma-separated string**, e.g. `Size, Chest (cm), Waist (cm)`    |
+| `size_chart_rows` | List of metaobject references → `size_chart_row` | Yes      | Body rows, in order. First cell of each row becomes a `<th scope="row">`               |
 
 **Admin setup:**
 
@@ -78,8 +78,8 @@ A single size guide (intro paragraph + table). One product references one `size_
 
 One row of cells in a `size_chart`.
 
-| Field   | Type             | Required | Purpose                                                                                                  |
-| ------- | ---------------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| Field   | Type             | Required | Purpose                                                                                                                     |
+| ------- | ---------------- | -------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `cells` | Single line text | Yes      | Cell values as a **comma-separated string** in column order, matching the parent chart's `headers`, e.g. `XS, 84-88, 70-74` |
 
 > **Important:** Both `headers` (on `size_chart`) and `cells` (on `size_chart_row`) must be **single line text** fields containing **comma-separated** values. The snippet splits on commas and trims whitespace, so `XS,84-88,70-74` and `XS, 84-88, 70-74` both work. Do not use list-type fields and do not put commas inside cell values (they would be split).
