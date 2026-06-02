@@ -1,0 +1,118 @@
+{% doc %}
+  Renders a `<button>` or `<a>` element with a unified visual style, variant
+  support, optional sizes, and built-in loading state.
+
+  @param {string} text - Visible label. Required.
+  @param {string} [href] - Destination URL. When present, renders an `<a>` element.
+  @param {string} [as] - Force element type: `'a'` or `'button'`. Defaults to
+    `'button'` unless `href` is supplied.
+  @param {string} [type] - `<button>` `type` attribute: `submit`, `button`, or
+    `reset`. Defaults to `'button'`. Ignored for anchors.
+  @param {string} [variant] - Visual style: `primary`, `secondary`, or `ghost`.
+    Defaults to `primary`.
+  @param {string} [size] - Size preset: `sm`, `md`, or `lg`. Defaults to `md`.
+  @param {boolean} [loading] - When true, shows a spinner and blocks interaction.
+  @param {boolean} [disabled] - Marks the control as disabled.
+  @param {string} [class] - Additional Tailwind classes appended to the element.
+  @param {string} [name] - `<button>` `name` attribute for form submission
+    routing (e.g. `'checkout'` or `'update'`). Ignored for anchors.
+  @param {string} [value] - `<button>` `value` attribute paired with `name`.
+    Ignored for anchors.
+  @param {string} [aria_label] - Accessible label override for cases where the
+    visible text is not descriptive enough.
+  @param {string} [id] - Optional `id` attribute.
+  @param {string} [ref] - Optional `ref` attribute for use with the `Component` base class.
+
+  @example
+  {% render 'button', text: 'Add to cart', variant: 'primary', type: 'submit' %}
+
+  @example
+  {% render 'button', text: 'Learn more', href: product.url, variant: 'secondary' %}
+
+  @example
+  {% render 'button', text: 'View details', href: product.url, variant: 'ghost', size: 'sm' %}
+
+  @example
+  {% render 'button', text: 'Adding…', loading: true, loading_text: 'Adding…', variant: 'primary' %}
+
+  @example
+  {% render 'button', text: 'Unavailable', variant: 'primary', disabled: true %}
+{% enddoc %}
+
+{% liquid
+  assign resolved_variant = variant | default: 'primary'
+  assign resolved_size = size | default: 'md'
+  assign resolved_type = type | default: 'button'
+
+  assign is_anchor = false
+  if href != blank or as == 'a'
+    assign is_anchor = true
+  endif
+
+  assign is_disabled = false
+  if disabled
+    assign is_disabled = true
+  endif
+
+  assign is_loading = false
+  if loading
+    assign is_loading = true
+  endif
+
+  assign base_classes = 'inline-flex items-center justify-center gap-2 font-primary font-medium rounded-input whitespace-nowrap select-none transition-opacity duration-150 group disabled:opacity-50 disabled:pointer-events-none aria-disabled:opacity-50 aria-disabled:pointer-events-none'
+
+  case resolved_size
+    when 'sm'
+      assign size_classes = 'px-4 py-2 text-sm'
+    when 'lg'
+      assign size_classes = 'px-8 py-4 text-lg'
+    else
+      assign size_classes = 'px-6 py-3 text-base'
+  endcase
+
+  case resolved_variant
+    when 'secondary'
+      assign variant_classes = 'bg-transparent text-fg border border-fg hover:bg-fg hover:text-bg'
+    when 'ghost'
+      assign variant_classes = 'bg-transparent text-fg hover:bg-fg/10'
+    else
+      assign variant_classes = 'bg-fg text-bg hover:opacity-80'
+  endcase
+
+  assign all_classes = base_classes | append: ' ' | append: size_classes | append: ' ' | append: variant_classes
+  if class != blank
+    assign all_classes = all_classes | append: ' ' | append: class
+  endif
+%}
+
+{%- if is_anchor -%}
+  <a
+    href="{{ href | default: '#' }}"
+    class="{{ all_classes }}"
+    {%- if id != blank %} id="{{ id }}"{% endif -%}
+    {%- if aria_label != blank %} aria-label="{{ aria_label | escape }}"{% endif -%}
+    {%- if is_loading %} aria-busy="true" data-loading=""{% endif -%}
+    {%- if is_disabled or is_loading %} aria-disabled="true" tabindex="-1"{% endif -%}
+  >
+    <span class="grid [grid-template-areas:'stack'] place-items-center">
+      <span class="[grid-area:stack] group-data-[loading]:invisible">{{ text | escape }}</span>
+      <span class="[grid-area:stack] size-[1em] rounded-full border-2 border-current border-t-transparent animate-spin invisible group-data-[loading]:visible" aria-hidden="true"></span>
+    </span>
+  </a>
+{%- else -%}
+  <button
+    type="{{ resolved_type }}"
+    class="{{ all_classes }}"
+    {%- if id != blank %} id="{{ id }}"{% endif -%}
+    {%- if ref != blank %} ref="{{ ref }}"{% endif -%}
+    {%- if aria_label != blank %} aria-label="{{ aria_label | escape }}"{% endif -%}
+    {%- if name != blank %} name="{{ name }}" value="{{ value }}"{% endif -%}
+    {%- if is_loading %} aria-busy="true" data-loading=""{% endif -%}
+    {%- if is_disabled or is_loading %} disabled{% endif -%}
+  >
+    <span class="grid [grid-template-areas:'stack'] place-items-center">
+      <span class="[grid-area:stack] group-data-[loading]:invisible">{{ text | escape }}</span>
+      <span class="[grid-area:stack] size-[1em] rounded-full border-2 border-current border-t-transparent animate-spin invisible group-data-[loading]:visible" aria-hidden="true"></span>
+    </span>
+  </button>
+{%- endif -%}

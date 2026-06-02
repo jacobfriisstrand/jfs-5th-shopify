@@ -62,17 +62,19 @@ export class AddToCartComponent extends Component {
   }
 
   /**
-   * Disables the add to cart button.
+   * Disables the add to cart button and shows the loading spinner.
    */
   disable() {
     this.refs.addToCartButton.disabled = true;
+    this.refs.addToCartButton.dataset.loading = "";
   }
 
   /**
-   * Enables the add to cart button.
+   * Enables the add to cart button and hides the loading spinner.
    */
   enable() {
     this.refs.addToCartButton.disabled = false;
+    delete this.refs.addToCartButton.dataset.loading;
   }
 
   /**
@@ -444,6 +446,10 @@ class ProductFormComponent extends Component {
 
     const fetchCfg = fetchConfig("javascript", { body: formData });
 
+    for (const container of allAddToCartContainers) {
+      container.disable();
+    }
+
     fetch(Theme.routes.cart_add_url, {
       ...fetchCfg,
       headers: {
@@ -585,6 +591,9 @@ class ProductFormComponent extends Component {
         );
       })
       .finally(() => {
+        for (const container of allAddToCartContainers) {
+          container.enable();
+        }
         if (event) {
           cartPerformance.measureFromEvent("add:user-action", event);
         }

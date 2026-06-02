@@ -12,6 +12,13 @@
 {% liquid
   assign variant = product.selected_or_first_available_variant
   assign form_id = 'product-form-' | append: section.id
+  if variant.available
+    assign btn_text = 'actions.add_to_cart' | t
+    assign btn_disabled = false
+  else
+    assign btn_text = 'blocks.sold_out' | t
+    assign btn_disabled = true
+  endif
 %}
 
 <product-form-component
@@ -35,19 +42,16 @@
       value="{{ variant.id }}"
     >
 
-    <button
-      type="submit"
-      class="bg-fg text-bg w-full rounded-input px-6 py-3 text-base font-medium disabled:opacity-50"
-      {% unless variant.available %}
-        disabled
-      {% endunless %}
-    >
-      {%- if variant.available -%}
-        {{ 'actions.add_to_cart' | t }}
-      {%- else -%}
-        {{ 'blocks.sold_out' | t }}
-      {%- endif -%}
-    </button>
+    <add-to-cart-component>
+      {% render 'button',
+        text: btn_text,
+        type: 'submit',
+        variant: 'primary',
+        class: 'w-full',
+        disabled: btn_disabled,
+        ref: 'addToCartButton'
+      %}
+    </add-to-cart-component>
 
     <div
       ref="liveRegion"

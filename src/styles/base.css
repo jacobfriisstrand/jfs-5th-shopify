@@ -41,11 +41,24 @@ button {
   cursor: pointer;
 }
 
+*:focus {
+  outline: none;
+}
+
 *:focus-visible,
 *:focus-visible::before,
 *:focus-visible::after {
   outline: 2px solid currentColor;
   outline-offset: 2px;
+}
+
+/* Suppress focus rings while the last interaction was pointer-driven.
+   The data-focus-source attribute is managed by the inline script in
+   snippets/scripts.liquid. */
+html[data-focus-source] *:focus-visible,
+html[data-focus-source] *:focus-visible::before,
+html[data-focus-source] *:focus-visible::after {
+  outline: none;
 }
 
 /* -------------------------------------------------------------------------- */
