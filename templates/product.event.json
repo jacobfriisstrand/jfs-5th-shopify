@@ -1,0 +1,70 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ *
+ * Event product template. Uses the shared main-product section but
+ * omits product-specific blocks (bundle-offer-pill, accordion rows).
+ * GM Event Ticketing app blocks are added via the theme editor.
+ *
+ * The main-product section guards inline metafield content (accordion,
+ * size guide) via _is-event-product snippet — belt-and-suspenders
+ * defense since event products carry product.type "Event".
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "event-media-gallery": {
+          "type": "_product-media-gallery",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "event-title": {
+          "type": "product-title",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "event-price": {
+          "type": "price",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "event-description": {
+          "type": "product-description",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "event-variant-picker": {
+          "type": "variant-picker",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "event-quantity": {
+          "type": "quantity",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "event-add-to-cart": {
+          "type": "add-to-cart",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        }
+      },
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

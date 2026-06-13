@@ -25,6 +25,10 @@
 
 {% liquid
   assign size_chart = product.metafields.custom.size_chart.value
+
+  capture is_event_product
+    render '_is-event-product', product: product
+  endcapture
   assign dialog_id = 'size-guide-dialog-' | append: section_id
   assign dialog_title_id = dialog_id | append: '-title'
   assign size_guide_label = 'products.product.size_guide' | t
@@ -34,7 +38,7 @@
   assign rows = size_chart.size_chart_rows.value
 %}
 
-{%- if size_chart != blank -%}
+{%- if is_event_product != 'true' and size_chart != blank -%}
   <size-guide-component class="block">
     <button
       type="button"

@@ -20,7 +20,9 @@
   assign pill_text = product.metafields.custom.bundle_offer_pill
 %}
 
-{%- if pill_text != blank -%}
+{%- capture is_event_product -%}{%- render '_is-event-product', product: product -%}{%- endcapture -%}
+
+{%- if is_event_product != 'true' and pill_text != blank -%}
   <span class="inline-flex items-center rounded-full bg-fg px-2 py-1 text-xs font-medium text-bg {{ class }}">
     {{ pill_text }}
   </span>
