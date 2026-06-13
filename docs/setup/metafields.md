@@ -8,15 +8,34 @@ To find what is actually read by the code at any given moment, grep:
 rg "\.metafields\." -t liquid
 ```
 
+## Scoping
+
+This theme uses Shopify products for two distinct purposes: **regular products** (physical goods) and **event tickets** (powered by the [GM Event Ticketing](https://apps.shopify.com/event-ticketing) app). The separation is enforced at two levels:
+
+1. **Template level** — regular products use `product.json`; event products use `product.event.json` (assign via the product admin's "Theme template" dropdown). The event template omits product-specific blocks (`bundle-offer-pill`, `_accordion-row`).
+2. **Liquid guards** — inline metafield content (metafield accordion, size guide, bundle pill) checks `product.type` via `_is-event-product` snippet. Belt-and-suspenders: guards fire even if the wrong template is assigned.
+
+| Scope | Template | Product type filter | Purpose |
+| --- | --- | --- | --- |
+| **Product** | `product` | All types EXCEPT event types | Physical/digital goods — details, care, shipping, sizing |
+| **Event** | `product.event` | `Event` or `Ticket` | Event date, venue, schedule, ticket tiers |
+
+Each section below declares its scope in the heading. When a metafield is scoped to products, it must NOT render on event-ticket pages (and vice versa).
+
 ## Conventions
 
-- All product metafields live under the `custom` namespace unless noted.
+- All metafields live under the `custom` namespace unless noted.
 - "Optional" means the theme renders nothing (no empty heading, no empty container) when the metafield is blank.
 - Rich-text metafields are rendered via `| metafield_tag` so Shopify produces the correct semantic HTML.
+- **Scope is declared in the heading** of each section (e.g. "Product metafields", "Event metafields").
 
 ---
 
-## Product metafields
+## Product metafields (scope: regular products)
+
+> These metafields apply to **regular products only**. They are guarded at two levels:
+> 1. **Template** — `product.event.json` omits product-specific blocks (`bundle-offer-pill`, `_accordion-row`).
+> 2. **Liquid** — `_is-event-product` snippet check (via `product.type`) suppresses inline metafield content (accordion, size guide, bundle pill) on event products.
 
 ### `custom.details` — _optional_
 
@@ -83,6 +102,13 @@ One row of cells in a `size_chart`.
 | `cells` | Single line text | Yes      | Cell values as a **comma-separated string** in column order, matching the parent chart's `headers`, e.g. `XS, 84-88, 70-74` |
 
 > **Important:** Both `headers` (on `size_chart`) and `cells` (on `size_chart_row`) must be **single line text** fields containing **comma-separated** values. The snippet splits on commas and trims whitespace, so `XS,84-88,70-74` and `XS, 84-88, 70-74` both work. Do not use list-type fields and do not put commas inside cell values (they would be split).
+
+---
+
+## Event metafields (scope: event tickets)
+
+> **Placeholder.** Event metafields will be added once the GM Event Ticketing app is installed and its storefront data model is understood.
+> Expected namespace: `custom.event_*` or app-injected fields. See [issue #35](https://github.com/jacobfriisstrand/jfs-5th-shopify/issues/35).
 
 ---
 

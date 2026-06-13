@@ -13,6 +13,11 @@
   if accordion_details != blank or accordion_product_specifications != blank or accordion_care != blank or accordion_shipping != blank
     assign has_accordion = true
   endif
+
+  capture is_event_product
+    render '_is-event-product', product: product
+  endcapture
+
   assign accordion_label_details = 'products.product.accordion.details' | t
   assign accordion_label_product_specifications = 'products.product.accordion.product_specifications' | t
   assign accordion_label_care = 'products.product.accordion.care' | t
@@ -41,7 +46,7 @@
       {% render 'product-size-guide', product: product, section_id: section.id %}
       {% content_for 'block', id: 'quantity', type: 'quantity' %}
       {% content_for 'block', id: 'add-to-cart', type: 'add-to-cart' %}
-      {%- if has_accordion -%}
+      {%- if is_event_product != 'true' and has_accordion -%}
         <div class="accordion-group">
           {%- if accordion_details != blank -%}
             <details class="accordion-row">
