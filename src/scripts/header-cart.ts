@@ -7,11 +7,14 @@
 //      `[data-cart-count-a11y]` element so any number of header-cart
 //      blocks (mobile + desktop variants) stay in sync.
 //
-//   2. Defer-load the cart drawer (`@theme/cart-drawer`) and open it on
-//      header cart icon click. The drawer module is dynamically imported
-//      on first hover/focus of the anchor — counts as 0 KB against the
-//      route's static asset budget per ADR-0003 pillar 7. The bare
-//      `<a href="/cart">` remains the JS-disabled fallback.
+//   2. Defer-load the cart drawer on first click:
+//      a) Dynamic-import `@theme/cart-drawer` on first hover/focus
+//         (0 KB against static asset budget per ADR-0003 pillar 7).
+//      b) On click, fetch and inject the cart-drawer section HTML via
+//         the Section Rendering API, then open it. The section markup
+//         is absent from the DOM until the user explicitly interacts
+//         with the cart — no dead weight on non-commerce pages.
+//      The bare `<a href="/cart">` remains the JS-disabled fallback.
 import { ThemeEvents } from "@theme/events";
 
 const cartCountSelector = "[data-cart-count]";
@@ -52,10 +55,58 @@ async function refresh() {
 }
 
 let drawerPromise: Promise<unknown> | null = null;
+let sectionInjected = false;
+let injectPromise: Promise<HTMLElement | null> | null = null;
 
 function loadDrawer(): Promise<unknown> {
   drawerPromise ??= import("@theme/cart-drawer");
   return drawerPromise;
+}
+
+async function injectCartDrawer(): Promise<HTMLElement | null> {
+  if (sectionInjected) return getDrawerElement() as HTMLElement | null;
+  injectPromise ??= _injectCartDrawer();
+  return injectPromise;
+}
+
+async function _injectCartDrawer(): Promise<HTMLElement | null> {
+  const url = new URL(window.location.href);
+  url.searchParams.set("section_id", "cart-drawer");
+  const response = await fetch(url.toString());
+  if (!response.ok) return null;
+  const html = await response.text();
+
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const section = doc.querySelector<HTMLElement>('[id^="shopify-section-"]');
+  if (!section) return null;
+
+  // Re-create <script> elements so they execute when appended to live DOM.
+  // Scripts parsed via DOMParser are inert; the cart-drawer section ships
+  // <script type="module"> tags for component-quantity-selector and cart-form
+  // that must register their custom elements.
+  for (const oldScript of section.querySelectorAll("script")) {
+    const newScript = document.createElement("script");
+    for (let i = 0; i < oldScript.attributes.length; i++) {
+      const attr = oldScript.attributes[i];
+      newScript.setAttribute(attr.name, attr.value);
+    }
+    newScript.textContent = oldScript.textContent;
+    oldScript.replaceWith(newScript);
+  }
+
+  const mainContent = document.getElementById("MainContent");
+  mainContent?.parentNode?.insertBefore(section, mainContent);
+
+  // Wait for the commerce-specific custom elements (<cart-form-component>,
+  // <quantity-selector-component>) shipped as <script type="module"> in the
+  // section HTML to load and register before the first open triggers a morph.
+  await Promise.all([
+    customElements.whenDefined("cart-form-component"),
+    customElements.whenDefined("quantity-selector-component"),
+  ]);
+
+  sectionInjected = true;
+  return section;
 }
 
 function getDrawerElement(): (HTMLElement & { show?: () => void }) | null {
@@ -68,6 +119,14 @@ async function openDrawer() {
   await loadDrawer();
   // Wait a microtask so the custom element upgrades before we call show().
   await Promise.resolve();
+
+  // Fetch and inject the cart-drawer section HTML on first open. Subsequent
+  // opens reuse the injected markup (re-rendered via Section Rendering API
+  // by the <cart-drawer-component>'s show() method).
+  if (!sectionInjected) {
+    await injectCartDrawer();
+  }
+
   const drawer = getDrawerElement();
   drawer?.show?.();
 }
