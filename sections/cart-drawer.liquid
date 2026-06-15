@@ -1,7 +1,10 @@
 {%- comment -%}
   Cart drawer (slice 11) — slide-over after-action affordance per ADR-0005.
 
-  Rendered once globally from `layout/theme.liquid`. Closed by default.
+  Rendered server-side inside an inert `<template>` in
+  `layout/theme.liquid`. Parsed but not in the main DOM until
+  `header-cart.ts` clones it on first cart interaction.
+  Closed by default — the native `<dialog>` is inert until opened.
   Opened by JS in two cases only:
     1. Successful PDP add-to-cart (CartAddEvent with source =
        "product-form-component").
