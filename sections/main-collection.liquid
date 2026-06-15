@@ -1,7 +1,8 @@
 {% liquid
-  assign products = collection.products
   assign heading_id = 'main-collection-' | append: section.id
 %}
+
+{% paginate collection.products by: section.settings.products_per_page %}
 
 <section
   class="grid-12 py-12 sm:py-16"
@@ -15,11 +16,207 @@
       class: 'text-2xl font-medium sm:text-3xl'
     %}
 
-    {%- if products.size == 0 -%}
+    {%- if collection.filters.size > 0 -%}
+      {%- liquid
+        assign current_sort = collection.sort_by | default: collection.default_sort_by
+        assign filter_form_id = 'CollectionFilters-' | append: section.id
+      -%}
+
+      <div class="flex flex-col gap-4">
+        {%- comment -%} Result count + Sort {%- endcomment -%}
+        <div class="flex items-center justify-between gap-4">
+          <p class="text-sm text-fg/70" data-filter-count>
+            {{ 'sections.collection.filters.result_count' | t: count: collection.products_count }}
+          </p>
+
+          {%- if collection.sort_options.size > 0 -%}
+            <form
+              method="get"
+              action="{{ collection.url }}"
+              class="flex items-center gap-2"
+            >
+              <label for="SortBy" class="text-sm font-medium">
+                {{- 'sections.collection.sort.label' | t -}}
+              </label>
+              <select
+                id="SortBy"
+                name="sort_by"
+                class="border border-current/15 rounded-input px-3 py-1.5 text-sm"
+                onchange="this.form.requestSubmit()"
+              >
+                {%- for option in collection.sort_options -%}
+                  <option
+                    value="{{ option.value }}"
+                    {% if option.value == current_sort %}selected{% endif %}
+                  >
+                    {{- option.name -}}
+                  </option>
+                {%- endfor -%}
+              </select>
+              <noscript>
+                <button type="submit" class="text-sm underline underline-offset-2">
+                  {{- 'actions.submit' | t -}}
+                </button>
+              </noscript>
+            </form>
+          {%- endif -%}
+        </div>
+
+        {%- comment -%} Active filters chip row {%- endcomment -%}
+        {%- assign has_active_filters = false -%}
+        {%- for filter in collection.filters -%}
+          {%- if filter.active_values.size > 0 -%}
+            {%- assign has_active_filters = true -%}
+          {%- endif -%}
+          {%- if filter.type == 'price_range' -%}
+            {%- if filter.min_value.value != blank or filter.max_value.value != blank -%}
+              {%- assign has_active_filters = true -%}
+            {%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- if has_active_filters -%}
+          <div class="flex flex-wrap items-center gap-2">
+            {%- for filter in collection.filters -%}
+              {%- if filter.type == 'price_range' -%}
+                {%- if filter.min_value.value != blank or filter.max_value.value != blank -%}
+                  <a
+                    href="{{ filter.url_to_remove }}"
+                    class="inline-flex items-center gap-1 rounded-full border border-current/15 px-3 py-1 text-xs"
+                  >
+                    {{- filter.label -}}:
+                    {%- if filter.min_value.value != blank %}{{ filter.min_value.value | money }}{% endif -%}
+                    {%- if filter.min_value.value != blank and filter.max_value.value != blank %} &ndash; {% endif -%}
+                    {%- if filter.max_value.value != blank %}{{ filter.max_value.value | money }}{% endif -%}
+                    <span aria-hidden="true">&times;</span>
+                  </a>
+                {%- endif -%}
+              {%- endif -%}
+              {%- for value in filter.active_values -%}
+                <a
+                  href="{{ value.url_to_remove }}"
+                  class="inline-flex items-center gap-1 rounded-full border border-current/15 px-3 py-1 text-xs"
+                >
+                  {{- value.label -}}
+                  <span aria-hidden="true">&times;</span>
+                </a>
+              {%- endfor -%}
+            {%- endfor -%}
+            <a
+              href="{{ collection.url }}{% if current_sort != collection.default_sort_by %}?sort_by={{ current_sort }}{% endif %}"
+              class="text-xs underline underline-offset-2"
+            >
+              {{- 'actions.clear_all' | t -}}
+            </a>
+          </div>
+        {%- endif -%}
+
+        {%- comment -%} Filter groups {%- endcomment -%}
+        <form method="get" action="{{ collection.url }}" id="{{ filter_form_id }}">
+          {%- if current_sort != collection.default_sort_by -%}
+            <input type="hidden" name="sort_by" value="{{ current_sort }}">
+          {%- endif -%}
+
+          <div class="flex flex-wrap gap-4">
+            {%- for filter in collection.filters -%}
+              {%- case filter.type -%}
+                {%- when 'list' -%}
+                  <details class="min-w-40">
+                    <summary class="cursor-pointer text-sm font-medium">
+                      {{- filter.label -}}
+                    </summary>
+                    <ul class="mt-2 flex flex-col gap-1.5">
+                      {%- for value in filter.values -%}
+                        <li class="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            name="{{ value.param_name }}"
+                            value="{{ value.value }}"
+                            id="Filter-{{ filter.param_name }}-{{ forloop.index }}"
+                            {% if value.active %}checked{% endif %}
+                            {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                            class="h-4 w-4"
+                          >
+                          <label
+                            for="Filter-{{ filter.param_name }}-{{ forloop.index }}"
+                            class="text-sm {% if value.count == 0 and value.active == false %}text-fg/40{% endif %}"
+                          >
+                            {{- value.label -}}
+                            <span class="text-fg/50 ml-1">({{ value.count }})</span>
+                          </label>
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  </details>
+
+                {%- when 'price_range' -%}
+                  <details class="min-w-40">
+                    <summary class="cursor-pointer text-sm font-medium">
+                      {{- filter.label -}}
+                    </summary>
+                    <div class="mt-2 flex items-center gap-2">
+                      <input
+                        type="number"
+                        name="{{ filter.min_value.param_name }}"
+                        id="Filter-{{ filter.min_value.param_name }}"
+                        placeholder="{{ 'sections.collection.filters.from' | t }}"
+                        min="0"
+                        max="{{ filter.range_max }}"
+                        value="{{ filter.min_value.value | default: '' }}"
+                        class="w-24 border border-current/15 rounded-input px-2 py-1 text-sm"
+                      >
+                      <span class="text-xs text-fg/50">{{ 'fields.separator' | t }}</span>
+                      <input
+                        type="number"
+                        name="{{ filter.max_value.param_name }}"
+                        id="Filter-{{ filter.max_value.param_name }}"
+                        placeholder="{{ 'sections.collection.filters.to' | t }}"
+                        min="0"
+                        max="{{ filter.range_max }}"
+                        value="{{ filter.max_value.value | default: '' }}"
+                        class="w-24 border border-current/15 rounded-input px-2 py-1 text-sm"
+                      >
+                    </div>
+                  </details>
+
+                {%- when 'boolean' -%}
+                  <details class="min-w-40">
+                    <summary class="cursor-pointer text-sm font-medium">
+                      {{- filter.label -}}
+                    </summary>
+                    <div class="mt-2 flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        name="{{ filter.param_name }}"
+                        value="1"
+                        id="Filter-{{ filter.param_name }}"
+                        {% if filter.active %}checked{% endif %}
+                        class="h-4 w-4"
+                      >
+                      <label for="Filter-{{ filter.param_name }}" class="text-sm">
+                        {{- filter.label -}}
+                      </label>
+                    </div>
+                  </details>
+              {%- endcase -%}
+            {%- endfor -%}
+          </div>
+
+          <div class="mt-4 flex gap-2">
+            <button type="submit" class="text-sm underline underline-offset-2">
+              {{- 'actions.apply' | t -}}
+            </button>
+          </div>
+        </form>
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} Product grid {%- endcomment -%}
+    {%- if collection.products.size == 0 -%}
       <p>{{ 'content.no_products_found' | t }}</p>
     {%- else -%}
       <ul role="list" class="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
-        {%- for product in products -%}
+        {%- for product in collection.products -%}
           {%- assign seen_colors = '||' -%}
           {%- for variant in product.variants -%}
             {%- assign color_key = '|' | append: variant.option1 | append: '|' -%}
@@ -31,8 +228,53 @@
         {%- endfor -%}
       </ul>
     {%- endif -%}
+
+    {%- comment -%} Pagination {%- endcomment -%}
+    {%- if paginate.pages > 1 -%}
+      <nav role="navigation" aria-label="{{ 'content.pagination.nav_label' | t }}" class="flex items-center justify-center gap-2">
+        {%- if paginate.previous -%}
+          <a
+            href="{{ paginate.previous.url }}"
+            rel="prev"
+            class="inline-flex items-center gap-1 px-3 py-1.5 text-sm border border-current/15 rounded-input hover:bg-fg/5"
+          >
+            {{- 'content.pagination.previous' | t -}}
+          </a>
+        {%- endif -%}
+
+        {%- for part in paginate.parts -%}
+          {%- if part.is_link -%}
+            <a
+              href="{{ part.url }}"
+              class="inline-flex items-center px-3 py-1.5 text-sm border border-current/15 rounded-input hover:bg-fg/5"
+            >
+              {{- part.title -}}
+            </a>
+          {%- else -%}
+            <span
+              aria-current="page"
+              class="inline-flex items-center px-3 py-1.5 text-sm bg-fg/10 rounded-input font-medium"
+            >
+              {{- part.title -}}
+            </span>
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- if paginate.next -%}
+          <a
+            href="{{ paginate.next.url }}"
+            rel="next"
+            class="inline-flex items-center gap-1 px-3 py-1.5 text-sm border border-current/15 rounded-input hover:bg-fg/5"
+          >
+            {{- 'content.pagination.next' | t -}}
+          </a>
+        {%- endif -%}
+      </nav>
+    {%- endif -%}
   </div>
 </section>
+
+{% endpaginate %}
 
 {% schema %}
 {
@@ -41,6 +283,17 @@
     "templates": [
       "collection"
     ]
-  }
+  },
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "t:labels.products_per_page",
+      "min": 12,
+      "max": 48,
+      "step": 12,
+      "default": 24
+    }
+  ]
 }
 {% endschema %}

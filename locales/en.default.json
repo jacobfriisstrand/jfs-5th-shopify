@@ -254,6 +254,19 @@
     }
   },
   "sections": {
+    "collection": {
+      "filters": {
+        "result_count": {
+          "one": "{{ count }} product",
+          "other": "{{ count }} products"
+        },
+        "from": "From",
+        "to": "To"
+      },
+      "sort": {
+        "label": "Sort by"
+      }
+    },
     "featured_collection": {
       "label": "Featured collection"
     }
