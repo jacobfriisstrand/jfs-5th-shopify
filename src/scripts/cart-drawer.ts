@@ -5,9 +5,10 @@ import { normalizeSectionId, sectionRenderer } from "@theme/section-renderer";
 /**
  * `<cart-drawer-component>` — slide-over cart drawer per ADR-0005.
  *
- * Mounted once globally by `sections/cart-drawer.liquid` (rendered from
- * `layout/theme.liquid`). Closed by default — the native `<dialog>` is
- * inert until opened. Closed by default. Opens only when explicitly asked:
+ * Rendered server-side inside an inert `<template>` in
+ * `layout/theme.liquid`. Parsed but not in the main DOM until
+ * `header-cart.ts` clones it on first cart interaction.
+ * Closed by default — the native `<dialog>` is inert until opened. Closed by default. Opens only when explicitly asked:
  *
  *   1. Header cart icon click — `header-cart.ts` defer-imports this module
  *      on first hover/focus, then calls `show()` on click.
