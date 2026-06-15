@@ -44,6 +44,25 @@ jobs:
       - name: Build theme
         run: npm run build
 
+      - name: Resolve existing Develop theme ID
+        id: resolve
+        run: |
+          set -euo pipefail
+          # List all themes and find one named exactly "Develop" (not "PR #…"
+          # preview themes). If found, push by ID to guarantee we update the
+          # same record. If not found, push by name to create it.
+          THEMES_JSON="$(npx shopify theme list --json)"
+          EXISTING_ID="$(echo "$THEMES_JSON" | jq -r '.[] | select(.name == "'"$THEME_NAME"'") | .id' | head -1)"
+          if [ -n "$EXISTING_ID" ] && [ "$EXISTING_ID" != "null" ]; then
+            echo "Found existing theme \"$THEME_NAME\" (id $EXISTING_ID)"
+            echo "theme_ref=$EXISTING_ID" >> "$GITHUB_OUTPUT"
+            echo "is_new=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "No existing theme named \"$THEME_NAME\" — will create one"
+            echo "theme_ref=$THEME_NAME" >> "$GITHUB_OUTPUT"
+            echo "is_new=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Push unpublished theme
         id: push
         run: |
@@ -51,7 +70,7 @@ jobs:
           OUTPUT="$(npx shopify theme push \
             --unpublished \
             --json \
-            --theme "$THEME_NAME")"
+            --theme "${{ steps.resolve.outputs.theme_ref }}")"
           echo "$OUTPUT"
           PREVIEW_URL="$(echo "$OUTPUT" | jq -r '.theme.preview_url // .preview_url')"
           EDITOR_URL="$(echo "$OUTPUT" | jq -r '.theme.editor_url // .editor_url')"
@@ -61,6 +80,24 @@ jobs:
             echo "editor_url=$EDITOR_URL"
             echo "theme_id=$THEME_ID"
           } >> "$GITHUB_OUTPUT"
+
+      - name: Delete orphaned Develop theme duplicates
+        if: steps.resolve.outputs.is_new == 'false'
+        run: |
+          set -euo pipefail
+          TARGET_ID="${{ steps.push.outputs.theme_id }}"
+          THEMES_JSON="$(npx shopify theme list --json)"
+          # Delete any unpublished theme named exactly "Develop" whose ID
+          # differs from the one we just pushed to.
+          DUPLICATES="$(echo "$THEMES_JSON" | jq -r '.[] | select(.name == "'"$THEME_NAME"'" and .id != '"$TARGET_ID"' and .role == "unpublished") | .id')"
+          if [ -n "$DUPLICATES" ]; then
+            for DUP_ID in $DUPLICATES; do
+              echo "Deleting orphaned duplicate theme $DUP_ID"
+              npx shopify theme delete --force --theme "$DUP_ID"
+            done
+          else
+            echo "No duplicate Develop themes found"
+          fi
 
       - name: Summary
         run: |
