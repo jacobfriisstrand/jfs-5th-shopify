@@ -10,10 +10,10 @@
 //   2. Defer-load the cart drawer on first click:
 //      a) Dynamic-import `@theme/cart-drawer` on first hover/focus
 //         (0 KB against static asset budget per ADR-0003 pillar 7).
-//      b) On click, fetch and inject the cart-drawer section HTML via
-//         the Section Rendering API, then open it. The section markup
-//         is absent from the DOM until the user explicitly interacts
-//         with the cart — no dead weight on non-commerce pages.
+//      b) On click, open the `<cart-drawer-component>` rendered by
+//         `layout/theme.liquid`. If the section was conditionally
+//         omitted from the template, lazy-fetch it via the Section
+//         Rendering API first.
 //      The bare `<a href="/cart">` remains the JS-disabled fallback.
 import { ThemeEvents } from "@theme/events";
 
@@ -120,10 +120,11 @@ async function openDrawer() {
   // Wait a microtask so the custom element upgrades before we call show().
   await Promise.resolve();
 
-  // Fetch and inject the cart-drawer section HTML on first open. Subsequent
-  // opens reuse the injected markup (re-rendered via Section Rendering API
-  // by the <cart-drawer-component>'s show() method).
-  if (!sectionInjected) {
+  // If the cart-drawer section wasn't rendered server-side (e.g. on
+  // non-ecommerce templates that conditionally omit it), lazy-fetch and
+  // inject it via the Section Rendering API. Otherwise the section is
+  // already in the DOM from the layout and we just open it.
+  if (!getDrawerElement() && !sectionInjected) {
     await injectCartDrawer();
   }
 
