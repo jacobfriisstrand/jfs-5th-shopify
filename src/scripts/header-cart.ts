@@ -100,8 +100,11 @@ async function _injectCartDrawer(): Promise<void> {
   );
   if (!section) return;
 
-  const mainContent = document.getElementById("MainContent");
-  mainContent?.parentNode?.insertBefore(section, mainContent);
+  // Append to <body> so the grid (grid-rows-[auto_1fr_auto]) keeps
+  // header, main, and footer in their explicit rows. The section
+  // occupies an implicit trailing row with zero height — the dialog
+  // inside is position:fixed and doesn't participate in flow.
+  document.body.appendChild(section);
 
   // Wait for the commerce-specific custom elements (<cart-form-component>,
   // <quantity-selector-component>) whose module scripts were just injected
