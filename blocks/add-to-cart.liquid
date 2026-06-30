@@ -12,8 +12,13 @@
 {% liquid
   assign variant = product.selected_or_first_available_variant
   assign form_id = 'product-form-' | append: section.id
+  assign t = product.type | downcase
   if variant.available
-    assign btn_text = 'actions.add_to_cart' | t
+    if t == 'event' or t == 'ticket'
+      assign btn_text = 'actions.add_ticket_to_cart' | t
+    else
+      assign btn_text = 'actions.add_to_cart' | t
+    endif
     assign btn_disabled = false
   else
     assign btn_text = 'blocks.sold_out' | t
