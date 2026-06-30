@@ -48,6 +48,7 @@
   },
   "actions": {
     "add": "Add",
+    "add_ticket_to_cart": "Add ticket to cart",
     "add_to_cart": "Add to cart",
     "added": "Added",
     "apply": "Apply",
@@ -256,6 +257,15 @@
   "sections": {
     "featured_collection": {
       "label": "Featured collection"
+    },
+    "event": {
+      "about": "What is this event about?",
+      "who_for": "Who is this event for?",
+      "participate": "What does it take to participate?",
+      "included": "What is included in the price?",
+      "practical_information": "Practical information",
+      "partners": "Our partners for this challenge",
+      "disclaimer": "Disclaimer"
     }
   }
 }

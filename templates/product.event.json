@@ -11,52 +11,55 @@
  * omits product-specific blocks (bundle-offer-pill, accordion rows).
  * GM Event Ticketing app blocks are added via the theme editor.
  *
- * The main-product section guards inline metafield content (accordion,
- * size guide) via _is-event-product snippet — belt-and-suspenders
- * defense since event products carry product.type "Event".
+ * Block IDs match the product template so main-product.liquid's
+ * content_for calls resolve correctly for both template types.
+ *
+ * Event-specific metafield content (about, who-for, participate,
+ * included, practical-info, partners, disclaimer) is rendered inline
+ * by main-product.liquid when _is-event-product detects an event.
  */
 {
   "sections": {
     "main": {
       "type": "main-product",
       "blocks": {
-        "event-media-gallery": {
+        "product-media-gallery": {
           "type": "_product-media-gallery",
           "static": true,
           "settings": {},
           "blocks": {}
         },
-        "event-title": {
+        "product-title": {
           "type": "product-title",
           "static": true,
           "settings": {},
           "blocks": {}
         },
-        "event-price": {
+        "price": {
           "type": "price",
           "static": true,
           "settings": {},
           "blocks": {}
         },
-        "event-description": {
+        "product-description": {
           "type": "product-description",
           "static": true,
           "settings": {},
           "blocks": {}
         },
-        "event-variant-picker": {
+        "variant-picker": {
           "type": "variant-picker",
           "static": true,
           "settings": {},
           "blocks": {}
         },
-        "event-quantity": {
+        "quantity": {
           "type": "quantity",
           "static": true,
           "settings": {},
           "blocks": {}
         },
-        "event-add-to-cart": {
+        "add-to-cart": {
           "type": "add-to-cart",
           "static": true,
           "settings": {},
