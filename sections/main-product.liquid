@@ -17,11 +17,28 @@
   capture is_event_product
     render '_is-event-product', product: product
   endcapture
+  assign is_event_product = is_event_product | strip
 
   assign accordion_label_details = 'products.product.accordion.details' | t
   assign accordion_label_product_specifications = 'products.product.accordion.product_specifications' | t
   assign accordion_label_care = 'products.product.accordion.care' | t
   assign accordion_label_shipping = 'products.product.accordion.shipping' | t
+
+  assign event_about = product.metafields.custom.event_about
+  assign event_who_for = product.metafields.custom.event_who_for
+  assign event_participate = product.metafields.custom.event_participate
+  assign event_included = product.metafields.custom.event_included
+  assign event_practical_info = product.metafields.custom.event_practical_info
+  assign event_partners = product.metafields.custom.event_partners
+  assign event_disclaimer = product.metafields.custom.event_disclaimer
+
+  assign event_label_about = 'sections.event.about' | t
+  assign event_label_who_for = 'sections.event.who_for' | t
+  assign event_label_participate = 'sections.event.participate' | t
+  assign event_label_included = 'sections.event.included' | t
+  assign event_label_practical_information = 'sections.event.practical_information' | t
+  assign event_label_partners = 'sections.event.partners' | t
+  assign event_label_disclaimer = 'sections.event.disclaimer' | t
 %}
 <script src="{{ 'product-form.js'  | asset_url }}" type="module" fetchpriority="low"></script>
 <script src="{{ 'product-price.js' | asset_url }}" type="module" fetchpriority="low"></script>
@@ -97,6 +114,100 @@
             </details>
           {%- endif -%}
         </div>
+      {%- endif -%}
+
+      {%- if is_event_product == 'true' -%}
+        {%- if event_about != blank or event_who_for != blank or event_participate != blank or event_included != blank -%}
+          <div class="accordion-group">
+            {%- if event_about != blank -%}
+              <details class="accordion-row" open>
+                <summary>
+                  {% render 'heading',
+                    text: event_label_about,
+                    level: 3,
+                    class: 'text-base font-medium'
+                  %}
+                </summary>
+                <div class="prose">{{ event_about | metafield_tag }}</div>
+              </details>
+            {%- endif -%}
+            {%- if event_who_for != blank -%}
+              <details class="accordion-row">
+                <summary>
+                  {% render 'heading',
+                    text: event_label_who_for,
+                    level: 3,
+                    class: 'text-base font-medium'
+                  %}
+                </summary>
+                <div class="prose">{{ event_who_for | metafield_tag }}</div>
+              </details>
+            {%- endif -%}
+            {%- if event_participate != blank -%}
+              <details class="accordion-row">
+                <summary>
+                  {% render 'heading',
+                    text: event_label_participate,
+                    level: 3,
+                    class: 'text-base font-medium'
+                  %}
+                </summary>
+                <div class="prose">{{ event_participate | metafield_tag }}</div>
+              </details>
+            {%- endif -%}
+            {%- if event_included != blank -%}
+              <details class="accordion-row">
+                <summary>
+                  {% render 'heading',
+                    text: event_label_included,
+                    level: 3,
+                    class: 'text-base font-medium'
+                  %}
+                </summary>
+                <div class="prose">{{ event_included | metafield_tag }}</div>
+              </details>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- if event_practical_info != blank -%}
+          <div>
+            {% render 'heading',
+              text: event_label_practical_information,
+              level: 2,
+              class: 'text-xl font-medium'
+            %}
+            <div class="prose mt-4">{{ event_practical_info | metafield_tag }}</div>
+          </div>
+        {%- endif -%}
+
+        {%- if event_partners != blank -%}
+          <div>
+            {% render 'heading',
+              text: event_label_partners,
+              level: 2,
+              class: 'text-xl font-medium'
+            %}
+            <div class="mt-4 flex flex-wrap gap-4">
+              {%- for file in event_partners.value -%}
+                <div class="w-24 h-24">
+                  {{ file.preview_image | image_url: width: 200 | image_tag: alt: file.alt, class: 'w-full h-full object-contain' }}
+                </div>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if event_disclaimer != blank -%}
+          <div>
+            {% render 'heading',
+              text: event_label_disclaimer,
+              level: 2,
+              class: 'text-xl font-medium'
+            %}
+            <div class="prose mt-4">{{ event_disclaimer | metafield_tag }}</div>
+          </div>
+        {%- endif -%}
       {%- endif -%}
     </div>
   </div>
