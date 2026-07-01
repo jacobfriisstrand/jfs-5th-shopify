@@ -107,8 +107,49 @@ One row of cells in a `size_chart`.
 
 ## Event metafields (scope: event tickets)
 
-> **Placeholder.** Event metafields will be added once the GM Event Ticketing app is installed and its storefront data model is understood.
-> Expected namespace: `custom.event_*` or app-injected fields. See [issue #35](https://github.com/jacobfriisstrand/jfs-5th-shopify/issues/35).
+> These metafields apply to **event products only** (product type `Event` or `Ticket`). They are rendered inline by `sections/main-product.liquid` when the `_is-event-product` snippet returns `true`. All fields are rendered below the add-to-cart button.
+
+### `custom.event_about` — _optional_
+
+- **Type:** Rich text
+- **Used by:** `sections/main-product.liquid` (accordion row "What is this event about?")
+- **Notes:** First accordion row, opens by default. Hidden if blank.
+
+### `custom.event_who_for` — _optional_
+
+- **Type:** Rich text
+- **Used by:** `sections/main-product.liquid` (accordion row "Who is this event for?")
+- **Notes:** Same accordion group. Hidden if blank.
+
+### `custom.event_participate` — _optional_
+
+- **Type:** Rich text
+- **Used by:** `sections/main-product.liquid` (accordion row "What does it take to participate?")
+- **Notes:** Same accordion group. Hidden if blank.
+
+### `custom.event_included` — _optional_
+
+- **Type:** Rich text
+- **Used by:** `sections/main-product.liquid` (accordion row "What is included in the price?")
+- **Notes:** Same accordion group. Hidden if blank.
+
+### `custom.event_practical_info` — _optional_
+
+- **Type:** Rich text
+- **Used by:** `sections/main-product.liquid` (standalone section "Practical information")
+- **Notes:** Rendered below the accordion group as an `<h2>` heading + prose. Hidden if blank.
+
+### `custom.event_partners` — _optional_
+
+- **Type:** **File** (list) — upload partner logo images
+- **Used by:** `sections/main-product.liquid` (standalone section "Our partners for this challenge")
+- **Notes:** Rendered as a flex grid of logo images (`200px` wide, `object-contain`). Each file's `preview_image` is used via `image_url` filter. Hidden if empty.
+
+### `custom.event_disclaimer` — _optional_
+
+- **Type:** Rich text
+- **Used by:** `sections/main-product.liquid` (standalone section "Disclaimer")
+- **Notes:** Rendered below partners as an `<h2>` heading + prose. Hidden if blank.
 
 ---
 
