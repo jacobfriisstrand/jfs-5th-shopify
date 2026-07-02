@@ -1,6 +1,33 @@
-{% comment %} buy-buttons: scaffold — populate as needed. {% endcomment %}
-<div class="buy-buttons">
-</div>
+{% doc %}
+  Renders Shopify's dynamic checkout / accelerated payment button (Shop Pay,
+  Apple Pay, Google Pay, etc.) for the current product on PDP.
+
+  Uses `{% form 'product', product %}` with `{{ form | payment_button }}`
+  so Shopify's Buy Button JS auto-initializes the button. The form has a
+  stable `id` derived from `section.id` so the section morph
+  (ADR-0001 + ADR-0002) correctly updates the hidden variant-id input
+  across variant changes instead of tearing down and re-creating the form.
+
+  Guards against unavailable variants by not rendering the form at all —
+  the morph handles add/remove of the form element when availability flips.
+
+  Used by `sections/main-product.liquid` via
+  `{% content_for 'block', type: 'buy-buttons' %}`.
+{% enddoc %}
+
+{% liquid
+  assign variant = product.selected_or_first_available_variant
+  assign form_id = 'buy-buttons-form-' | append: section.id
+%}
+
+{%- if variant.available -%}
+  <div class="buy-buttons mt-4">
+    {% form 'product', product, id: form_id %}
+      <input type="hidden" name="id" value="{{ variant.id }}">
+      {{ form | payment_button }}
+    {% endform %}
+  </div>
+{%- endif -%}
 
 {% schema %}
 {

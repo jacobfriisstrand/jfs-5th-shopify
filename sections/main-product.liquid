@@ -63,6 +63,7 @@
       {% render 'product-size-guide', product: product, section_id: section.id %}
       {% content_for 'block', id: 'quantity', type: 'quantity' %}
       {% content_for 'block', id: 'add-to-cart', type: 'add-to-cart' %}
+      {% content_for 'block', id: 'buy-buttons', type: 'buy-buttons' %}
       {%- if is_event_product != 'true' and has_accordion -%}
         <div class="accordion-group">
           {%- if accordion_details != blank -%}

@@ -20,6 +20,12 @@
           "static": true,
           "settings": {},
           "blocks": {}
+        },
+        "accelerated-checkout": {
+          "type": "accelerated-checkout",
+          "static": true,
+          "settings": {},
+          "blocks": {}
         }
       },
       "settings": {}

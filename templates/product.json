@@ -54,6 +54,12 @@
           "settings": {},
           "blocks": {}
         },
+        "buy-buttons": {
+          "type": "buy-buttons",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
         "accordion-row-1": {
           "type": "_accordion-row",
           "static": true,

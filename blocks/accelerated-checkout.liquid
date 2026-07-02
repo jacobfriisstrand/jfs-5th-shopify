@@ -1,6 +1,21 @@
-{% comment %} accelerated-checkout: scaffold — populate as needed. {% endcomment %}
-<div class="accelerated-checkout">
-</div>
+{% doc %}
+  Renders accelerated checkout buttons (Shop Pay, Apple Pay, Google Pay,
+  etc.) on the /cart page. Uses Shopify's `content_for_additional_checkout_buttons`
+  when the store has at least one accelerated checkout method enabled.
+
+  On the cart page the `<SHOPIFY-ACCELERATED-CHECKOUT-CART>` custom element
+  is explicitly preserved across morphs (`src/scripts/morph.ts`) so
+  quantity-line-item updates don't tear down and re-init the button.
+
+  Used by `sections/main-cart.liquid` via
+  `{% content_for 'block', type: 'accelerated-checkout' %}`.
+{% enddoc %}
+
+{%- if additional_checkout_buttons -%}
+  <div class="accelerated-checkout mt-4">
+    {{ content_for_additional_checkout_buttons }}
+  </div>
+{%- endif -%}
 
 {% schema %}
 {
