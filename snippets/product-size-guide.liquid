@@ -45,7 +45,7 @@
       data-size-guide-trigger
       aria-controls="{{ dialog_id }}"
       aria-expanded="false"
-      class="text-fg/70 underline-offset-4 hover:text-fg self-start text-sm underline"
+      class="text-foreground/70 underline-offset-4 hover:text-foreground self-start text-sm underline"
     >
       {{ size_guide_label }}
     </button>
@@ -81,7 +81,7 @@
                     <tr>
                       {%- for header in header_cells -%}
                         {%- assign header_text = header | strip -%}
-                        <th scope="col" class="border-fg/10 border-b px-3 py-2 font-medium">
+                        <th scope="col" class="border-foreground/10 border-b px-3 py-2 font-medium">
                           {{ header_text }}
                         </th>
                       {%- endfor -%}
@@ -99,11 +99,11 @@
                       {%- for cell in cells -%}
                         {%- assign cell_text = cell | strip -%}
                         {%- if forloop.first -%}
-                          <th scope="row" class="border-fg/10 border-b px-3 py-2 font-medium">
+                          <th scope="row" class="border-foreground/10 border-b px-3 py-2 font-medium">
                             {{ cell_text }}
                           </th>
                         {%- else -%}
-                          <td class="border-fg/10 border-b px-3 py-2">{{ cell_text }}</td>
+                          <td class="border-foreground/10 border-b px-3 py-2">{{ cell_text }}</td>
                         {%- endif -%}
                       {%- endfor -%}
                     </tr>
@@ -114,7 +114,7 @@
           {%- endif -%}
 
           {%- if intro == blank and rows == blank -%}
-            <p class="text-fg/60 text-sm">
+            <p class="text-foreground/60 text-sm">
               The linked size chart metaobject has no <code>intro</code> or
               <code>size_chart_rows</code> populated. Check the metaobject entry
               in the Shopify admin (Content → Metaobjects → Size chart).

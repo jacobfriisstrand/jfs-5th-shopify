@@ -20,7 +20,7 @@
 %}
 
 {%- if product.has_only_default_variant == false and current_variant -%}
-  <p class="text-fg/70 text-sm">
+  <p class="text-foreground/70 text-sm">
     {%- for option in product.options_with_values -%}
       <span>
         <span class="font-medium">{{ option.name }}:</span>

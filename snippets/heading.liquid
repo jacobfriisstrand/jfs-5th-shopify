@@ -20,21 +20,25 @@
 
 {% liquid
   assign resolved_level = level | default: 2
+  assign heading_class = 'font-heading'
+  if class != blank
+    assign heading_class = heading_class | append: ' ' | append: class
+  endif
 %}
 
 {%- case resolved_level -%}
   {%- when 1 -%}
-    <h1{% if id != blank %} id="{{ id }}"{% endif %}{% if class != blank %} class="{{ class }}"{% endif %}>{{ text | escape }}</h1>
+    <h1{% if id != blank %} id="{{ id }}"{% endif %} class="{{ heading_class }}">{{ text | escape }}</h1>
   {%- when 2 -%}
-    <h2{% if id != blank %} id="{{ id }}"{% endif %}{% if class != blank %} class="{{ class }}"{% endif %}>{{ text | escape }}</h2>
+    <h2{% if id != blank %} id="{{ id }}"{% endif %} class="{{ heading_class }}">{{ text | escape }}</h2>
   {%- when 3 -%}
-    <h3{% if id != blank %} id="{{ id }}"{% endif %}{% if class != blank %} class="{{ class }}"{% endif %}>{{ text | escape }}</h3>
+    <h3{% if id != blank %} id="{{ id }}"{% endif %} class="{{ heading_class }}">{{ text | escape }}</h3>
   {%- when 4 -%}
-    <h4{% if id != blank %} id="{{ id }}"{% endif %}{% if class != blank %} class="{{ class }}"{% endif %}>{{ text | escape }}</h4>
+    <h4{% if id != blank %} id="{{ id }}"{% endif %} class="{{ heading_class }}">{{ text | escape }}</h4>
   {%- when 5 -%}
-    <h5{% if id != blank %} id="{{ id }}"{% endif %}{% if class != blank %} class="{{ class }}"{% endif %}>{{ text | escape }}</h5>
+    <h5{% if id != blank %} id="{{ id }}"{% endif %} class="{{ heading_class }}">{{ text | escape }}</h5>
   {%- when 6 -%}
-    <h6{% if id != blank %} id="{{ id }}"{% endif %}{% if class != blank %} class="{{ class }}"{% endif %}>{{ text | escape }}</h6>
+    <h6{% if id != blank %} id="{{ id }}"{% endif %} class="{{ heading_class }}">{{ text | escape }}</h6>
   {%- else -%}
-    <h2{% if id != blank %} id="{{ id }}"{% endif %}{% if class != blank %} class="{{ class }}"{% endif %}>{{ text | escape }}</h2>
+    <h2{% if id != blank %} id="{{ id }}"{% endif %} class="{{ heading_class }}">{{ text | escape }}</h2>
 {%- endcase -%}

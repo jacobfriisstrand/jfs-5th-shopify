@@ -87,11 +87,11 @@
               text: heading,
               level: resolved_heading_level,
               id: heading_id,
-              class: 'font-primary text-2xl font-bold sm:text-3xl'
+              class: 'font-body text-2xl font-bold sm:text-3xl'
             %}
           {%- endif -%}
           {%- if subheading != blank -%}
-            <p class="text-fg/70 text-sm sm:text-base">{{ subheading | escape }}</p>
+            <p class="text-foreground/70 text-sm sm:text-base">{{ subheading | escape }}</p>
           {%- endif -%}
         </div>
       {%- endif -%}
@@ -128,7 +128,7 @@
         type="button"
         data-carousel-prev
         aria-label="Previous"
-        class="border-fg/20 text-fg flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+        class="border-foreground/20 text-foreground flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
       >
         <span aria-hidden="true">&larr;</span>
       </button>
@@ -136,7 +136,7 @@
         type="button"
         data-carousel-next
         aria-label="Next"
-        class="border-fg/20 text-fg flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+        class="border-foreground/20 text-foreground flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
       >
         <span aria-hidden="true">&rarr;</span>
       </button>

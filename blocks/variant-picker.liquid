@@ -31,9 +31,9 @@
   <variant-picker-form class="flex flex-col gap-4">
     {%- for option in product.options_with_values -%}
       <fieldset class="contents">
-        <legend class="text-fg/70 mb-2 text-sm font-medium">
+        <legend class="text-foreground/70 mb-2 text-sm font-medium">
           {{ option.name }}:
-          <span class="text-fg">{{ current_variant.options[forloop.index0] }}</span>
+          <span class="text-foreground">{{ current_variant.options[forloop.index0] }}</span>
         </legend>
         <ul class="flex flex-wrap gap-2">
           {%- for value in option.values -%}

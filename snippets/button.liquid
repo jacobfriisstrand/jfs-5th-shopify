@@ -59,7 +59,7 @@
     assign is_loading = true
   endif
 
-  assign base_classes = 'inline-flex items-center justify-center gap-2 font-primary font-medium rounded-input whitespace-nowrap select-none transition-opacity duration-150 group disabled:opacity-50 disabled:pointer-events-none aria-disabled:opacity-50 aria-disabled:pointer-events-none'
+  assign base_classes = 'inline-flex items-center justify-center gap-2 font-body font-medium rounded-input whitespace-nowrap select-none transition-opacity duration-150 group disabled:opacity-50 disabled:pointer-events-none aria-disabled:opacity-50 aria-disabled:pointer-events-none'
 
   case resolved_size
     when 'sm'
@@ -72,11 +72,11 @@
 
   case resolved_variant
     when 'secondary'
-      assign variant_classes = 'bg-transparent text-fg border border-fg hover:bg-fg hover:text-bg'
+      assign variant_classes = 'bg-transparent text-foreground border border-foreground hover:bg-foreground hover:text-background'
     when 'ghost'
-      assign variant_classes = 'bg-transparent text-fg hover:bg-fg/10'
+      assign variant_classes = 'bg-transparent text-foreground hover:bg-foreground/10'
     else
-      assign variant_classes = 'bg-fg text-bg hover:opacity-80'
+      assign variant_classes = 'bg-foreground text-background hover:opacity-80'
   endcase
 
   assign all_classes = base_classes | append: ' ' | append: size_classes | append: ' ' | append: variant_classes

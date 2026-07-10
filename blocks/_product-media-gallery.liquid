@@ -140,7 +140,7 @@
         type="button"
         data-carousel-prev
         aria-label="Previous image"
-        class="border-fg/20 text-fg flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+        class="border-foreground/20 text-foreground flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
       >
         <span aria-hidden="true">&larr;</span>
       </button>
@@ -148,7 +148,7 @@
         type="button"
         data-carousel-next
         aria-label="Next image"
-        class="border-fg/20 text-fg flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+        class="border-foreground/20 text-foreground flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
       >
         <span aria-hidden="true">&rarr;</span>
       </button>
@@ -161,7 +161,7 @@
     ></script>
   {%- endif -%}
 {%- else -%}
-  {{ 'product-1' | placeholder_svg_tag: 'h-auto w-full bg-fg/5' }}
+  {{ 'product-1' | placeholder_svg_tag: 'h-auto w-full bg-foreground/5' }}
 {%- endif -%}
 
 {% schema %}

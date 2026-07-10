@@ -48,21 +48,21 @@
       <div class="flex flex-1 flex-col gap-2">
         <div class="flex items-start justify-between gap-3">
           <div class="flex flex-col gap-1">
-            <a href="{{ line.url }}" class="text-fg text-sm font-medium hover:underline sm:text-base">
+            <a href="{{ line.url }}" class="text-foreground text-sm font-medium hover:underline sm:text-base">
               {{ line.product.title }}
             </a>
             {%- unless line.product.has_only_default_variant -%}
-              <p class="text-fg/70 text-xs">{{ line.variant.title }}</p>
+              <p class="text-foreground/70 text-xs">{{ line.variant.title }}</p>
             {%- endunless -%}
             {%- if line.selling_plan_allocation -%}
-              <p class="text-fg/70 text-xs">{{ line.selling_plan_allocation.selling_plan.name }}</p>
+              <p class="text-foreground/70 text-xs">{{ line.selling_plan_allocation.selling_plan.name }}</p>
             {%- endif -%}
             {% render '_bundle-offer-pill', product: line.product %}
           </div>
-          <p class="text-fg flex flex-col items-end gap-0.5 text-sm font-medium sm:text-base">
+          <p class="text-foreground flex flex-col items-end gap-0.5 text-sm font-medium sm:text-base">
             <span class="group-data-[updating=true]:hidden">
               {%- if has_line_discount -%}
-                <span class="text-fg/50 mr-1 line-through">{{ line.original_line_price | money }}</span>
+                <span class="text-foreground/50 mr-1 line-through">{{ line.original_line_price | money }}</span>
               {%- endif -%}
               {{ line.final_line_price | money }}
             </span>
@@ -88,7 +88,7 @@
             name="updates[{{ line.key }}]"
             value="0"
             aria-label="{{ remove_label }}"
-            class="hover:text-fg text-fg/70 text-xs underline-offset-2 hover:underline"
+            class="hover:text-foreground text-foreground/70 text-xs underline-offset-2 hover:underline"
           >
             {{ 'actions.remove' | t }}
           </button>

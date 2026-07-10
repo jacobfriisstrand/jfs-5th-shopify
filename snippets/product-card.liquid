@@ -54,10 +54,10 @@
 
 <a
   href="{{ card_url }}"
-  class="group flex flex-col gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg"
+  class="group flex flex-col gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
 >
   {%- if card_image != blank -%}
-    <div class="grid aspect-square w-full place-items-start overflow-hidden rounded-input bg-fg/5">
+    <div class="grid aspect-square w-full place-items-start overflow-hidden rounded-input bg-foreground/5">
       {{
         card_image
         | image_url: width: 800
@@ -72,7 +72,7 @@
       {% render '_bundle-offer-pill', product: product, class: '[grid-area:1/1] m-2' %}
     </div>
   {%- else -%}
-    <div class="grid aspect-square w-full place-items-start rounded-input bg-fg/5" aria-hidden="true">
+    <div class="grid aspect-square w-full place-items-start rounded-input bg-foreground/5" aria-hidden="true">
       {% render '_bundle-offer-pill', product: product, class: '[grid-area:1/1] m-2' %}
     </div>
   {%- endif -%}

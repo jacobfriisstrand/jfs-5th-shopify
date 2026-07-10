@@ -8,7 +8,7 @@
 >
   <div ref="priceContainer" class="text-xl font-medium">
     {%- if variant.compare_at_price > variant.price -%}
-      <span class="text-fg/60 line-through me-2">
+      <span class="text-foreground/60 line-through me-2">
         <span class="sr-only">{{ 'content.price_regular' | t }}: </span>
         {{- variant.compare_at_price | money -}}
       </span>

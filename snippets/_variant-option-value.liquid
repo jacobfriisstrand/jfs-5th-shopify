@@ -103,7 +103,7 @@
 {%- elsif is_current -%}
   <span
     aria-current="true"
-    class="bg-fg text-bg rounded-input inline-flex items-center gap-2 border border-current px-4 py-2 text-sm font-medium"
+    class="bg-foreground text-background rounded-input inline-flex items-center gap-2 border border-current px-4 py-2 text-sm font-medium"
   >
     <span aria-hidden="true">✓</span>
     {{ value }}
@@ -113,7 +113,7 @@
   <a
     href="{{ product.url }}?variant={{ target_variant.id }}"
     data-axis="{{ option_name | downcase }}"
-    class="text-fg rounded-input hover:bg-fg hover:text-bg inline-flex items-center border border-current px-4 py-2 text-sm font-medium {% if is_sold_out %}opacity-60{% endif %}"
+    class="text-foreground rounded-input hover:bg-foreground hover:text-background inline-flex items-center border border-current px-4 py-2 text-sm font-medium {% if is_sold_out %}opacity-60{% endif %}"
   >
     {{ value }}
     {%- if is_sold_out %} — {{ 'products.product.sold_out' | t }}{% endif -%}

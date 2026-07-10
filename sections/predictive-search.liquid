@@ -37,11 +37,11 @@
         >
           <a
             href="{{ product.url }}"
-            class="flex items-center gap-3 p-2 rounded-input hover:bg-fg/5 focus-visible:outline-2 focus-visible:outline-offset-2 aria-selected:bg-fg/10"
+            class="flex items-center gap-3 p-2 rounded-input hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-offset-2 aria-selected:bg-foreground/10"
           >
             {%- if result_image -%}
               <span class="relative h-12 w-12 shrink-0 overflow-hidden rounded-input">
-                {% render 'skeleton', class: 'absolute inset-0 rounded-none bg-fg/8 animate-pulse' %}
+                {% render 'skeleton', class: 'absolute inset-0 rounded-none bg-foreground/8 animate-pulse' %}
                 {{
                   result_image
                   | image_url: width: 96

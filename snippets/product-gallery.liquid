@@ -111,7 +111,7 @@
         type="button"
         data-carousel-prev
         aria-label="{{ 'content.pagination.previous' | t | escape }}"
-        class="border-fg/20 text-fg flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+        class="border-foreground/20 text-foreground flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
       >
         <span aria-hidden="true">&larr;</span>
       </button>
@@ -119,7 +119,7 @@
         type="button"
         data-carousel-next
         aria-label="{{ 'content.pagination.next' | t | escape }}"
-        class="border-fg/20 text-fg flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+        class="border-foreground/20 text-foreground flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
       >
         <span aria-hidden="true">&rarr;</span>
       </button>
@@ -127,5 +127,5 @@
     </swiper-carousel>
   {%- endif -%}
 {%- else -%}
-  {{ 'product-1' | placeholder_svg_tag: 'h-auto w-full bg-fg/5' }}
+  {{ 'product-1' | placeholder_svg_tag: 'h-auto w-full bg-foreground/5' }}
 {%- endif -%}
