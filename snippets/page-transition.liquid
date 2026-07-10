@@ -8,17 +8,23 @@
     2. Arriving page: only animates when arriving from an internal
        navigation (sessionStorage flag).  On first load / reload the
        overlay is hidden instantly.
+
+  Both layers start with the `hidden` attribute so the UA stylesheet's
+  `[hidden] { display: none }` hides them before any CSS loads — no
+  FOUC, no stuck overlay if the author stylesheet is late.
 {% endcomment %}
 
 <div
   id="PageTransitionBlur"
   class="page-transition-blur"
+  hidden
   aria-hidden="true"
 ></div>
 
 <div
   id="PageTransitionOverlay"
   class="page-transition-overlay"
+  hidden
   aria-hidden="true"
 ></div>
 
@@ -44,22 +50,21 @@
 
       if (url.origin !== window.location.origin) return;
       if (url.pathname === window.location.pathname
-          && url.search === window.location.search
-          && url.hash !== window.location.hash) {
+          && url.search === window.location.search) {
         return;
       }
 
       e.preventDefault();
 
       /* Show blur backdrop (900 ms transition in). */
-      blur.style.display = 'block';
+      blur.hidden = false;
       blur.offsetHeight;
       blur.classList.add('active');
 
       /* Overlay starts sliding up before blur finishes.
          animation-delay: 150 ms (CSS) — heavy overlap with blur. */
       overlay.classList.remove('reveal');
-      overlay.style.display = 'block';
+      overlay.hidden = false;
       overlay.offsetHeight;
       overlay.classList.add('cover');
 
@@ -78,31 +83,53 @@
     sessionStorage.removeItem('page-transition');
 
     if (!shouldReveal) {
-      overlay.style.display = 'none';
-      blur.style.display = 'none';
+      /* Elements already hidden (attribute).  Belt-and-suspenders. */
+      blur.hidden = true;
+      overlay.hidden = true;
       return;
     }
 
+    blur.hidden = false;
     blur.classList.add('active');
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
+
+        var revealDone = false;
+        function cleanup() {
+          if (revealDone) return;
+          revealDone = true;
+          blur.classList.remove('active');
+          blur.removeEventListener('transitionend', onBlurEnd);
+          blur.hidden = true;
+          overlay.removeEventListener('animationend', onRevealEnd);
+          overlay.hidden = true;
+        }
+
+        function onBlurEnd() {
+          blur.hidden = true;
+        }
+
+        /* Safety net: if the reveal animation never fires (author
+           stylesheet not loaded, interrupted by another transition,
+           etc.), force-hide after 2 s so the page isn't stuck. */
+        setTimeout(cleanup, 2000);
 
         /* Start blur fade-out while the slide is still in progress.
            overlay reveal = 920 ms. Start blur removal at 350 ms
            so they overlap for most of the reveal. */
         setTimeout(function () {
+          if (revealDone) return;
           blur.classList.remove('active');
-          blur.addEventListener('transitionend', function () {
-            blur.style.display = 'none';
-          });
+          blur.addEventListener('transitionend', onBlurEnd);
         }, 350);
 
-        overlay.addEventListener('animationend', function onRevealEnd(e) {
+        function onRevealEnd(e) {
           if (e.animationName !== 'page-transition-reveal') return;
-          overlay.removeEventListener('animationend', onRevealEnd);
-          overlay.style.display = 'none';
-        });
+          cleanup();
+        }
+        overlay.addEventListener('animationend', onRevealEnd);
         overlay.classList.add('reveal');
+        overlay.hidden = false;
       });
     });
   })();

@@ -65,7 +65,7 @@
                       "name": "t:names.header_menu_link",
                       "settings": {
                         "label": "Latest Events",
-                        "url": "#"
+                        "url": "shopify://collections/events"
                       },
                       "blocks": {}
                     }
