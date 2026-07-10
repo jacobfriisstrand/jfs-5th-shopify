@@ -50,12 +50,20 @@ export class DialogComponent extends Component {
    */
   #applyInertOutside() {
     this.#inertedElements = [];
+    // Use getComputedStyle to read the resolved top value — reliable
+    // regardless of body position:fixed scroll-lock in Chrome.
+    const dialogTop = parseFloat(getComputedStyle(this.refs.dialog).top) || 0;
     for (const el of Array.from(document.body.children)) {
       if (el === this) continue;
       if (el.hasAttribute("inert")) continue;
       // Allow opt-out: elements like a shared dialog backdrop must
       // remain interactive while the dialog is open.
       if (el.hasAttribute("data-dialog-passthrough")) continue;
+      // If the dialog starts below the top of the viewport (e.g. desktop
+      // megamenu pinned below the header at top: 64px), keep the header
+      // group interactive — it sits above the dialog and hosts nav,
+      // search, and cart controls. Everything else stays inert.
+      if (dialogTop > 0 && el.id === "header-group") continue;
       el.setAttribute("inert", "");
       this.#inertedElements.push(el);
     }

@@ -1,0 +1,15 @@
+/*
+ * Color tokens: Tailwind utilities bg-bg / text-fg.
+ */
+:root {
+  --color-dark: #282828;
+  --color-light: #fffff6;
+  --color-brand: #f66242;
+  --color-background: var(--color-dark);
+  --color-foreground: var(--color-light);
+}
+
+@theme {
+  --color-background: var(--color-dark);
+  --color-foreground: var(--color-light);
+}

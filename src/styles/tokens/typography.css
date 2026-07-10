@@ -1,0 +1,19 @@
+/*
+ * Typography tokens: map custom fonts to Tailwind utilities.
+ *
+ * Usage: font-body, font-heading
+ */
+:root {
+  --font-body--family: "Satoshi", sans-serif;
+  --font-body--style: normal;
+  --font-body--weight: 400;
+
+  --font-heading--family: "BebasNeue", sans-serif;
+  --font-heading--style: normal;
+  --font-heading--weight: 400;
+}
+
+@theme {
+  --font-body: var(--font-body--family);
+  --font-heading: var(--font-heading--family);
+}

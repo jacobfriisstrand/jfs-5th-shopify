@@ -1,12 +1,13 @@
 @import "tailwindcss";
-@import "./base.css";
-@import "./colors.css";
-@import "./typography.css";
-@import "./radii.css";
-@import "./layout.css";
-@import "./accordion.css";
-@import "./header-menu.css";
-@import "./prose.css";
+@import "./base/base.css";
+@import "./tokens/colors.css";
+@import "./tokens/typography.css";
+@import "./tokens/radii.css";
+@import "./tokens/animations.css";
+@import "./utilities/layout.css";
+@import "./components/accordion.css";
+@import "./components/header-menu.css";
+@import "./components/prose.css";
 
 @source "../../sections/**/*.liquid";
 @source "../../blocks/**/*.liquid";

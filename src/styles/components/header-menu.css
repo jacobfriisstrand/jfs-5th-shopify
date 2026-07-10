@@ -3,7 +3,7 @@
 /*                                                                            */
 /* Layout + motion for the megamenu and the inline mobile nav. All motion     */
 /* values come from the shared overlay tokens defined in `base.css`           */
-/* (`--motion-overlay-*`) so drawers and megamenus animate in lockstep.       */
+/* (`--motion-overlay-*` for all drawer and overlay motion).       */
 /* -------------------------------------------------------------------------- */
 
 /* -------------------------------------------------------------------------- */
@@ -129,20 +129,20 @@
   /* Start below the header so the header (and its hamburger→X trigger)
      stays visible and clickable while the mobile drawer is open. */
   inset: var(--header-height, 0) 0 0 0;
-  z-index: 49;
+  z-index: 38;
   background: rgb(0 0 0 / 0.4);
   backdrop-filter: blur(8px);
   opacity: 0;
   pointer-events: none;
   transition:
-    opacity var(--motion-backdrop-duration) ease-out,
+    opacity var(--motion-backdrop-duration) linear,
     visibility 0s linear var(--motion-backdrop-duration);
 
   &[data-open="true"] {
     opacity: 1;
     pointer-events: auto;
     transition:
-      opacity var(--motion-backdrop-duration) ease-in,
+      opacity var(--motion-backdrop-duration) linear,
       visibility 0s linear 0s;
   }
 }
@@ -267,10 +267,10 @@
    - Desktop (md+): pinned below the header as a wide dropdown.
    The featured image is hidden on mobile. */
 @utility header-menu-megamenu {
-  /* Mobile defaults: full screen. */
+  /* Mobile defaults: full screen. Above the nav drawer (z:50). */
   position: fixed;
   inset: 0;
-  z-index: 60;
+  z-index: 51;
   width: 100vw;
   max-width: 100vw;
   height: 100dvh;
@@ -289,12 +289,10 @@
     top: var(--header-height, 0);
     left: 0;
     right: 0;
-    /* Above the shared header backdrop (z:49) so the megamenu panel
-       paints over the dimmed page content. */
-    z-index: 55;
+    /* Sits behind the header (z:40) so the nav bar stays on top. */
+    z-index: 39;
     height: auto;
     max-height: calc(100dvh - var(--header-height, 0px));
-    border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
   }
 }
 
@@ -310,11 +308,9 @@
    Modal `<dialog>`s render in the top layer, so the header — which sits
    in normal flow — cannot beat the dialog's backdrop or the dialog box
    itself with z-index alone. Instead, we shrink the backdrop to start
-   below the header (so the header stays visually clean) and replace the
-   shared `data-drawer="top"` translate animation with a `clip-path`
-   reveal so the dialog box never visually intrudes into the header
-   strip during the entry/exit transition. The effect reads as a panel
-   "dropping out from under" the header. */
+   below the header (so the header stays visually clean). The shared
+   `data-drawer` animation system from `base.css` handles entry/exit
+   motion, using the same slide keyframes as the cart drawer. */
 dialog.header-menu-megamenu::backdrop {
   inset: 0;
 
@@ -324,59 +320,23 @@ dialog.header-menu-megamenu::backdrop {
 }
 
 dialog[data-drawer="top"].header-menu-megamenu[open]:not(.dialog-closing) {
-  /* Mobile: slide in from the right (drawer-style). */
-  animation: megamenu-slide-in var(--motion-overlay-in-duration)
+  /* Mobile: same right-slide as the cart drawer, with linear easing. */
+  animation: drawer-in-right var(--motion-overlay-in-duration)
     var(--motion-overlay-in-easing);
 
   @media (min-width: 768px) {
-    animation: megamenu-reveal-in var(--motion-overlay-in-duration)
+    animation: drawer-in-top var(--motion-overlay-in-duration)
       var(--motion-overlay-in-easing);
   }
 }
 
 dialog[data-drawer="top"].header-menu-megamenu.dialog-closing {
-  animation: megamenu-slide-out var(--motion-overlay-out-duration)
+  animation: drawer-out-right var(--motion-overlay-out-duration)
     var(--motion-overlay-out-easing) forwards;
 
   @media (min-width: 768px) {
-    animation: megamenu-reveal-out var(--motion-overlay-out-duration)
+    animation: drawer-out-top var(--motion-overlay-out-duration)
       var(--motion-overlay-out-easing) forwards;
-  }
-}
-
-@keyframes megamenu-slide-in {
-  from {
-    translate: 100% 0;
-  }
-  to {
-    translate: 0 0;
-  }
-}
-
-@keyframes megamenu-slide-out {
-  from {
-    translate: 0 0;
-  }
-  to {
-    translate: 100% 0;
-  }
-}
-
-@keyframes megamenu-reveal-in {
-  from {
-    clip-path: inset(0 0 100% 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-@keyframes megamenu-reveal-out {
-  from {
-    clip-path: inset(0 0 0 0);
-  }
-  to {
-    clip-path: inset(0 0 100% 0);
   }
 }
 

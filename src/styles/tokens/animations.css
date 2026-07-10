@@ -1,0 +1,179 @@
+/* -------------------------------------------------------------------------- */
+/* Animation tokens & keyframes — single source of truth for drawer/overlay   */
+/* entry/exit motion.                                                         */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  --motion-overlay-in-duration: 640ms;
+  --motion-overlay-in-easing: cubic-bezier(0.77, 0, 0.18, 1);
+  --motion-overlay-out-duration: 640ms;
+  --motion-overlay-out-easing: cubic-bezier(0.77, 0, 0.18, 1);
+  --motion-backdrop-duration: 640ms;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Drawer animation system                                                    */
+/*                                                                            */
+/* Any `<dialog>` with a `data-drawer="<side>"` attribute (where side is one  */
+/* of `right`, `left`, `top`, `bottom`) gets the shared slide-in/out          */
+/* animation. The exit is triggered by the `.dialog-closing` class that       */
+/* `<dialog-component>` adds before awaiting `animationend` and calling       */
+/* `dialog.close()`. The `:not(.dialog-closing)` guard prevents the entry     */
+/* animation from re-running while the exit animation plays.                  */
+/*                                                                            */
+/* Positioning (anchor side, sizing) stays in the markup as Tailwind          */
+/* utilities — this layer only owns motion.                                   */
+/* -------------------------------------------------------------------------- */
+
+dialog[data-drawer][open]:not(.dialog-closing)::backdrop {
+  animation: drawer-backdrop-in var(--motion-backdrop-duration) linear;
+}
+
+dialog[data-drawer].dialog-closing::backdrop {
+  animation: drawer-backdrop-out var(--motion-backdrop-duration) linear forwards;
+}
+
+dialog[data-drawer="right"][open]:not(.dialog-closing) {
+  animation: drawer-in-right var(--motion-overlay-in-duration)
+    var(--motion-overlay-in-easing);
+}
+
+dialog[data-drawer="right"].dialog-closing {
+  animation: drawer-out-right var(--motion-overlay-out-duration)
+    var(--motion-overlay-out-easing) forwards;
+}
+
+dialog[data-drawer="left"][open]:not(.dialog-closing) {
+  animation: drawer-in-left var(--motion-overlay-in-duration)
+    var(--motion-overlay-in-easing);
+}
+
+dialog[data-drawer="left"].dialog-closing {
+  animation: drawer-out-left var(--motion-overlay-out-duration)
+    var(--motion-overlay-out-easing) forwards;
+}
+
+dialog[data-drawer="top"][open]:not(.dialog-closing) {
+  animation: drawer-in-top var(--motion-overlay-in-duration)
+    var(--motion-overlay-in-easing);
+}
+
+dialog[data-drawer="top"].dialog-closing {
+  animation: drawer-out-top var(--motion-overlay-out-duration)
+    var(--motion-overlay-out-easing) forwards;
+}
+
+dialog[data-drawer="bottom"][open]:not(.dialog-closing) {
+  animation: drawer-in-bottom var(--motion-overlay-in-duration)
+    var(--motion-overlay-in-easing);
+}
+
+dialog[data-drawer="bottom"].dialog-closing {
+  animation: drawer-out-bottom var(--motion-overlay-out-duration)
+    var(--motion-overlay-out-easing) forwards;
+}
+
+@keyframes drawer-in-right {
+  from {
+    translate: 100% 0;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+@keyframes drawer-out-right {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 100% 0;
+  }
+}
+
+@keyframes drawer-in-left {
+  from {
+    translate: -100% 0;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+@keyframes drawer-out-left {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: -100% 0;
+  }
+}
+
+@keyframes drawer-in-top {
+  from {
+    translate: 0 -100%;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+@keyframes drawer-out-top {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 -100%;
+  }
+}
+
+@keyframes drawer-in-bottom {
+  from {
+    translate: 0 100%;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+@keyframes drawer-out-bottom {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 100%;
+  }
+}
+
+@keyframes drawer-backdrop-in {
+  from {
+    background-color: rgb(0 0 0 / 0);
+    backdrop-filter: blur(0px);
+  }
+  to {
+    background-color: rgb(0 0 0 / 0.4);
+    backdrop-filter: blur(12px);
+  }
+}
+
+@keyframes drawer-backdrop-out {
+  from {
+    background-color: rgb(0 0 0 / 0.4);
+    backdrop-filter: blur(12px);
+  }
+  to {
+    background-color: rgb(0 0 0 / 0);
+    backdrop-filter: blur(0px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
