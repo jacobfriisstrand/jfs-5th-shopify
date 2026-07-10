@@ -12,8 +12,6 @@
     Default `false`.
   @param {boolean} [muted] - Default `true` (browsers block unmuted autoplay).
   @param {boolean} [loop] - Default `false`.
-  @param {boolean} [controls] - Renders a custom play/pause button overlay.
-    Default `true`.
   @param {string} [preload] - `'none'` | `'metadata'` | `'auto'`.
     Default `'none'`.
   @param {string} [class] - Additional CSS classes on the wrapping element.
@@ -27,7 +25,6 @@
     autoplay: true,
     loop: true,
     muted: true,
-    class: 'absolute inset-0 -z-10',
     video_class: 'h-full w-full object-cover'
   %}
 
@@ -35,7 +32,6 @@
   {% render 'video',
     video: section.settings.video,
     poster: section.settings.poster_image,
-    controls: true,
     preload: 'metadata',
     class: 'w-full',
     video_class: 'w-full h-auto'
@@ -56,11 +52,6 @@
   assign resolved_loop = false
   if loop
     assign resolved_loop = true
-  endif
-
-  assign resolved_controls = true
-  if controls == false
-    assign resolved_controls = false
   endif
 
   assign resolved_preload = preload | default: 'none'
@@ -109,8 +100,7 @@
       }}
     {%- endif -%}
 
-    {%- if resolved_controls -%}
-      <button
+    <button
         type="button"
         data-video-toggle
         aria-label="{{ play_label }}"

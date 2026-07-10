@@ -14,7 +14,7 @@
       "settings": {
         "heading": "Welcome to our store",
         "subheading": "Discover our latest collection.",
-        "image": "shopify://shop_images/jorgen-hendriksen-BomU_atAAKQ-unsplash.jpg",
+        "video": "shopify://files/videos/Forside video - Matty .MOV",
         "button_label": "Shop now",
         "button_link": "shopify://pages/contact"
       }
@@ -25,7 +25,8 @@
         "heading": "Featured products",
         "subheading": "This is some products of ours.",
         "collection": "collection1",
-        "products_to_show": 6
+        "products_to_show": 6,
+        "link_text": "View all"
       }
     }
   },

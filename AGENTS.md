@@ -113,7 +113,6 @@ custom play/pause toggle with localised accessible labels. Pass
   autoplay: true,
   loop: true,
   muted: true,
-  controls: false,
   video_class: 'h-full w-full object-cover'
 %}
 ```
