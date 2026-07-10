@@ -37,10 +37,20 @@
   {%- if image != blank -%}
     {%- if image_link_url != blank -%}
       <a href="{{ image_link_url }}" class="block">
-        {{ image | image_url: width: 640 | image_tag: loading: 'lazy', widths: '320,640', sizes: '(min-width: 768px) 256px, 100vw' }}
+        {% render 'image',
+          image: image,
+          width_max: 640,
+          widths: '320, 640',
+          sizes: '(min-width: 768px) 256px, 100vw'
+        %}
       </a>
     {%- else -%}
-      {{ image | image_url: width: 640 | image_tag: loading: 'lazy', widths: '320,640', sizes: '(min-width: 768px) 256px, 100vw' }}
+      {% render 'image',
+        image: image,
+        width_max: 640,
+        widths: '320, 640',
+        sizes: '(min-width: 768px) 256px, 100vw'
+      %}
     {%- endif -%}
   {%- endif -%}
   {%- if cta_text != blank and cta_url != blank -%}

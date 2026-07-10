@@ -15,20 +15,21 @@
 
 <section class="grid-12">
   {%- if image != blank -%}
-    {{
-      image
-      | image_url: width: 3000
-      | image_tag:
-        class: 'full-bleed h-[60svh] w-full object-cover',
-        widths: '480, 768, 1024, 1440, 1920, 2560, 3000',
-        sizes: '100vw',
-        loading: 'eager',
-        fetchpriority: 'high',
-        alt: image.alt
-    }}
+    {% render 'image',
+      image: image,
+      priority: 'lcp',
+      class: 'full-bleed h-[60svh] w-full object-cover',
+      width_max: 3000,
+      widths: '480, 768, 1024, 1440, 1920, 2560, 3000',
+      sizes: '100vw'
+    %}
   {%- endif -%}
   {%- if heading != blank -%}
-    <h2 class="span-4 md:span-8 lg:cs-1 lg:span-8 text-4xl">{{ heading }}</h2>
+    {% render 'heading',
+      text: heading,
+      level: 2,
+      class: 'span-4 md:span-8 lg:cs-1 lg:span-8 text-4xl'
+    %}
   {%- endif -%}
 </section>
 

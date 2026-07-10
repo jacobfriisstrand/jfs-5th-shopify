@@ -9,19 +9,15 @@
 <section class="relative isolate w-full overflow-hidden bg-background text-foreground">
   {%- if image != blank -%}
     <div class="absolute inset-0 -z-10">
-      {{
-        image
-        | image_url: width: 2400
-        | image_tag:
-          loading: 'eager',
-          fetchpriority: 'high',
-          decoding: 'async',
-          sizes: '100vw',
-          widths: '480, 768, 1024, 1440, 1920, 2400',
-          class: 'h-full w-full object-cover',
-          alt: image.alt
-        | default: heading
-      }}
+      {% render 'image',
+        image: image,
+        priority: 'lcp',
+        class: 'h-full w-full object-cover',
+        alt_fallback: heading,
+        width_max: 2400,
+        widths: '480, 768, 1024, 1440, 1920, 2400',
+        sizes: '100vw'
+      %}
       <div class="absolute inset-0 bg-foreground/30"></div>
     </div>
   {%- endif -%}

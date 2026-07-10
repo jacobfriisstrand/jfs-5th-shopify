@@ -58,17 +58,14 @@
 >
   {%- if card_image != blank -%}
     <div class="grid aspect-square w-full place-items-start overflow-hidden rounded-input bg-foreground/5">
-      {{
-        card_image
-        | image_url: width: 800
-        | image_tag:
-          loading: 'lazy',
-          decoding: 'async',
-          sizes: '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw',
-          widths: '200, 300, 400, 600, 800',
-          class: '[grid-area:1/1] h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]',
-          alt: card_image.alt | default: card_title
-      }}
+      {% render 'image',
+        image: card_image,
+        class: '[grid-area:1/1] h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]',
+        alt_fallback: card_title,
+        width_max: 800,
+        widths: '200, 300, 400, 600, 800',
+        sizes: '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw'
+      %}
       {% render '_bundle-offer-pill', product: product, class: '[grid-area:1/1] m-2' %}
     </div>
   {%- else -%}
