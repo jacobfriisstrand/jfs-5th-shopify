@@ -444,3 +444,37 @@ export function defineSection(schema: SectionSchema): SectionSchema {
 export function defineBlock(schema: BlockSchema): BlockSchema {
   return schema;
 }
+
+/**
+ * Canonical image-or-video setting pair. Sections that accept either a
+ * background image or video should use this instead of manually declaring
+ * both `image_picker` and `video` settings.
+ *
+ * Liquid should check `video` first (with autoplay/muted/loop), falling
+ * back to `image`:
+ *
+ * ```liquid
+ * {%- if video != blank -%}
+ *   {% render 'video', video: video, autoplay: true, loop: true, muted: true, controls: false, … %}
+ * {%- elsif image != blank -%}
+ *   {% render 'image', image: image, priority: 'lcp', … %}
+ * {%- endif -%}
+ * ```
+ */
+export function defineMediaSettings(options?: {
+  imageLabel?: string;
+  videoLabel?: string;
+}): [ImagePickerSetting, VideoSetting] {
+  return [
+    {
+      type: "image_picker",
+      id: "image",
+      label: options?.imageLabel ?? "t:settings.image",
+    },
+    {
+      type: "video",
+      id: "video",
+      label: options?.videoLabel ?? "t:settings.video",
+    },
+  ];
+}

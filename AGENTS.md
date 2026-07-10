@@ -541,6 +541,7 @@ All Shopify setting types are typed in `src/schemas/types.ts`. Key interfaces:
 - **`BlockSchema`** — block schema (name, settings, blocks, presets, limit, etc.)
 - **`ShopifySetting`** — union of all 30+ setting types (text, textarea, number, range, select, image_picker, color, font_picker, url, product, collection, etc.)
 - **`defineSection(schema)`** / **`defineBlock(schema)`** — identity helpers that provide type inference
+- **`defineMediaSettings(options?)`** — returns the canonical `[image_picker, video]` pair for "choose image or video" sections
 
 ### How the build works
 
