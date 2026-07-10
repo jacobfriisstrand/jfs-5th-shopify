@@ -22,6 +22,11 @@ export default defineSection({
       label: "t:settings.image",
     },
     {
+      type: "video",
+      id: "video",
+      label: "t:settings.video",
+    },
+    {
       type: "text",
       id: "button_label",
       label: "t:settings.button_label",

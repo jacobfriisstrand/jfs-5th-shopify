@@ -2,12 +2,26 @@
   assign heading = section.settings.heading
   assign subheading = section.settings.subheading
   assign image = section.settings.image
+  assign video = section.settings.video
   assign button_label = section.settings.button_label
   assign button_link = section.settings.button_link
 %}
 
 <section class="relative isolate w-full overflow-hidden bg-background text-foreground">
-  {%- if image != blank -%}
+  {%- if video != blank -%}
+    <div class="absolute inset-0 -z-10">
+      {% render 'video',
+        video: video,
+        autoplay: true,
+        loop: true,
+        muted: true,
+        controls: false,
+        class: 'h-full w-full',
+        video_class: 'h-full w-full object-cover'
+      %}
+      <div class="absolute inset-0 bg-foreground/30"></div>
+    </div>
+  {%- elsif image != blank -%}
     <div class="absolute inset-0 -z-10">
       {% render 'image',
         image: image,
@@ -71,6 +85,11 @@
       "type": "image_picker",
       "id": "image",
       "label": "t:settings.image"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:settings.video"
     },
     {
       "type": "text",
