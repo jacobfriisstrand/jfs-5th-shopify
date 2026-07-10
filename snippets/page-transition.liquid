@@ -1,0 +1,109 @@
+{% comment %}
+  Page transition overlay — two-layer system:
+
+    1. Departing page: intercept same-origin link clicks.
+       Backdrop blur builds immediately → overlay slides up from bottom
+       while blur is still in progress → navigate.
+
+    2. Arriving page: only animates when arriving from an internal
+       navigation (sessionStorage flag).  On first load / reload the
+       overlay is hidden instantly.
+{% endcomment %}
+
+<div
+  id="PageTransitionBlur"
+  class="page-transition-blur"
+  aria-hidden="true"
+></div>
+
+<div
+  id="PageTransitionOverlay"
+  class="page-transition-overlay"
+  aria-hidden="true"
+></div>
+
+<script>
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var blur = document.getElementById('PageTransitionBlur');
+    var overlay = document.getElementById('PageTransitionOverlay');
+    if (!blur || !overlay) return;
+
+    /* ---- Phase 1: departing page — blur then cover ---- */
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest('a');
+      if (!link || !link.href) return;
+      if (link.hasAttribute('data-header-cart')) return;
+      if (link.target && link.target !== '_self') return;
+      if (link.getAttribute('download') != null) return;
+
+      var url;
+      try { url = new URL(link.href); }
+      catch (_) { return; }
+
+      if (url.origin !== window.location.origin) return;
+      if (url.pathname === window.location.pathname
+          && url.search === window.location.search
+          && url.hash !== window.location.hash) {
+        return;
+      }
+
+      e.preventDefault();
+
+      /* Show blur backdrop (900 ms transition in). */
+      blur.style.display = 'block';
+      blur.offsetHeight;
+      blur.classList.add('active');
+
+      /* Overlay starts sliding up before blur finishes.
+         animation-delay: 150 ms (CSS) — heavy overlap with blur. */
+      overlay.classList.remove('reveal');
+      overlay.style.display = 'block';
+      overlay.offsetHeight;
+      overlay.classList.add('cover');
+
+      /* After cover finishes, flag the navigation then navigate. */
+      overlay.addEventListener('animationend', function onCoverEnd(e) {
+        if (e.animationName !== 'page-transition-cover') return;
+        overlay.removeEventListener('animationend', onCoverEnd);
+        sessionStorage.setItem('page-transition', '1');
+        window.location.href = link.href;
+      });
+    });
+
+    /* ---- Phase 2: arriving page — slide-down reveal (only after
+         internal navigation) ---- */
+    var shouldReveal = sessionStorage.getItem('page-transition') === '1';
+    sessionStorage.removeItem('page-transition');
+
+    if (!shouldReveal) {
+      overlay.style.display = 'none';
+      blur.style.display = 'none';
+      return;
+    }
+
+    blur.classList.add('active');
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+
+        /* Start blur fade-out while the slide is still in progress.
+           overlay reveal = 920 ms. Start blur removal at 350 ms
+           so they overlap for most of the reveal. */
+        setTimeout(function () {
+          blur.classList.remove('active');
+          blur.addEventListener('transitionend', function () {
+            blur.style.display = 'none';
+          });
+        }, 350);
+
+        overlay.addEventListener('animationend', function onRevealEnd(e) {
+          if (e.animationName !== 'page-transition-reveal') return;
+          overlay.removeEventListener('animationend', onRevealEnd);
+          overlay.style.display = 'none';
+        });
+        overlay.classList.add('reveal');
+      });
+    });
+  })();
+</script>
