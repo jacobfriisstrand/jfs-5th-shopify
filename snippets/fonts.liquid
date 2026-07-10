@@ -1,4 +1,22 @@
 {% comment %}
-  fonts: stub. Define your own design tokens in assets/app.css (Tailwind v4 @theme).
-  See docs/agent-reference/STYLE_TOKENS.md.
+  fonts: @font-face declarations for custom typefaces.
+  Referenced by Tailwind theme tokens in src/styles/typography.css.
 {% endcomment %}
+
+<style>
+  @font-face {
+    font-family: 'Satoshi';
+    src: url('{{ 'Satoshi-Regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'BebasNeue';
+    src: url('{{ 'BebasNeue-Regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+</style>
