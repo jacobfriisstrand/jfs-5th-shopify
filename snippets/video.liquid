@@ -101,12 +101,12 @@
     {%- endif -%}
 
     <button
-        type="button"
-        data-video-toggle
-        aria-label="{{ play_label }}"
-        class="absolute inset-0 z-10 flex items-center justify-center bg-foreground/0 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground group-data-[playing]/video:opacity-0 group-data-[playing]/video:hover:opacity-100 group-data-[playing]/video:focus-within:opacity-100 cursor-pointer"
-      >
-        <span class="flex h-16 w-16 items-center justify-center rounded-full bg-foreground/60 text-background transition-transform group-hover/video:scale-110">
+      type="button"
+      data-video-toggle
+      aria-label="{{ play_label }}"
+      class="absolute inset-0 z-10 flex items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground cursor-pointer"
+    >
+      <span class="flex h-16 w-16 items-center justify-center rounded-full bg-foreground/60 text-background transition-transform hover:scale-110">
           <svg
             class="h-8 w-8 group-data-[playing]/video:hidden"
             viewBox="0 0 24 24"
