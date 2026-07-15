@@ -12,6 +12,8 @@
     Default `false`.
   @param {boolean} [muted] - Default `true` (browsers block unmuted autoplay).
   @param {boolean} [loop] - Default `false`.
+  @param {boolean} [hide_button] - When true, skips the play/pause button.
+    Use when the caller renders its own button outside a stacking context.
   @param {string} [preload] - `'none'` | `'metadata'` | `'auto'`.
     Default `'none'`.
   @param {string} [class] - Additional CSS classes on the wrapping element.
@@ -25,6 +27,7 @@
     autoplay: true,
     loop: true,
     muted: true,
+    hide_button: true,
     video_class: 'h-full w-full object-cover'
   %}
 
@@ -56,6 +59,16 @@
 
   assign resolved_preload = preload | default: 'none'
 
+  assign resolved_hide_button = false
+  if hide_button
+    assign resolved_hide_button = true
+  endif
+
+  assign resolved_video_class = 'bg-black'
+  if video_class != blank
+    assign resolved_video_class = resolved_video_class | append: ' ' | append: video_class
+  endif
+
   assign resolved_poster = ''
   if poster != blank
     assign resolved_poster = poster | image_url: width: 1920
@@ -70,19 +83,23 @@
 %}
 
 {%- if video != blank and video.sources != blank -%}
-  <figure class="group/video relative {{ class }}">
+  <div
+    data-video
+    {%- if resolved_autoplay %} data-autoplay {% endif -%}
+    class="group/video relative bg-black {{ class }}"
+  >
     {%- if resolved_poster != blank -%}
       {{
         video
         | video_tag:
           image_size: '1920x1080',
-          autoplay: resolved_autoplay,
+          autoplay: false,
           loop: resolved_loop,
           muted: resolved_muted,
           controls: false,
           preload: resolved_preload,
           poster: resolved_poster,
-          class: video_class,
+          class: resolved_video_class,
           aria_label: resolved_aria_label
       }}
     {%- else -%}
@@ -90,79 +107,81 @@
         video
         | video_tag:
           image_size: '1920x1080',
-          autoplay: resolved_autoplay,
+          autoplay: false,
           loop: resolved_loop,
           muted: resolved_muted,
           controls: false,
           preload: resolved_preload,
-          class: video_class,
+          class: resolved_video_class,
           aria_label: resolved_aria_label
       }}
     {%- endif -%}
 
+    {%- unless resolved_hide_button -%}
     <button
       type="button"
       data-video-toggle
       aria-label="{{ play_label }}"
-      class="absolute inset-0 z-10 flex items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground cursor-pointer"
+      class="absolute bottom-4 right-4 z-50 flex items-center justify-center rounded-full bg-foreground/60 text-background p-3 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground cursor-pointer"
     >
-      <span class="flex h-16 w-16 items-center justify-center rounded-full bg-foreground/60 text-background transition-transform hover:scale-110">
-          <svg
-            class="h-8 w-8 group-data-[playing]/video:hidden"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M8 5v14l11-7z"/>
-          </svg>
-          <svg
-            class="hidden h-8 w-8 group-data-[playing]/video:block"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-          </svg>
-        </span>
-      </button>
-  </figure>
+      <span class="group-data-[playing]/video:hidden">
+        {%- render 'icon', icon: 'play', size: 24, class: 'block' -%}
+      </span>
+      <span class="hidden group-data-[playing]/video:block">
+        {%- render 'icon', icon: 'pause', size: 24, class: 'block' -%}
+      </span>
+    </button>
+    {%- endunless -%}
+  </div>
 
   <script>
     (function () {
-      var figure = document.currentScript.previousElementSibling;
-      var video = figure.querySelector('video');
-      var btn = figure.querySelector('[data-video-toggle]');
-      if (!video || !btn) return;
+      var container = document.querySelector('[data-video]');
+      var video = container.querySelector('video');
+      if (!video) return;
+
+      var wantsAutoplay = container.hasAttribute('data-autoplay');
+
+      function startIfAllowed() {
+        if (wantsAutoplay && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          video.play();
+        }
+      }
 
       var mql = window.matchMedia('(prefers-reduced-motion: reduce)');
       function handleMotion(e) {
         if (e.matches) {
-          video.removeAttribute('autoplay');
           video.pause();
+        } else if (wantsAutoplay) {
+          video.play();
         }
       }
-      handleMotion(mql);
       mql.addEventListener('change', handleMotion);
 
-      function updateState() {
-        var p = !video.paused;
-        btn.setAttribute('aria-label', p ? '{{ pause_label }}' : '{{ play_label }}');
-        figure.setAttribute('data-playing', p ? '' : null);
-      }
+      startIfAllowed();
 
-      btn.addEventListener('click', function () {
-        if (video.paused) {
-          video.play();
-        } else {
-          video.pause();
+      var btn = container.querySelector('[data-video-toggle]');
+      if (btn) {
+        function updateState() {
+          var p = !video.paused;
+          btn.setAttribute('aria-label', p ? '{{ pause_label }}' : '{{ play_label }}');
+          if (p) { container.setAttribute('data-playing', ''); } else { container.removeAttribute('data-playing'); }
         }
-      });
 
-      video.addEventListener('play', updateState);
-      video.addEventListener('pause', updateState);
-      video.addEventListener('ended', updateState);
+        btn.addEventListener('click', function () {
+          if (video.paused) {
+            video.play();
+          } else {
+            video.pause();
+          }
+        });
 
-      updateState();
+        video.addEventListener('play', updateState);
+        video.addEventListener('pause', updateState);
+        video.addEventListener('ended', updateState);
+
+        updateState();
+      }
     })();
   </script>
 {%- endif -%}
