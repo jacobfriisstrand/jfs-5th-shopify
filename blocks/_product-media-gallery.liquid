@@ -101,30 +101,26 @@
   <ul role="list" class="flex flex-col gap-4">
     {%- if primary != blank -%}
       <li>
-        {{
-          primary
-          | image_url: width: 1200
-          | image_tag:
-            loading: 'eager',
-            fetchpriority: 'high',
-            sizes: '(min-width: 768px) 50vw, 100vw',
-            widths: '400, 600, 800, 1000, 1200',
-            class: 'h-auto w-full'
-        }}
+        {% render 'image',
+          image: primary,
+          priority: 'lcp',
+          class: 'h-auto w-full',
+          width_max: 1200,
+          widths: '400, 600, 800, 1000, 1200',
+          sizes: '(min-width: 768px) 50vw, 100vw'
+        %}
       </li>
     {%- endif -%}
     {%- if matched_images != empty -%}
       {%- for media in matched_images -%}
         <li>
-          {{
-            media
-            | image_url: width: 1200
-            | image_tag:
-              loading: 'lazy',
-              sizes: '(min-width: 768px) 50vw, 100vw',
-              widths: '400, 600, 800, 1000, 1200',
-              class: 'h-auto w-full'
-          }}
+          {% render 'image',
+            image: media,
+            class: 'h-auto w-full',
+            width_max: 1200,
+            widths: '400, 600, 800, 1000, 1200',
+            sizes: '(min-width: 768px) 50vw, 100vw'
+          %}
         </li>
       {%- endfor -%}
     {%- endif -%}

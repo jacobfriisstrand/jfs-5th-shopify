@@ -192,7 +192,11 @@
             <div class="mt-4 flex flex-wrap gap-4">
               {%- for file in event_partners.value -%}
                 <div class="w-24 h-24">
-                  {{ file.preview_image | image_url: width: 200 | image_tag: alt: file.alt, class: 'w-full h-full object-contain' }}
+                  {% render 'image',
+                    image: file.preview_image,
+                    width_max: 200,
+                    class: 'w-full h-full object-contain'
+                  %}
                 </div>
               {%- endfor -%}
             </div>

@@ -1,4 +1,4 @@
-import { defineSection } from "../types.ts";
+import { defineSection, defineMediaSettings } from "../types.ts";
 
 export default defineSection({
   name: "t:names.home_hero",
@@ -16,11 +16,7 @@ export default defineSection({
       id: "subheading",
       label: "t:settings.subheading",
     },
-    {
-      type: "image_picker",
-      id: "image",
-      label: "t:settings.image",
-    },
+    ...defineMediaSettings(),
     {
       type: "text",
       id: "button_label",

@@ -1,0 +1,187 @@
+{% doc %}
+  Renders a `<video>` element with perf-optimised loading and full
+  accessibility controls including a play/pause toggle that respects
+  `prefers-reduced-motion`.
+
+  @param {object} video - Shopify video object (from `video` setting type).
+    Required. Must have `.sources` and `.preview_image`.
+  @param {image} [poster] - Shopify image object for the poster frame.
+    Falls back to `video.preview_image` when omitted.
+  @param {boolean} [autoplay] - When true, autoplays muted + looped.
+    Disabled when the user has `prefers-reduced-motion: reduce` set.
+    Default `false`.
+  @param {boolean} [muted] - Default `true` (browsers block unmuted autoplay).
+  @param {boolean} [loop] - Default `false`.
+  @param {boolean} [hide_button] - When true, skips the play/pause button.
+    Use when the caller renders its own button outside a stacking context.
+  @param {string} [preload] - `'none'` | `'metadata'` | `'auto'`.
+    Default `'none'`.
+  @param {string} [class] - Additional CSS classes on the wrapping element.
+  @param {string} [video_class] - Additional CSS classes on the `<video>` element.
+  @param {string} [aria_label] - Accessible label for the video region.
+    Defaults to `'accessibility.video' | t`.
+
+  @example
+  {% render 'video',
+    video: section.settings.video,
+    autoplay: true,
+    loop: true,
+    muted: true,
+    hide_button: true,
+    video_class: 'h-full w-full object-cover'
+  %}
+
+  @example
+  {% render 'video',
+    video: section.settings.video,
+    poster: section.settings.poster_image,
+    preload: 'metadata',
+    class: 'w-full',
+    video_class: 'w-full h-auto'
+  %}
+{% enddoc %}
+
+{% liquid
+  assign resolved_autoplay = false
+  if autoplay
+    assign resolved_autoplay = true
+  endif
+
+  assign resolved_muted = true
+  if muted == false
+    assign resolved_muted = false
+  endif
+
+  assign resolved_loop = false
+  if loop
+    assign resolved_loop = true
+  endif
+
+  assign resolved_preload = preload | default: 'none'
+
+  assign resolved_hide_button = false
+  if hide_button
+    assign resolved_hide_button = true
+  endif
+
+  assign resolved_video_class = 'bg-black'
+  if video_class != blank
+    assign resolved_video_class = resolved_video_class | append: ' ' | append: video_class
+  endif
+
+  assign resolved_poster = ''
+  if poster != blank
+    assign resolved_poster = poster | image_url: width: 1920
+  elsif video.preview_image != blank
+    assign resolved_poster = video.preview_image | image_url: width: 1920
+  endif
+
+  assign resolved_aria_label = aria_label | default: 'accessibility.video' | t
+
+  assign play_label = 'accessibility.play_video' | t
+  assign pause_label = 'accessibility.pause_video' | t
+%}
+
+{%- if video != blank and video.sources != blank -%}
+  <div
+    data-video
+    {%- if resolved_autoplay %} data-autoplay {% endif -%}
+    class="group/video relative bg-black {{ class }}"
+  >
+    {%- if resolved_poster != blank -%}
+      {{
+        video
+        | video_tag:
+          image_size: '1920x1080',
+          autoplay: false,
+          loop: resolved_loop,
+          muted: resolved_muted,
+          controls: false,
+          preload: resolved_preload,
+          poster: resolved_poster,
+          class: resolved_video_class,
+          aria_label: resolved_aria_label
+      }}
+    {%- else -%}
+      {{
+        video
+        | video_tag:
+          image_size: '1920x1080',
+          autoplay: false,
+          loop: resolved_loop,
+          muted: resolved_muted,
+          controls: false,
+          preload: resolved_preload,
+          class: resolved_video_class,
+          aria_label: resolved_aria_label
+      }}
+    {%- endif -%}
+
+    {%- unless resolved_hide_button -%}
+    <button
+      type="button"
+      data-video-toggle
+      aria-label="{{ play_label }}"
+      class="absolute bottom-4 right-4 z-50 flex items-center justify-center rounded-full bg-foreground/60 text-background p-3 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground cursor-pointer"
+    >
+      <span class="group-data-[playing]/video:hidden">
+        {%- render 'icon', icon: 'play', size: 24, class: 'block' -%}
+      </span>
+      <span class="hidden group-data-[playing]/video:block">
+        {%- render 'icon', icon: 'pause', size: 24, class: 'block' -%}
+      </span>
+    </button>
+    {%- endunless -%}
+  </div>
+
+  <script>
+    (function () {
+      var container = document.querySelector('[data-video]');
+      var video = container.querySelector('video');
+      if (!video) return;
+
+      var wantsAutoplay = container.hasAttribute('data-autoplay');
+
+      function startIfAllowed() {
+        if (wantsAutoplay && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          video.play();
+        }
+      }
+
+      var mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+      function handleMotion(e) {
+        if (e.matches) {
+          video.pause();
+        } else if (wantsAutoplay) {
+          video.play();
+        }
+      }
+      mql.addEventListener('change', handleMotion);
+
+      startIfAllowed();
+
+      var btn = container.querySelector('[data-video-toggle]');
+      if (btn) {
+        function updateState() {
+          var p = !video.paused;
+          btn.setAttribute('aria-label', p ? '{{ pause_label }}' : '{{ play_label }}');
+          if (p) { container.setAttribute('data-playing', ''); } else { container.removeAttribute('data-playing'); }
+        }
+
+        btn.addEventListener('click', function () {
+          if (video.paused) {
+            video.play();
+          } else {
+            video.pause();
+          }
+        });
+
+        video.addEventListener('play', updateState);
+        video.addEventListener('pause', updateState);
+        video.addEventListener('ended', updateState);
+
+        updateState();
+      }
+    })();
+  </script>
+{%- endif -%}

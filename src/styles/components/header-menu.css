@@ -356,12 +356,7 @@ dialog[data-drawer="top"].header-menu-megamenu.dialog-closing {
 }
 
 #header-group[data-scrolled] {
-  background-color: color-mix(
-    in srgb,
-    var(--color-background) 70%,
-    transparent
-  );
-  backdrop-filter: blur(12px) saturate(180%);
+  background-color: var(--color-background);
 }
 
 #header-group[data-megamenu-open] {

@@ -42,15 +42,13 @@
             {%- if result_image -%}
               <span class="relative h-12 w-12 shrink-0 overflow-hidden rounded-input">
                 {% render 'skeleton', class: 'absolute inset-0 rounded-none bg-foreground/8 animate-pulse' %}
-                {{
-                  result_image
-                  | image_url: width: 96
-                  | image_tag:
-                    width: 48,
-                    height: 48,
-                    loading: 'lazy',
-                    class: 'relative z-10 h-full w-full object-cover'
-                }}
+                {% render 'image',
+                  image: result_image,
+                  width: 48,
+                  height: 48,
+                  width_max: 96,
+                  class: 'relative z-10 h-full w-full object-cover'
+                %}
               </span>
             {%- endif -%}
             <span class="flex-1 min-w-0">

@@ -1,0 +1,96 @@
+{% doc %}
+  Renders a responsive `<img>` via Shopify's `image_tag` filter with
+  standardised `loading`, `fetchpriority`, and `decoding` attributes.
+
+  @param {image} image - The Shopify image object. Required.
+  @param {string} [priority] - Controls loading behaviour:
+    `lcp` → eager + high fetchpriority + decoding async,
+    `above-fold` → eager + decoding async,
+    default (omitted) → lazy + decoding async.
+  @param {string} [class] - Additional CSS classes on the `<img>` tag.
+  @param {string} [alt] - Explicit alt text. Takes precedence over
+    `alt_fallback` and `image.alt`.
+  @param {string} [alt_fallback] - Fallback alt text when `image.alt` is
+    blank and no explicit `alt` is supplied.
+  @param {string} [sizes] - Responsive `sizes` attribute (e.g. `100vw`).
+  @param {string} [widths] - Comma-separated width breakpoints for
+    responsive `srcset` (e.g. `'480, 768, 1024, 1440, 1920, 2400'`).
+  @param {number} [width_max] - Max intrinsic width passed to the
+    `image_url` filter. Defaults to the image's own width.
+  @param {number} [width] - Fixed `width` attribute on the `<img>`.
+  @param {number} [height] - Fixed `height` attribute on the `<img>`.
+  @param {string} [style] - Inline `style` attribute on the `<img>`.
+
+  @example
+  {% render 'image',
+    image: section.settings.image,
+    priority: 'lcp',
+    class: 'h-full w-full object-cover',
+    alt_fallback: heading,
+    width_max: 2400,
+    widths: '480, 768, 1024, 1440, 1920, 2400',
+    sizes: '100vw'
+  %}
+
+  @example
+  {% render 'image',
+    image: product.featured_image,
+    class: 'h-full w-full object-cover transition-transform duration-300',
+    alt_fallback: product.title,
+    width_max: 800,
+    widths: '200, 300, 400, 600, 800',
+    sizes: '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw'
+  %}
+
+  @example
+  {% render 'image',
+    image: line.image,
+    width: line.image.width,
+    height: line.image.height,
+    width_max: 200,
+    widths: '100, 200, 400',
+    sizes: '(min-width: 640px) 96px, 80px',
+    class: 'rounded-input h-auto w-full object-cover',
+    alt: line.product.title
+  %}
+{% enddoc %}
+
+{% liquid
+  assign resolved_loading = 'lazy'
+  assign resolved_fetchpriority = 'low'
+
+  if priority == 'lcp'
+    assign resolved_loading = 'eager'
+    assign resolved_fetchpriority = 'high'
+  elsif priority == 'above-fold'
+    assign resolved_loading = 'eager'
+  endif
+
+  assign resolved_alt = image.alt
+
+  if alt != blank
+    assign resolved_alt = alt
+  elsif resolved_alt == blank and alt_fallback != blank
+    assign resolved_alt = alt_fallback
+  endif
+
+  assign resolved_width_max = width_max | default: image.width
+%}
+
+{%- if image != blank -%}
+  {{
+    image
+    | image_url: width: resolved_width_max
+    | image_tag:
+      loading: resolved_loading,
+      fetchpriority: resolved_fetchpriority,
+      decoding: 'async',
+      alt: resolved_alt,
+      class: class,
+      style: style,
+      width: width,
+      height: height,
+      widths: widths,
+      sizes: sizes
+  }}
+{%- endif -%}

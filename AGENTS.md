@@ -61,6 +61,69 @@ Rules:
 See [ADR-0003](./docs/adr/0003-architectural-pillars.md), pillar 8, for the
 rationale.
 
+### Canonical media snippets
+
+**All `<img>`, `<button>`/CTA links, and `<video>` elements MUST be rendered
+via their respective canonical snippets.** Direct inline `image_tag`,
+`video_tag`, or hand-rolled buttons in `.liquid` files are forbidden,
+except inside the snippets themselves.
+
+| Media type     | Snippet                  | Mandatory for                              |
+| -------------- | ------------------------ | ------------------------------------------ |
+| Images         | `snippets/image.liquid`  | Every `image_url \| image_tag` call        |
+| Buttons / CTAs | `snippets/button.liquid` | Every `<button>` or `<a>` with CTA styling |
+| Videos         | `snippets/video.liquid`  | Every `<video>` element                    |
+
+**Image:** standardises `loading`, `fetchpriority`, `decoding`, `alt`
+fallback, responsive `widths`/`sizes`. Priority param: `lcp`,
+`above-fold`, or default (lazy).
+
+```liquid
+{% render 'image',
+  image: section.settings.image,
+  priority: 'lcp',
+  class: 'h-full w-full object-cover',
+  alt_fallback: heading,
+  width_max: 2400,
+  widths: '480, 768, 1024, 1440, 1920, 2400',
+  sizes: '100vw'
+%}
+```
+
+**Button:** standardises variant (`primary`/`secondary`/`ghost`), size
+(`sm`/`md`/`lg`), loading spinner, and `aria-disabled` handling. Renders
+`<a>` when `href` is set, `<button>` otherwise.
+
+```liquid
+{% render 'button',
+  text: 'actions.submit' | t,
+  variant: 'primary',
+  type: 'submit'
+%}
+```
+
+**Video:** standardises `preload`, `autoplay` with `prefers-reduced-motion`
+respect (via inline `matchMedia` script), poster image fallback, and a
+custom play/pause toggle with localised accessible labels. Pass
+`controls: false` for decorative background videos.
+
+```liquid
+{% render 'video',
+  video: section.settings.video,
+  autoplay: true,
+  loop: true,
+  muted: true,
+  video_class: 'h-full w-full object-cover'
+%}
+```
+
+Icon-only controls (close buttons, carousel arrows, quantity ±, menu
+toggles) are exempt from the button snippet — they are not CTAs.
+
+Existing call sites are migrated opportunistically: when you touch a file
+for unrelated work, replace any inline `image_tag`/`video_tag` or
+hand-rolled button with the canonical snippet in the same commit.
+
 ### Headings: always via the `heading` snippet
 
 **All `<h1>`–`<h6>` elements MUST be rendered via
@@ -477,6 +540,7 @@ All Shopify setting types are typed in `src/schemas/types.ts`. Key interfaces:
 - **`BlockSchema`** — block schema (name, settings, blocks, presets, limit, etc.)
 - **`ShopifySetting`** — union of all 30+ setting types (text, textarea, number, range, select, image_picker, color, font_picker, url, product, collection, etc.)
 - **`defineSection(schema)`** / **`defineBlock(schema)`** — identity helpers that provide type inference
+- **`defineMediaSettings(options?)`** — returns the canonical `[image_picker, video]` pair for "choose image or video" sections
 
 ### How the build works
 

@@ -2,26 +2,88 @@
   assign heading = section.settings.heading
   assign subheading = section.settings.subheading
   assign image = section.settings.image
+  assign video = section.settings.video
   assign button_label = section.settings.button_label
   assign button_link = section.settings.button_link
 %}
 
 <section class="relative isolate w-full overflow-hidden bg-background text-foreground">
-  {%- if image != blank -%}
-    <div class="absolute inset-0 -z-10">
-      {{
-        image
-        | image_url: width: 2400
-        | image_tag:
-          loading: 'eager',
-          fetchpriority: 'high',
-          decoding: 'async',
-          sizes: '100vw',
-          widths: '480, 768, 1024, 1440, 1920, 2400',
-          class: 'h-full w-full object-cover',
-          alt: image.alt
-        | default: heading
-      }}
+  {%- if video != blank -%}
+    <div class="absolute inset-0 -z-10 bg-black">
+      {% render 'video',
+        video: video,
+        autoplay: true,
+        loop: true,
+        muted: true,
+        hide_button: true,
+        class: 'h-full w-full',
+        video_class: 'h-full w-full object-cover'
+      %}
+      <div class="absolute inset-0 bg-foreground/30"></div>
+    </div>
+    <button
+      type="button"
+      data-video-toggle
+      id="hero-video-toggle-{{ section.id }}"
+      aria-label="{{ 'accessibility.play_video' | t }}"
+      class="absolute bottom-4 right-4 z-50 flex items-center justify-center rounded-full bg-foreground/60 text-background p-3 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground cursor-pointer group"
+    >
+      <span class="block group-data-paused:hidden">
+        {%- render 'icon', icon: 'pause', size: 24, class: 'block' -%}
+      </span>
+      <span class="hidden group-data-paused:block">
+        {%- render 'icon', icon: 'play', size: 24, class: 'block' -%}
+      </span>
+    </button>
+    {%- if video != blank -%}
+      <script>
+        (function () {
+          var btn = document.getElementById('hero-video-toggle-{{ section.id }}');
+          var section = btn.closest('section');
+          if (!section) return;
+          var video = section.querySelector('video');
+          if (!video) return;
+
+          var playLabel = '{{ "accessibility.play_video" | t }}';
+          var pauseLabel = '{{ "accessibility.pause_video" | t }}';
+
+          function updateState() {
+            var paused = video.paused;
+            btn.setAttribute('aria-label', paused ? playLabel : pauseLabel);
+            if (paused) {
+              btn.setAttribute('data-paused', '');
+            } else {
+              btn.removeAttribute('data-paused');
+            }
+          }
+
+          btn.addEventListener('click', function () {
+            if (video.paused) {
+              video.play();
+            } else {
+              video.pause();
+            }
+          });
+
+          video.addEventListener('play', updateState);
+          video.addEventListener('pause', updateState);
+          video.addEventListener('ended', updateState);
+
+          updateState();
+        })();
+      </script>
+    {%- endif -%}
+  {%- elsif image != blank -%}
+    <div class="absolute inset-0 -z-10 bg-background">
+      {% render 'image',
+        image: image,
+        priority: 'lcp',
+        class: 'h-full w-full object-cover',
+        alt_fallback: heading,
+        width_max: 2400,
+        widths: '480, 768, 1024, 1440, 1920, 2400',
+        sizes: '100vw'
+      %}
       <div class="absolute inset-0 bg-foreground/30"></div>
     </div>
   {%- endif -%}
@@ -75,6 +137,11 @@
       "type": "image_picker",
       "id": "image",
       "label": "t:settings.image"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:settings.video"
     },
     {
       "type": "text",

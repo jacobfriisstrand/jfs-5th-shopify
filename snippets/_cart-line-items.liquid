@@ -30,18 +30,16 @@
     <li class="group flex gap-4 border-b border-current/15 py-4" data-cart-line="{{ forloop.index }}">
       <a href="{{ line.url }}" class="block w-20 shrink-0 sm:w-24">
         {%- if line.image -%}
-          {{
-            line.image
-            | image_url: width: 200
-            | image_tag:
-              loading: 'lazy',
-              width: line.image.width,
-              height: line.image.height,
-              widths: '100,200,400',
-              sizes: '(min-width: 640px) 96px, 80px',
-              alt: line.product.title,
-              class: 'rounded-input h-auto w-full object-cover'
-          }}
+          {% render 'image',
+            image: line.image,
+            width: line.image.width,
+            height: line.image.height,
+            width_max: 200,
+            widths: '100, 200, 400',
+            sizes: '(min-width: 640px) 96px, 80px',
+            class: 'rounded-input h-auto w-full object-cover',
+            alt: line.product.title
+          %}
         {%- endif -%}
       </a>
 
