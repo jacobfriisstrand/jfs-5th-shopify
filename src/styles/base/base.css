@@ -81,6 +81,18 @@ dialog[data-drawer]::backdrop {
   backdrop-filter: blur(12px);
 }
 
+/* --------------------------------------------------------------------------
+   Video blur for drawers / page transitions.
+   `will-change: filter` forces the composited video layer to repaint
+   with the filter applied — necessary because the GPU-composited `<video>`
+   layer can otherwise ignore `filter` on ancestor elements.
+   -------------------------------------------------------------------------- */
+
+[data-blur-videos] video {
+  filter: blur(12px);
+  transition: filter 300ms ease-out;
+}
+
 /* -------------------------------------------------------------------------- */
 /* a11y utility (referenced by Horizon JS)                                    */
 /* -------------------------------------------------------------------------- */
