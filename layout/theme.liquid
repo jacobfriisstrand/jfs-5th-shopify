@@ -22,7 +22,7 @@
 
   <body class="grid grid-rows-[auto_1fr_auto] min-h-svh">
     {% render 'page-transition' %}
-    <script src="{{ 'video-blur.js' | asset_url }}"></script>
+    <script defer src="{{ 'video-blur.js' | asset_url }}"></script>
     {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
     <div id="header-group">
       {% sections 'header-group' %}
