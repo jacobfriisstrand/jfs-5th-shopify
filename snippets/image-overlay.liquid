@@ -1,0 +1,43 @@
+{% doc %}
+  Renders a gradient overlay over an image or video background to improve
+  text readability. The gradient fades from a solid colour to transparent.
+
+  @param {string} [direction] - Where the solid colour starts, fading toward
+    the opposite edge. One of `top`, `bottom`, `left`, `right`.
+    Default `bottom` (colour at the bottom edge, transparent at the top).
+  @param {string} [color] - CSS variable name segment for the solid colour.
+    Default `background` (resolves to `var(--color-background)`).
+  @param {string} [opacity] - Opacity of the solid end as a CSS opacity
+    value (e.g. `0.6`, `80%`). Default `60%`.
+  @param {string} [class] - Additional CSS classes.
+
+  @example
+  {% render 'image-overlay', direction: 'bottom' %}
+
+  @example
+  {% render 'image-overlay', direction: 'top', opacity: '40%' %}
+{% enddoc %}
+
+{% liquid
+  assign resolved_direction = direction | default: 'bottom'
+  assign resolved_opacity = opacity | default: '60%'
+  assign resolved_color = color | default: 'background'
+
+  case resolved_direction
+    when 'top'
+      assign gradient_angle = 'to bottom'
+    when 'right'
+      assign gradient_angle = 'to left'
+    when 'left'
+      assign gradient_angle = 'to right'
+    else
+      assign resolved_direction = 'bottom'
+      assign gradient_angle = 'to top'
+  endcase
+%}
+
+<div
+  class="absolute inset-0 {{ class }}"
+  style="background: linear-gradient({{ gradient_angle }}, color-mix(in srgb, var(--color-{{ resolved_color }}) {{ resolved_opacity }}, transparent), transparent 100%);"
+  aria-hidden="true"
+></div>

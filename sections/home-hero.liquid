@@ -19,7 +19,7 @@
         class: 'h-full w-full',
         video_class: 'h-full w-full object-cover'
       %}
-      <div class="absolute inset-0 bg-foreground/30"></div>
+      {% render 'image-overlay', direction: 'bottom' %}
     </div>
     <button
       type="button"
@@ -84,7 +84,7 @@
         widths: '480, 768, 1024, 1440, 1920, 2400',
         sizes: '100vw'
       %}
-      <div class="absolute inset-0 bg-foreground/30"></div>
+      {% render 'image-overlay', direction: 'bottom' %}
     </div>
   {%- endif -%}
 
