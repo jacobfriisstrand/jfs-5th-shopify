@@ -9,19 +9,72 @@
 
 <section class="relative isolate w-full overflow-hidden bg-background text-foreground">
   {%- if video != blank -%}
-    <div class="absolute inset-0 -z-10">
+    <div class="absolute inset-0 -z-10 bg-black">
       {% render 'video',
         video: video,
         autoplay: true,
         loop: true,
         muted: true,
+        hide_button: true,
         class: 'h-full w-full',
         video_class: 'h-full w-full object-cover'
       %}
       <div class="absolute inset-0 bg-foreground/30"></div>
     </div>
+    <button
+      type="button"
+      data-video-toggle
+      id="hero-video-toggle-{{ section.id }}"
+      aria-label="{{ 'accessibility.play_video' | t }}"
+      class="absolute bottom-4 right-4 z-50 flex items-center justify-center rounded-full bg-foreground/60 text-background p-3 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground cursor-pointer group"
+    >
+      <span class="block group-data-paused:hidden">
+        {%- render 'icon', icon: 'pause', size: 24, class: 'block' -%}
+      </span>
+      <span class="hidden group-data-paused:block">
+        {%- render 'icon', icon: 'play', size: 24, class: 'block' -%}
+      </span>
+    </button>
+    {%- if video != blank -%}
+      <script>
+        (function () {
+          var btn = document.getElementById('hero-video-toggle-{{ section.id }}');
+          var section = btn.closest('section');
+          if (!section) return;
+          var video = section.querySelector('video');
+          if (!video) return;
+
+          var playLabel = '{{ "accessibility.play_video" | t }}';
+          var pauseLabel = '{{ "accessibility.pause_video" | t }}';
+
+          function updateState() {
+            var paused = video.paused;
+            btn.setAttribute('aria-label', paused ? playLabel : pauseLabel);
+            if (paused) {
+              btn.setAttribute('data-paused', '');
+            } else {
+              btn.removeAttribute('data-paused');
+            }
+          }
+
+          btn.addEventListener('click', function () {
+            if (video.paused) {
+              video.play();
+            } else {
+              video.pause();
+            }
+          });
+
+          video.addEventListener('play', updateState);
+          video.addEventListener('pause', updateState);
+          video.addEventListener('ended', updateState);
+
+          updateState();
+        })();
+      </script>
+    {%- endif -%}
   {%- elsif image != blank -%}
-    <div class="absolute inset-0 -z-10">
+    <div class="absolute inset-0 -z-10 bg-background">
       {% render 'image',
         image: image,
         priority: 'lcp',
