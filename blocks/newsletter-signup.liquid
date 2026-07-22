@@ -1,0 +1,142 @@
+{% comment %}
+  Newsletter signup block — Klaviyo integration.
+
+  Renders a mail-signup form with a consent checkbox. Submission uses
+  Klaviyo's client-side API (CORS-enabled) for inline feedback — no
+  redirect to Klaviyo's hosted success page.
+
+  Falls back to native form POST if JavaScript is disabled.
+{% endcomment %}
+
+{% liquid
+  assign heading = block.settings.heading
+  assign klaviyo_public_key = block.settings.klaviyo_public_key
+  assign klaviyo_list_id = block.settings.klaviyo_list_id
+  assign email_placeholder = block.settings.email_placeholder
+  assign submit_label = block.settings.submit_label
+  assign consent_label = block.settings.consent_label
+  assign success_message = block.settings.success_message
+%}
+
+{%- if klaviyo_public_key != blank and klaviyo_list_id != blank -%}
+  <newsletter-signup
+    class="flex flex-col gap-3"
+    data-public-key="{{ klaviyo_public_key | escape }}"
+    data-list-id="{{ klaviyo_list_id | escape }}"
+    data-success-message="{{ success_message | escape }}"
+    data-error-text="{{ 'blocks.newsletter_signup.error' | t | escape }}"
+    data-custom-source="{{ shop.name | escape }} — Footer newsletter signup"
+  >
+    {%- if heading != blank -%}
+      {% render 'heading', text: heading, level: 3, class: 'text-sm font-semibold uppercase tracking-wide' %}
+    {%- endif -%}
+
+    <form
+      action="https://manage.kmail-lists.com/subscriptions/subscribe"
+      method="POST"
+      class="flex flex-col gap-3"
+    >
+      <input type="hidden" name="g" value="{{ klaviyo_list_id | escape }}">
+
+      <div class="flex flex-col gap-3 sm:flex-row">
+        <label for="newsletter-email-{{ block.id }}" class="sr-only">
+          {{- 'blocks.newsletter_signup.email_label' | t -}}
+        </label>
+        <input
+          type="email"
+          name="email"
+          id="newsletter-email-{{ block.id }}"
+          placeholder="{{ email_placeholder | escape }}"
+          required
+          autocomplete="email"
+          class="flex-1 rounded-input border border-current/20 bg-transparent px-4 py-2 font-body text-base placeholder:text-current/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+
+        {% render 'button',
+          text: submit_label,
+          variant: 'primary',
+          type: 'submit',
+          size: 'md'
+        %}
+      </div>
+
+      <div class="flex items-start gap-2">
+        <input
+          type="checkbox"
+          name="consent"
+          id="newsletter-consent-{{ block.id }}"
+          required
+          class="mt-1 size-4 rounded-input border-current/20"
+        >
+        <label for="newsletter-consent-{{ block.id }}" class="text-sm">
+          {{- consent_label | escape -}}
+        </label>
+      </div>
+    </form>
+
+    <p
+      data-newsletter-signup-message
+      class="hidden text-sm"
+      role="status"
+      aria-live="polite"
+    ></p>
+  </newsletter-signup>
+
+  <script src="{{ 'newsletter-signup.js' | asset_url }}" type="module" fetchpriority="low"></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.newsletter_signup",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:settings.heading",
+      "default": "Newsletter"
+    },
+    {
+      "type": "text",
+      "id": "klaviyo_public_key",
+      "label": "t:settings.newsletter_signup.klaviyo_public_key",
+      "info": "t:settings.newsletter_signup.klaviyo_public_key_info"
+    },
+    {
+      "type": "text",
+      "id": "klaviyo_list_id",
+      "label": "t:settings.newsletter_signup.klaviyo_list_id",
+      "info": "t:settings.newsletter_signup.klaviyo_list_id_info"
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "t:settings.newsletter_signup.email_placeholder",
+      "default": "Email address"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "t:settings.newsletter_signup.submit_label",
+      "default": "Subscribe"
+    },
+    {
+      "type": "text",
+      "id": "consent_label",
+      "label": "t:settings.newsletter_signup.consent_label",
+      "default": "I agree to receive marketing emails"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "t:settings.newsletter_signup.success_message",
+      "default": "Thanks for subscribing!"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.newsletter_signup"
+    }
+  ]
+}
+{% endschema %}

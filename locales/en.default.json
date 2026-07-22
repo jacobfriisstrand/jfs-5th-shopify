@@ -47,6 +47,15 @@
     "unit_price": "Unit price",
     "find_country": "Find country"
   },
+  "blocks": {
+    "newsletter_signup": {
+      "email_label": "Email address",
+      "error": "Something went wrong. Please try again."
+    },
+    "filter": "Filter",
+    "load_video": "Load video: {{ description }}",
+    "sold_out": "Sold out"
+  },
   "actions": {
     "add": "Add",
     "add_ticket_to_cart": "Add ticket to cart",
@@ -88,11 +97,7 @@
     "removed": "Removed item from cart",
     "update_failed": "Could not update cart"
   },
-  "blocks": {
-    "filter": "Filter",
-    "load_video": "Load video: {{ description }}",
-    "sold_out": "Sold out"
-  },
+
   "blogs": {
     "article": {
       "comment_author_separator": "•"
