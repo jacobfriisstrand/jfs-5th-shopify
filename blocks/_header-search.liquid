@@ -50,7 +50,8 @@
           class="w-full bg-transparent border-0 outline-none text-lg py-2 focus-visible:outline-2 focus-visible:outline-offset-2"
         >
       </form>
-      {%- render 'drawer-close-button', label: 'actions.close_search' | t -%}
+      {%- assign close_search_label = 'actions.close_search' | t -%}
+      {%- render 'drawer-close-button', label: close_search_label -%}
     </div>
 
     <div
@@ -63,10 +64,11 @@
   </predictive-search>
 {%- endcapture -%}
 
+{%- assign search_aria_label = 'content.search' | t -%}
 {%- render 'drawer',
   id: 'header-search-dialog',
   side: 'top',
-  aria_label: 'content.search' | t,
+  aria_label: search_aria_label,
   content: search_drawer_body
 -%}
 

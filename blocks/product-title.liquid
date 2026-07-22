@@ -10,12 +10,13 @@
 
 {% liquid
   assign current_variant = product.selected_or_first_available_variant
+  assign heading_id = 'main-product-' | append: section.id | append: '-title'
 %}
 
 {% render 'heading',
   text: product.title,
   level: 1,
-  id: 'main-product-' | append: section.id | append: '-title',
+  id: heading_id,
   class: 'text-2xl font-medium sm:text-3xl'
 %}
 
