@@ -358,6 +358,7 @@
     "media": "Media",
     "media_with_text": "Media with text",
     "menu": "Menu",
+    "newsletter_signup": "Newsletter signup",
     "header_menu_link": "Menu link",
     "header_megamenu": "Megamenu",
     "header_menu_column": "Megamenu column",
@@ -1193,7 +1194,17 @@
     "cs_slider_inner_color": "Slider inner color",
     "text_on_images": "Text on images",
     "x_position": "Horizontal position",
-    "y_position": "Vertical position"
+    "y_position": "Vertical position",
+    "newsletter_signup": {
+      "klaviyo_public_key": "Public API key",
+      "klaviyo_public_key_info": "Found in Klaviyo under Settings → API Keys → Public API Key / Site ID",
+      "klaviyo_list_id": "List ID",
+      "klaviyo_list_id_info": "Found in your Klaviyo account under List → Settings → List ID",
+      "email_placeholder": "Email placeholder",
+      "submit_label": "Submit button label",
+      "consent_label": "Consent checkbox label",
+      "success_message": "Success message"
+    }
   },
   "text_defaults": {
     "accordion_heading": "Accordion heading",
