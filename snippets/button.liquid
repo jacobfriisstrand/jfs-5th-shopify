@@ -59,7 +59,7 @@
     assign is_loading = true
   endif
 
-  assign base_classes = 'inline-flex items-center justify-center gap-2 font-body font-medium rounded-input whitespace-nowrap select-none transition-opacity duration-150 group disabled:opacity-50 disabled:pointer-events-none aria-disabled:opacity-50 aria-disabled:pointer-events-none'
+  assign base_classes = 'h-fit inline-flex items-center justify-center gap-2 font-body font-medium rounded-input whitespace-nowrap select-none transition-opacity duration-150 group disabled:opacity-50 disabled:pointer-events-none aria-disabled:opacity-50 aria-disabled:pointer-events-none'
 
   case resolved_size
     when 'sm'
@@ -95,7 +95,7 @@
     {%- if is_disabled or is_loading %} aria-disabled="true" tabindex="-1"{% endif -%}
   >
     <span class="grid [grid-template-areas:'stack'] place-items-center">
-      <span class="[grid-area:stack] group-data-[loading]:invisible">{{ text | escape }}</span>
+      <span class="[grid-area:stack] group-data-loading:invisible">{{ text | escape }}</span>
       <span class="[grid-area:stack] size-[1em] rounded-full border-2 border-current border-t-transparent animate-spin invisible group-data-[loading]:visible" aria-hidden="true"></span>
     </span>
   </a>
