@@ -5,14 +5,15 @@
   @param {string} [text] - Visible label. Required unless `icon` is set.
   @param {string} [icon] - Icon name to render. When set, `variant: 'icon'` is implied.
   @param {number} [icon_size] - Icon size in px. Defaults to 24.
+  @param {boolean} [noIcon] - When true, hides the default arrow icon after the text.
   @param {string} [href] - Destination URL. When present, renders an `<a>` element.
   @param {string} [as] - Force element type: `'a'` or `'button'`. Defaults to
     `'button'` unless `href` is supplied.
   @param {string} [type] - `<button>` `type` attribute: `submit`, `button`, or
     `reset`. Defaults to `'button'`. Ignored for anchors.
-  @param {string} [variant] - Visual style: `primary`, `secondary`, or `ghost`.
-    Defaults to `primary`.
-  @param {string} [size] - Size preset: `sm`, `md`, or `lg`. Defaults to `md`.
+  @param {string} [variant] - Visual style: `base`, `link`, or `noIcon`.
+    Defaults to `base`.
+  @param {string} [size] - Size preset: `base` or `large`. Defaults to `base`.
   @param {boolean} [loading] - When true, shows a spinner and blocks interaction.
   @param {boolean} [disabled] - Marks the control as disabled.
   @param {string} [class] - Additional Tailwind classes appended to the element.
@@ -27,24 +28,25 @@
   @param {string} [attrs] - Raw HTML attributes string rendered on the element.
 
   @example
-  {% render 'button', text: 'Add to cart', variant: 'primary', type: 'submit' %}
+  {% render 'button', text: 'Add to cart', variant: 'base', type: 'submit' %}
 
   @example
-  {% render 'button', text: 'Learn more', href: product.url, variant: 'secondary' %}
+  {% render 'button', text: 'Learn more', href: product.url, variant: 'link' %}
 
   @example
-  {% render 'button', text: 'View details', href: product.url, variant: 'ghost', size: 'sm' %}
+  {% render 'button', text: 'Unavailable', variant: 'base', disabled: true %}
 
   @example
-  {% render 'button', text: 'Adding…', loading: true, loading_text: 'Adding…', variant: 'primary' %}
-
-  @example
-  {% render 'button', text: 'Unavailable', variant: 'primary', disabled: true %}
+  {% render 'button', text: 'Learn more', variant: 'base', noIcon: true %}
 {% enddoc %}
 
 {% liquid
-  assign resolved_variant = variant | default: 'primary'
-  assign resolved_size = size | default: 'md'
+  assign resolved_variant = variant | default: 'base'
+  if resolved_variant == 'link' and size == blank
+    assign resolved_size = 'link'
+  else
+    assign resolved_size = size | default: 'base'
+  endif
   assign resolved_type = type | default: 'button'
 
   assign is_anchor = false
@@ -62,17 +64,22 @@
     assign is_loading = true
   endif
 
-  assign icon_size = icon_size | default: 24
+  assign icon_size = icon_size | default: 16
+  assign hide_icon = noIcon | default: false
 
-  assign base_classes = 'h-fit inline-flex items-center justify-center gap-2 font-body font-medium rounded-input whitespace-nowrap select-none transition-opacity duration-150 group disabled:opacity-50 disabled:pointer-events-none aria-disabled:opacity-50 aria-disabled:pointer-events-none'
+  if resolved_variant == 'link' or resolved_variant == 'noIcon'
+    assign hide_icon = true
+  endif
+
+  assign base_classes = 'h-fit font-body font-medium whitespace-nowrap select-none transition-opacity duration-100 group disabled:opacity-50 disabled:pointer-events-none aria-disabled:opacity-50 aria-disabled:pointer-events-none rounded-full'
 
   case resolved_size
-    when 'sm'
-      assign size_classes = 'px-4 py-2 text-sm'
-    when 'lg'
-      assign size_classes = 'px-8 py-4 text-lg'
+    when 'link'
+      assign size_classes = 'btn-size--link'
+    when 'large'
+      assign size_classes = 'btn-size--large'
     else
-      assign size_classes = 'px-6 py-3 text-base'
+      assign size_classes = 'btn-size--base'
   endcase
 
   if icon != blank
@@ -83,14 +90,14 @@
     endif
   else
 
-  case resolved_variant
-    when 'secondary'
-      assign variant_classes = 'bg-transparent text-foreground border border-foreground hover:bg-foreground hover:text-background'
-    when 'ghost'
-      assign variant_classes = 'bg-transparent text-foreground hover:bg-foreground/10'
-    else
-      assign variant_classes = 'bg-foreground text-background hover:opacity-80'
-  endcase
+    case resolved_variant
+      when 'link'
+        assign variant_classes = 'btn-variant--link'
+      when 'noIcon'
+        assign variant_classes = 'btn-variant--noIcon [transition-property:opacity,background-color,border-color]'
+      else
+        assign variant_classes = 'btn-variant--base'
+    endcase
 
     assign all_classes = base_classes | append: ' ' | append: size_classes | append: ' ' | append: variant_classes
     if class != blank
@@ -119,7 +126,14 @@
       </span>
     {%- else -%}
       <span class="grid [grid-template-areas:'stack'] place-items-center">
-        <span class="[grid-area:stack] group-data-loading:invisible">{{ text | escape }}</span>
+        <span class="[grid-area:stack] inline-flex items-center gap-2 group-data-loading:invisible">
+          {{ text | escape }}
+          {%- unless hide_icon -%}
+            <span class="inline-flex items-center justify-center rounded-full bg-foreground p-1">
+              {%- render 'icon', icon: 'arrow-up-right', size: icon_size, class: 'text-background transition-transform duration-300 group-hover:rotate-45' -%}
+            </span>
+          {%- endunless -%}
+        </span>
         <span class="[grid-area:stack] size-[1em] rounded-full border-2 border-current border-t-transparent animate-spin invisible group-data-loading:visible" aria-hidden="true"></span>
       </span>
     {%- endif -%}
@@ -145,7 +159,14 @@
       </span>
     {%- else -%}
       <span class="grid [grid-template-areas:'stack'] place-items-center">
-        <span class="[grid-area:stack] group-data-loading:invisible">{{ text | escape }}</span>
+        <span class="[grid-area:stack] inline-flex items-center gap-2 group-data-loading:invisible">
+          {{ text | escape }}
+          {%- unless hide_icon -%}
+            <span class="inline-flex items-center justify-center rounded-full bg-foreground p-1">
+              {%- render 'icon', icon: 'arrow-up-right', size: icon_size, class: 'text-background transition-transform duration-300 group-hover:rotate-45' -%}
+            </span>
+          {%- endunless -%}
+        </span>
         <span class="[grid-area:stack] size-[1em] rounded-full border-2 border-current border-t-transparent animate-spin invisible group-data-loading:visible" aria-hidden="true"></span>
       </span>
     {%- endif -%}
