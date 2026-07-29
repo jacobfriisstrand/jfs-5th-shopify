@@ -1,6 +1,8 @@
+import { imagePicker, range } from "../settings.ts";
 import { defineBlock } from "../types.ts";
 
 export default defineBlock({
   name: "t:names.logo",
   tag: null,
+  settings: [imagePicker("logo", "t:settings.logo")],
 });

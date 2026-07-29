@@ -9,19 +9,20 @@
   {% content_for 'block', type: '_header-cart', id: 'header-cart' %}
 {% enddoc %}
 
-<a
-  href="{{ routes.cart_url }}"
-  data-header-cart
-  aria-label="{{ 'accessibility.cart' | t }}"
-  class="relative inline-flex items-center gap-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
->
-  {%- render 'icon', icon: 'cart', size: 24 -%}
-  <span class="visually-hidden">{{ 'accessibility.cart' | t }}</span>
-  <span aria-hidden="true" data-cart-count>{{ cart.item_count }}</span>
-  <span class="visually-hidden" data-cart-count-a11y>
-    {{- 'accessibility.cart_count' | t -}}: {{ cart.item_count -}}
-  </span>
-</a>
+{% liquid
+  assign cart_label = 'accessibility.cart' | t
+%}
+
+<div class="relative inline-flex">
+  {% render 'button',
+    icon: 'cart',
+    icon_size: 24,
+    variant: 'icon',
+    href: routes.cart_url,
+    aria_label: cart_label,
+    attrs: 'data-header-cart'
+  %}
+</div>
 
 <script src="{{ 'header-cart.js' | asset_url }}" type="module" fetchpriority="low"></script>
 

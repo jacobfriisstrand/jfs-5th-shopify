@@ -2,7 +2,9 @@
   Renders a `<button>` or `<a>` element with a unified visual style, variant
   support, optional sizes, and built-in loading state.
 
-  @param {string} text - Visible label. Required.
+  @param {string} [text] - Visible label. Required unless `icon` is set.
+  @param {string} [icon] - Icon name to render. When set, `variant: 'icon'` is implied.
+  @param {number} [icon_size] - Icon size in px. Defaults to 24.
   @param {string} [href] - Destination URL. When present, renders an `<a>` element.
   @param {string} [as] - Force element type: `'a'` or `'button'`. Defaults to
     `'button'` unless `href` is supplied.
@@ -22,6 +24,7 @@
     visible text is not descriptive enough.
   @param {string} [id] - Optional `id` attribute.
   @param {string} [ref] - Optional `ref` attribute for use with the `Component` base class.
+  @param {string} [attrs] - Raw HTML attributes string rendered on the element.
 
   @example
   {% render 'button', text: 'Add to cart', variant: 'primary', type: 'submit' %}
@@ -59,6 +62,8 @@
     assign is_loading = true
   endif
 
+  assign icon_size = icon_size | default: 24
+
   assign base_classes = 'h-fit inline-flex items-center justify-center gap-2 font-body font-medium rounded-input whitespace-nowrap select-none transition-opacity duration-150 group disabled:opacity-50 disabled:pointer-events-none aria-disabled:opacity-50 aria-disabled:pointer-events-none'
 
   case resolved_size
@@ -70,6 +75,14 @@
       assign size_classes = 'px-6 py-3 text-base'
   endcase
 
+  if icon != blank
+    assign resolved_variant = 'icon'
+    assign all_classes = 'p-2 aspect-square inline-flex items-center justify-center'
+    if class != blank
+      assign all_classes = all_classes | append: ' ' | append: class
+    endif
+  else
+
   case resolved_variant
     when 'secondary'
       assign variant_classes = 'bg-transparent text-foreground border border-foreground hover:bg-foreground hover:text-background'
@@ -79,9 +92,10 @@
       assign variant_classes = 'bg-foreground text-background hover:opacity-80'
   endcase
 
-  assign all_classes = base_classes | append: ' ' | append: size_classes | append: ' ' | append: variant_classes
-  if class != blank
-    assign all_classes = all_classes | append: ' ' | append: class
+    assign all_classes = base_classes | append: ' ' | append: size_classes | append: ' ' | append: variant_classes
+    if class != blank
+      assign all_classes = all_classes | append: ' ' | append: class
+    endif
   endif
 %}
 
@@ -90,14 +104,25 @@
     href="{{ href | default: '#' }}"
     class="{{ all_classes }}"
     {%- if id != blank %} id="{{ id }}"{% endif -%}
+    {%- if ref != blank %} ref="{{ ref }}"{% endif -%}
+    {%- if attrs != blank %} {{ attrs }}{% endif -%}
     {%- if aria_label != blank %} aria-label="{{ aria_label | escape }}"{% endif -%}
     {%- if is_loading %} aria-busy="true" data-loading=""{% endif -%}
     {%- if is_disabled or is_loading %} aria-disabled="true" tabindex="-1"{% endif -%}
   >
-    <span class="grid [grid-template-areas:'stack'] place-items-center">
-      <span class="[grid-area:stack] group-data-loading:invisible">{{ text | escape }}</span>
-      <span class="[grid-area:stack] size-[1em] rounded-full border-2 border-current border-t-transparent animate-spin invisible group-data-[loading]:visible" aria-hidden="true"></span>
-    </span>
+    {%- if icon != blank -%}
+      <span class="grid [grid-template-areas:'stack'] place-items-center">
+        <span class="[grid-area:stack] group-data-loading:invisible">
+          {%- render 'icon', icon: icon, size: icon_size -%}
+        </span>
+        <span class="[grid-area:stack] size-[1em] rounded-full border-2 border-current border-t-transparent animate-spin invisible group-data-loading:visible" aria-hidden="true"></span>
+      </span>
+    {%- else -%}
+      <span class="grid [grid-template-areas:'stack'] place-items-center">
+        <span class="[grid-area:stack] group-data-loading:invisible">{{ text | escape }}</span>
+        <span class="[grid-area:stack] size-[1em] rounded-full border-2 border-current border-t-transparent animate-spin invisible group-data-loading:visible" aria-hidden="true"></span>
+      </span>
+    {%- endif -%}
   </a>
 {%- else -%}
   <button
@@ -105,14 +130,24 @@
     class="{{ all_classes }}"
     {%- if id != blank %} id="{{ id }}"{% endif -%}
     {%- if ref != blank %} ref="{{ ref }}"{% endif -%}
+    {%- if attrs != blank %} {{ attrs }}{% endif -%}
     {%- if aria_label != blank %} aria-label="{{ aria_label | escape }}"{% endif -%}
     {%- if name != blank %} name="{{ name }}" value="{{ value }}"{% endif -%}
     {%- if is_loading %} aria-busy="true" data-loading=""{% endif -%}
     {%- if is_disabled or is_loading %} disabled{% endif -%}
   >
-    <span class="grid [grid-template-areas:'stack'] place-items-center">
-      <span class="[grid-area:stack] group-data-[loading]:invisible">{{ text | escape }}</span>
-      <span class="[grid-area:stack] size-[1em] rounded-full border-2 border-current border-t-transparent animate-spin invisible group-data-[loading]:visible" aria-hidden="true"></span>
-    </span>
+    {%- if icon != blank -%}
+      <span class="grid [grid-template-areas:'stack'] place-items-center">
+        <span class="[grid-area:stack] group-data-loading:invisible">
+          {%- render 'icon', icon: icon, size: icon_size -%}
+        </span>
+        <span class="[grid-area:stack] size-[1em] rounded-full border-2 border-current border-t-transparent animate-spin invisible group-data-loading:visible" aria-hidden="true"></span>
+      </span>
+    {%- else -%}
+      <span class="grid [grid-template-areas:'stack'] place-items-center">
+        <span class="[grid-area:stack] group-data-loading:invisible">{{ text | escape }}</span>
+        <span class="[grid-area:stack] size-[1em] rounded-full border-2 border-current border-t-transparent animate-spin invisible group-data-loading:visible" aria-hidden="true"></span>
+      </span>
+    {%- endif -%}
   </button>
 {%- endif -%}

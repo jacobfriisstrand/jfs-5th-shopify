@@ -238,6 +238,10 @@ class HeaderComponent extends Component {
       trigger.dataset.closeLabel ?? "Close menu",
     );
 
+    document
+      .getElementById("header-group")
+      ?.setAttribute("data-mobile-nav-open", "");
+
     this.#showBackdrop();
     this.#setBodyScrollLock(true);
 
@@ -260,6 +264,10 @@ class HeaderComponent extends Component {
       "aria-label",
       trigger.dataset.openLabel ?? "Open menu",
     );
+
+    document
+      .getElementById("header-group")
+      ?.removeAttribute("data-mobile-nav-open");
 
     this.#maybeHideBackdrop();
     this.#setBodyScrollLock(false);

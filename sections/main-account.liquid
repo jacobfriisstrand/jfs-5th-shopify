@@ -1,0 +1,66 @@
+<div class="page-width py-8 md:py-16">
+  <h1 class="text-2xl font-medium mb-8">{{ 'customer.account.title' | t }}</h1>
+
+  {%- if customer -%}
+    <p class="mb-8">{{ 'customer.account.welcome_html' | t: name: customer.first_name }}</p>
+
+    <div class="grid gap-8 md:grid-cols-2">
+      <div>
+        <h2 class="text-lg font-medium mb-4">{{ 'customer.orders.title' | t }}</h2>
+        {% paginate customer.orders by 20 %}
+          {%- if customer.orders.size > 0 -%}
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left border-b border-foreground/20">
+                  <th class="pb-2 font-medium">{{ 'customer.orders.order_number' | t }}</th>
+                  <th class="pb-2 font-medium">{{ 'customer.orders.date' | t }}</th>
+                  <th class="pb-2 font-medium">{{ 'customer.orders.payment_status' | t }}</th>
+                  <th class="pb-2 font-medium">{{ 'customer.orders.fulfillment_status' | t }}</th>
+                  <th class="pb-2 font-medium text-right">{{ 'customer.orders.total' | t }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {%- for order in customer.orders -%}
+                  <tr class="border-b border-foreground/10">
+                    <td class="py-3">
+                      <a href="{{ order.customer_url }}" class="underline">
+                        {{ order.name }}
+                      </a>
+                    </td>
+                    <td class="py-3">{{ order.created_at | time_tag: format: 'date' }}</td>
+                    <td class="py-3">{{ order.financial_status_label }}</td>
+                    <td class="py-3">{{ order.fulfillment_status_label }}</td>
+                    <td class="py-3 text-right">{{ order.total_net_amount | money_with_currency }}</td>
+                  </tr>
+                {%- endfor -%}
+              </tbody>
+            </table>
+          {%- else -%}
+            <p class="text-foreground/60">{{ 'customer.orders.none' | t }}</p>
+          {%- endif -%}
+        {% endpaginate %}
+      </div>
+
+      <div>
+        <h2 class="text-lg font-medium mb-4">{{ 'customer.account.details' | t }}</h2>
+        {{ customer.default_address | format_address }}
+        <a href="{{ routes.account_addresses_url }}" class="inline-block mt-4 underline text-sm">
+          {{ 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }})
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-8 pt-8 border-t border-foreground/20">
+      <a href="{{ routes.account_logout_url }}" class="underline text-sm">
+        {{ 'customer.log_out' | t }}
+      </a>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.account",
+  "tag": "section"
+}
+{% endschema %}

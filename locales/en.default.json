@@ -9,6 +9,7 @@
  */
 {
   "accessibility": {
+    "account": "Account",
     "cart": "Cart",
     "cart_count": "Total items in cart",
     "close_dialog": "Close dialog",
@@ -113,6 +114,37 @@
       "success_moderated": "Comment posted, awaiting moderation",
       "success": "Comment posted"
     }
+  },
+  "customer": {
+    "account": {
+      "title": "Account",
+      "welcome_html": "Welcome back, {{ name }}!",
+      "details": "Account details",
+      "view_addresses": "View addresses"
+    },
+    "login": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "forgot_password": "Forgot your password?"
+    },
+    "register": {
+      "title": "Create account"
+    },
+    "orders": {
+      "title": "Order history",
+      "none": "You haven't placed any orders yet.",
+      "order_number": "Order",
+      "date": "Date",
+      "payment_status": "Payment status",
+      "fulfillment_status": "Fulfillment status",
+      "total": "Total"
+    },
+    "addresses": {
+      "title": "Addresses"
+    },
+    "log_out": "Log out"
   },
   "content": {
     "discount": "Discount",

@@ -1,46 +1,38 @@
-{%- liquid
-  assign logo = settings.logo
-  assign logo_width = settings.logo_width | default: 120
-  assign logo_sizes = logo_width | append: 'px'
-  assign logo_style = 'width:' | append: logo_width | append: 'px;height:auto;'
-  assign is_home = false
-  if request.page_type == 'index'
-    assign is_home = true
-  endif
--%}
+{% liquid
+  assign logo = block.settings.logo
+%}
 
-{%- if is_home -%}
-  <span data-header-logo class="inline-flex items-center">
-{%- else -%}
-  <a
-    href="{{ routes.root_url }}"
-    rel="home"
-    data-header-logo
-    class="inline-flex items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
-  >
-{%- endif -%}
+<a
+  href="{{ routes.root_url }}"
+  rel="home"
+  data-header-logo
+  class="inline-flex items-center focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-foreground"
+>
   {%- if logo != blank -%}
     {% render 'image',
       image: logo,
       priority: 'lcp',
       widths: '120, 240, 360, 480, 600',
       width_max: 600,
-      sizes: logo_sizes,
+      sizes: '120px',
       alt: shop.name,
-      style: logo_style
+      class: 'w-12 lg:w-17 h-auto'
     %}
   {%- else -%}
     <span>{{ shop.name }}</span>
   {%- endif -%}
-{%- if is_home -%}
-  </span>
-{%- else -%}
-  </a>
-{%- endif -%}
+</a>
 
 {% schema %}
 {
   "name": "t:names.logo",
-  "tag": null
+  "tag": null,
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "t:settings.logo"
+    }
+  ]
 }
 {% endschema %}

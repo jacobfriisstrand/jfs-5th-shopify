@@ -1,0 +1,27 @@
+{% doc %}
+  Header account icon. Renders as an `<a href>` link to the customer account
+  page.
+
+  @example
+  {% content_for 'block', type: '_header-account', id: 'header-account' %}
+{% enddoc %}
+
+{% liquid
+  assign account_label = 'accessibility.account' | t
+%}
+
+{% render 'button',
+  icon: 'user',
+  icon_size: 24,
+  variant: 'icon',
+  href: routes.account_url,
+  aria_label: account_label,
+  attrs: 'data-header-account'
+%}
+
+{% schema %}
+{
+  "name": "t:names.account",
+  "tag": null
+}
+{% endschema %}
