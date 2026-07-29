@@ -12,12 +12,19 @@
 <header-component class="grid-12">
   <div
     data-header-row
-    class="col-content flex items-center justify-between gap-4 py-3"
+    class="col-content grid grid-cols-[auto_1fr_auto] md:grid-cols-[1fr_auto_1fr] items-center py-3"
   >
-    {% content_for 'block', type: '_header-logo', id: 'header-logo' %}
-    {% content_for 'block', type: '_header-menu', id: 'header-menu' %}
-    {% content_for 'block', type: '_header-search', id: 'header-search' %}
-    {% content_for 'block', type: '_header-cart', id: 'header-cart' %}
+    <div class="max-md:order-2 max-md:ml-auto">
+      {% content_for 'block', type: '_header-menu', id: 'header-menu' %}
+    </div>
+    <div class="max-md:order-first">
+      {% content_for 'block', type: '_header-logo', id: 'header-logo' %}
+    </div>
+    <div class="max-md:order-3 flex items-center justify-end gap-1">
+      {% content_for 'block', type: '_header-search', id: 'header-search' %}
+      {% content_for 'block', type: '_header-account', id: 'header-account' %}
+      {% content_for 'block', type: '_header-cart', id: 'header-cart' %}
+    </div>
   </div>
 </header-component>
 
@@ -27,6 +34,23 @@
 {% schema %}
 {
   "name": "t:names.header",
-  "tag": "header"
+  "tag": "header",
+  "blocks": [
+    {
+      "type": "_header-logo"
+    },
+    {
+      "type": "_header-menu"
+    },
+    {
+      "type": "_header-search"
+    },
+    {
+      "type": "_header-account"
+    },
+    {
+      "type": "_header-cart"
+    }
+  ]
 }
 {% endschema %}
