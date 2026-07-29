@@ -1,0 +1,29 @@
+/* -------------------------------------------------------------------------- */
+/* Navigation link + button baseline. Used by snippets/link.liquid.           */
+/* -------------------------------------------------------------------------- */
+
+@utility link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+
+  & svg {
+    color: var(--color-foreground);
+  }
+
+  @media (hover: hover) {
+    --h: 1.2em;
+    line-height: var(--h);
+    color: #0000;
+    text-shadow:
+      0 calc(-1 * var(--_t, 0em)) var(--color-foreground),
+      0 calc(var(--h) - var(--_t, 0em)) var(--color-foreground);
+    overflow: hidden;
+    transition: 0.3s;
+
+    &:hover {
+      --_t: var(--h);
+    }
+  }
+}

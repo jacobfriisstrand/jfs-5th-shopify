@@ -36,7 +36,7 @@
 {%- capture featured -%}
   {%- if image != blank -%}
     {%- if image_link_url != blank -%}
-      <a href="{{ image_link_url }}" class="block">
+      <a href="{{ image_link_url }}">
         {% render 'image',
           image: image,
           width_max: 640,
@@ -54,9 +54,10 @@
     {%- endif -%}
   {%- endif -%}
   {%- if cta_text != blank and cta_url != blank -%}
-    <a href="{{ cta_url }}" class="inline-flex mt-3 underline">
-      {{ cta_text | escape }}
-    </a>
+    {% render 'link',
+      text: cta_text,
+      href: cta_url
+    %}
   {%- endif -%}
 {%- endcapture -%}
 
@@ -67,14 +68,7 @@
       Desktop = inline button with a chevron. Both open the same
       `<dialog-component>` below; CSS owns the per-breakpoint slide.
     {%- endcomment -%}
-    <button
-      type="button"
-      data-megamenu-trigger
-      aria-controls="{{ dialog_id }}"
-      aria-expanded="false"
-      class="inline-flex items-center gap-1 py-2 max-md:flex max-md:w-full max-md:justify-between max-md:gap-3 max-md:min-h-12 max-md:px-4 max-md:py-3 max-md:rounded-lg max-md:text-left max-md:hover:bg-black/5 cursor-pointer bg-transparent border-0"
-    >
-      <span>{{ label | escape }}</span>
+{%- capture trigger_icon -%}
       <svg
         viewBox="0 0 24 24"
         width="12"
@@ -88,7 +82,15 @@
       >
         <polyline points="6 9 12 15 18 9" />
       </svg>
-    </button>
+    {%- endcapture -%}
+    {% render 'link',
+      text: label,
+      icon: trigger_icon,
+      icon_position: 'after',
+      data_attrs: 'data-megamenu-trigger',
+      aria_controls: dialog_id,
+      aria_expanded: 'false'
+    %}
 
     <dialog-component id="{{ dialog_id }}" class="contents" data-non-modal>
       <dialog
@@ -97,13 +99,8 @@
         aria-label="{{ label | escape }}"
         class="header-menu-megamenu"
       >
-        <div class="header-menu-megamenu-mobile-header md:hidden sticky top-0 z-10 flex items-center gap-2 p-4 border-b">
-          <button
-            type="button"
-            data-megamenu-back
-            aria-label="{{ 'actions.close_menu' | t }}"
-            class="header-menu-megamenu-back inline-flex items-center gap-2"
-          >
+        <div class="header-menu-megamenu-mobile-header md:hidden sticky top-0 z-10 flex items-center gap-2 p-4 border-b border-foreground/50">
+          {%- capture back_icon -%}
             <svg
               viewBox="0 0 24 24"
               width="16"
@@ -117,8 +114,17 @@
             >
               <polyline points="15 18 9 12 15 6" />
             </svg>
-            <span>{{ label | escape }}</span>
-          </button>
+          {%- endcapture -%}
+          {%- liquid
+            assign back_label = 'actions.close_menu' | t
+          -%}
+          {% render 'link',
+            text: label,
+            icon: back_icon,
+            icon_position: 'before',
+            data_attrs: 'data-megamenu-back',
+            aria_label: back_label
+          %}
         </div>
         <div class="header-menu-megamenu-inner grid-12 py-8 max-md:py-4">
           <div class="col-content lg:span-8 grid grid-cols-1 md:grid-cols-3 gap-6">

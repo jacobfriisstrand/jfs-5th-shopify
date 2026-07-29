@@ -1,0 +1,56 @@
+{% doc %}
+  Renders a navigation link or button. Unstyled — styling belongs here.
+
+  @param {string} text - Visible text
+  @param {string} [href] - URL. Omit to render a <button>.
+  @param {string} [icon] - Optional icon HTML.
+  @param {string} [icon_position] - 'before' (default) or 'after'.
+  @param {boolean} [aria_current] - When true, sets aria-current="page"
+  @param {string} [data_attrs] - Data attributes (e.g. 'data-megamenu-trigger')
+  @param {string} [aria_controls] - aria-controls value
+  @param {string} [aria_expanded] - aria-expanded value
+  @param {string} [aria_label] - aria-label value
+
+  @example
+  {% render 'link', text: 'Home', href: '/', aria_current: true %}
+  {% render 'link', text: 'Shop', data_attrs: 'data-megamenu-trigger', aria_controls: 'shop', aria_expanded: 'false', icon: chevron, icon_position: 'after' %}
+{% enddoc %}
+
+{% liquid
+  assign icon_pos = icon_position | default: 'before'
+  assign is_current = false
+  if aria_current == true and href != blank
+    if request.path == href
+      assign is_current = true
+    endif
+  endif
+%}
+
+{%- if href != blank -%}
+  <a
+    href="{{ href }}"
+    class="link"
+    {%- if data_attrs != blank %} {{ data_attrs }}{% endif -%}
+    {%- if aria_controls != blank %} aria-controls="{{ aria_controls }}"{% endif -%}
+    {%- if aria_expanded != blank %} aria-expanded="{{ aria_expanded }}"{% endif -%}
+    {%- if aria_label != blank %} aria-label="{{ aria_label | escape }}"{% endif -%}
+    {%- if is_current %} aria-current="page"{% endif -%}
+  >
+    {%- if icon != blank and icon_pos == 'before' %}{{ icon }}{% endif -%}
+    {{- text | escape -}}
+    {%- if icon != blank and icon_pos == 'after' %}{{ icon }}{% endif -%}
+  </a>
+{%- else -%}
+  <button
+    type="button"
+    class="link"
+    {%- if data_attrs != blank %} {{ data_attrs }}{% endif -%}
+    {%- if aria_controls != blank %} aria-controls="{{ aria_controls }}"{% endif -%}
+    {%- if aria_expanded != blank %} aria-expanded="{{ aria_expanded }}"{% endif -%}
+    {%- if aria_label != blank %} aria-label="{{ aria_label | escape }}"{% endif -%}
+  >
+    {%- if icon != blank and icon_pos == 'before' %}{{ icon }}{% endif -%}
+    {{- text | escape -}}
+    {%- if icon != blank and icon_pos == 'after' %}{{ icon }}{% endif -%}
+  </button>
+{%- endif -%}
