@@ -17,7 +17,9 @@
         "header-logo": {
           "type": "_header-logo",
           "static": true,
-          "settings": {},
+          "settings": {
+            "logo": "shopify://shop_images/Main_logo_orange_2.svg"
+          },
           "blocks": {}
         },
         "header-menu": {
@@ -102,6 +104,12 @@
         },
         "header-search": {
           "type": "_header-search",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "header-account": {
+          "type": "_header-account",
           "static": true,
           "settings": {},
           "blocks": {}
