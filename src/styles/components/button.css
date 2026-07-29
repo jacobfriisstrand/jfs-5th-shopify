@@ -1,0 +1,68 @@
+/* ==========================================================================
+   button.css — component classes for button sizes and variants.
+
+   Hook classes assigned by snippets/button.liquid:
+     .btn-size--base   / .btn-size--large
+     .btn-variant--base / .btn-variant--link / .btn-variant--noIcon
+
+   Defined in @layer components so they always emit regardless of whether
+   Tailwind's scanner sees them in class="…" attributes.
+   ========================================================================== */
+
+@layer components {
+  /* --- Sizes -------------------------------------------------------------- */
+
+  .btn-size--link {
+    /* padding, font-size for link variant */
+    padding: 0;
+  }
+
+  .btn-size--base {
+    /* padding, font-size, line-height for the base button size */
+    padding-inline: 0.75rem;
+    padding-block: 0.5rem;
+  }
+
+  .btn-size--large {
+    /* padding, font-size, line-height for the large button size */
+    padding-inline: 1rem;
+    padding-block: 0.75rem;
+  }
+
+  /* --- Variants ----------------------------------------------------------- */
+
+  .btn-variant--base {
+    /* default button: background, text color, border, hover state */
+    background: var(--color-brand);
+  }
+
+  .btn-variant--link {
+    /* link-style button: underline, inline, minimal chrome */
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset-block-end: 0;
+      inset-inline-start: 0;
+      inline-size: 100%;
+      block-size: 1px;
+      background: var(--color-brand);
+      transition: background var(--default-transition-duration)
+        var(--default-transition-timing-function);
+    }
+
+    &:hover::after {
+      background: var(--color-foreground);
+    }
+  }
+
+  .btn-variant--noIcon {
+    border: 1px solid var(--color-brand);
+    background: var(--color-brand);
+
+    &:hover {
+      background: transparent;
+    }
+  }
+}
