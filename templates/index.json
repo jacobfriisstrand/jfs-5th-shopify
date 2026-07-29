@@ -12,11 +12,11 @@
     "home_hero": {
       "type": "home-hero",
       "settings": {
-        "heading": "Welcome to our store",
-        "subheading": "Discover our latest collection.",
+        "heading": "Show up. Get better. Repeat.",
+        "subheading": "5th Element is a training crew built on showing up, pushing each other, and walking away a little stronger than we came in. Open to all levels, every week of the year. Find us on the track, the trails, and everywhere in between.",
         "video": "shopify://files/videos/Forside video - Matty .MOV",
         "button_label": "Shop now",
-        "button_link": "shopify://pages/contact"
+        "button_link": "shopify://collections"
       }
     },
     "featured_collection": {

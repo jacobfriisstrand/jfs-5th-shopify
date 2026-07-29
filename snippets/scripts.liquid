@@ -62,7 +62,8 @@
   See ADR-0003 pillar 7 (defer-load) and docs/perf-budget.md.
 {% endcomment %}
 <script src="{{ 'popover-polyfill.js' | asset_url }}" type="module" fetchpriority="low"></script>
-<script src="{{ 'dialog.js'           | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'dialog.js'            | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'video-toggle.js'      | asset_url }}" type="module" fetchpriority="low"></script>
 
 {% if request.design_mode %}
   <script src="{{ 'theme-editor.js' | asset_url }}" type="module"></script>

@@ -38,6 +38,10 @@ body {
   font-family: var(--font-body);
 }
 
+p {
+  line-height: var(--leading-snug);
+}
+
 button {
   cursor: pointer;
 }

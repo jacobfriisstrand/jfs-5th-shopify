@@ -83,10 +83,9 @@
 %}
 
 {%- if video != blank and video.sources != blank -%}
-  <div
-    data-video
+  <video-toggle
     {%- if resolved_autoplay %} data-autoplay {% endif -%}
-    class="group/video relative bg-black {{ class }}"
+    class="group relative bg-black {{ class }}"
   >
     {%- if resolved_poster != blank -%}
       {{
@@ -122,66 +121,16 @@
       type="button"
       data-video-toggle
       aria-label="{{ play_label }}"
-      class="absolute bottom-4 right-4 z-50 flex items-center justify-center rounded-full bg-foreground/60 text-background p-3 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground cursor-pointer"
+      data-pause-label="{{ pause_label }}"
+      class="absolute bottom-4 right-4 z-50 flex items-center justify-center rounded-full bg-background/60 p-3 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground cursor-pointer text-foreground"
     >
-      <span class="group-data-[playing]/video:hidden">
-        {%- render 'icon', icon: 'play', size: 24, class: 'block' -%}
-      </span>
-      <span class="hidden group-data-[playing]/video:block">
+      <span class="block group-data-[paused]:hidden">
         {%- render 'icon', icon: 'pause', size: 24, class: 'block' -%}
+      </span>
+      <span class="hidden group-data-[paused]:block">
+        {%- render 'icon', icon: 'play', size: 24, class: 'block' -%}
       </span>
     </button>
     {%- endunless -%}
-  </div>
-
-  <script>
-    (function () {
-      var container = document.querySelector('[data-video]');
-      var video = container.querySelector('video');
-      if (!video) return;
-
-      var wantsAutoplay = container.hasAttribute('data-autoplay');
-
-      function startIfAllowed() {
-        if (wantsAutoplay && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          video.play();
-        }
-      }
-
-      var mql = window.matchMedia('(prefers-reduced-motion: reduce)');
-      function handleMotion(e) {
-        if (e.matches) {
-          video.pause();
-        } else if (wantsAutoplay) {
-          video.play();
-        }
-      }
-      mql.addEventListener('change', handleMotion);
-
-      startIfAllowed();
-
-      var btn = container.querySelector('[data-video-toggle]');
-      if (btn) {
-        function updateState() {
-          var p = !video.paused;
-          btn.setAttribute('aria-label', p ? '{{ pause_label }}' : '{{ play_label }}');
-          if (p) { container.setAttribute('data-playing', ''); } else { container.removeAttribute('data-playing'); }
-        }
-
-        btn.addEventListener('click', function () {
-          if (video.paused) {
-            video.play();
-          } else {
-            video.pause();
-          }
-        });
-
-        video.addEventListener('play', updateState);
-        video.addEventListener('pause', updateState);
-        video.addEventListener('ended', updateState);
-
-        updateState();
-      }
-    })();
-  </script>
+  </video-toggle>
 {%- endif -%}
