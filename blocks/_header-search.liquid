@@ -12,16 +12,17 @@
     Escape closes the dialog.
 {% endcomment %}
 
-<button
-  type="button"
-  data-search-trigger
-  aria-label="{{ 'actions.open_search' | t }}"
-  aria-controls="header-search-dialog"
-  aria-expanded="false"
-  class="inline-flex items-center justify-center p-2"
->
-  {%- render 'icon', icon: 'search', size: 24 -%}
-</button>
+{% liquid
+  assign search_label = 'actions.open_search' | t
+%}
+
+{% render 'button',
+  icon: 'search',
+  icon_size: 24,
+  variant: 'icon',
+  aria_label: search_label,
+  attrs: 'data-search-trigger aria-controls="header-search-dialog" aria-expanded="false"'
+%}
 
 {%- capture search_drawer_body -%}
   <predictive-search class="flex flex-col h-full">
