@@ -59,6 +59,10 @@
 
   assign resolved_preload = preload | default: 'none'
 
+  if resolved_autoplay and preload == blank
+    assign resolved_preload = 'auto'
+  endif
+
   assign resolved_hide_button = false
   if hide_button
     assign resolved_hide_button = true
@@ -85,31 +89,43 @@
 {%- if video != blank and video.sources != blank -%}
   <video-toggle
     {%- if resolved_autoplay %} data-autoplay {% endif -%}
-    class="group relative bg-black {{ class }}"
+    class="group bg-black {{ class }}"
+    style="background-color: #000"
   >
     {%- if resolved_poster != blank -%}
       {{
         video
         | video_tag:
           image_size: '1920x1080',
-          autoplay: false,
+          autoplay: resolved_autoplay,
           loop: resolved_loop,
           muted: resolved_muted,
           controls: false,
+          playsinline: true,
           preload: resolved_preload,
           poster: resolved_poster,
           class: resolved_video_class,
           aria_label: resolved_aria_label
       }}
+      <img
+        src="{{ resolved_poster }}"
+        alt=""
+        data-poster-overlay
+        class="absolute inset-0 z-10 h-full w-full object-cover"
+        width="1920"
+        height="1080"
+        aria-hidden="true"
+      >
     {%- else -%}
       {{
         video
         | video_tag:
           image_size: '1920x1080',
-          autoplay: false,
+          autoplay: resolved_autoplay,
           loop: resolved_loop,
           muted: resolved_muted,
           controls: false,
+          playsinline: true,
           preload: resolved_preload,
           class: resolved_video_class,
           aria_label: resolved_aria_label

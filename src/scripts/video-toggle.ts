@@ -11,23 +11,38 @@ class VideoToggle extends HTMLElement {
       this.closest("section")?.querySelector<HTMLVideoElement>("video");
     if (!video) return;
 
-    // Autoplay with reduced-motion respect
+    // Autoplay with reduced-motion respect.
+    // The <video> element carries the native autoplay attribute — the browser
+    // handles the poster→frame transition smoothly.  JS only pauses when the
+    // user prefers reduced motion.
     if (this.hasAttribute("data-autoplay")) {
       const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-      const startIfAllowed = () => {
-        if (!mql.matches) video.play();
+      const sync = () => {
+        if (mql.matches) {
+          video.pause();
+        } else if (video.paused) {
+          video.play();
+        }
       };
 
-      mql.addEventListener("change", (e) => {
-        if (e.matches) {
-          video.pause();
-        } else {
-          startIfAllowed();
-        }
-      });
+      sync();
+      mql.addEventListener("change", sync);
+    }
 
-      startIfAllowed();
+    // Poster overlay — keeps the poster image visible while Chrome tears
+    // down the native poster before the first frame decodes (avoids the
+    // dark-purple flash).  Hidden once playback actually starts.
+    const poster = this.querySelector<HTMLImageElement>(
+      "[data-poster-overlay]",
+    );
+    if (poster) {
+      const showPoster = () => {
+        poster.style.display = video.currentTime === 0 ? "" : "none";
+      };
+      video.addEventListener("playing", () => (poster.style.display = "none"));
+      video.addEventListener("pause", showPoster);
+      video.addEventListener("ended", showPoster);
     }
 
     // Play/pause toggle button (optional)

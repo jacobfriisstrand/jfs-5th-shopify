@@ -97,6 +97,16 @@ dialog[data-drawer]::backdrop {
   transition: filter 300ms ease-out;
 }
 
+/* --------------------------------------------------------------------------
+   Video background — Chrome shows a dark-purple internal background when
+   the poster has been removed but the first frame hasn't decoded yet.
+   Hardcoded #000 avoids the Tailwind CSS-variable load gap.                */
+/* -------------------------------------------------------------------------- */
+
+video-toggle video {
+  background-color: #000;
+}
+
 /* -------------------------------------------------------------------------- */
 /* a11y utility (referenced by Horizon JS)                                    */
 /* -------------------------------------------------------------------------- */
