@@ -128,9 +128,7 @@ video-toggle video {
 /* -------------------------------------------------------------------------- */
 
 :root {
-  /* Fixed header height. Hard-coded on purpose: the header is a known,
-     static size, and dropdown/megamenu positioning needs a stable value
-     without a JS measurement round-trip. If the header layout changes,
-     update this value to match. */
+  /* Header height is measured dynamically by header-component via
+     ResizeObserver. This is a fallback for the first paint frame. */
   --header-height: 64px;
 }

@@ -31,6 +31,7 @@ class HeaderComponent extends Component {
     window.addEventListener("scroll", this.#onScroll, { passive: true });
     // Sync initial scrolled state (e.g. page reload mid-scroll).
     this.#updateScrolledAttr();
+    this.#observeHeaderHeight();
 
     // Portal megamenu dialog-components to <body>. Chrome computes the
     // dialog's containing block against the nearest ancestor scrolling/
@@ -216,6 +217,24 @@ class HeaderComponent extends Component {
     } else {
       group.removeAttribute("data-scrolled");
     }
+  }
+
+  /** Keep --header-height in sync with actual rendered header height. */
+  #observeHeaderHeight() {
+    const group = document.getElementById("header-group");
+    if (!group) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const h = entry.borderBoxSize?.[0]?.blockSize;
+        if (h) {
+          document.documentElement.style.setProperty(
+            "--header-height",
+            `${h}px`,
+          );
+        }
+      }
+    });
+    ro.observe(group);
   }
 
   #toggleMobileNav() {
