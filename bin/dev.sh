@@ -75,8 +75,7 @@ echo "[dev] Aligning remote dev theme with local files..."
 shopify theme push \
   --development \
   --nodelete \
-  --json \
-  --ignore "config/settings_schema.json" >/dev/null
+  --json >/dev/null
 
 # 4. Start `shopify theme dev` in the background, mirroring its output to a
 #    log file so we can grep for the "Preview your theme" ready banner.
@@ -86,7 +85,7 @@ SHOPIFY_LOG=$(mktemp -t shopify-dev.XXXXXX)
 shopify theme dev \
   --live-reload=hot-reload \
   --theme-editor-sync \
-  --ignore "config/settings_schema.json" \
+  --ignore "config/settings_data.json" \
   "${STORE_PASSWORD_FLAG[@]}" \
   2>&1 | tee "$SHOPIFY_LOG" &
 SHOPIFY_PID=$!
