@@ -1,10 +1,28 @@
-{% comment %} image: scaffold — populate as needed. {% endcomment %}
-<div class="image">
-</div>
+{% liquid
+  assign image = block.settings.image
+%}
+
+{%- if image != blank -%}
+  <div class="image">
+    {% render 'image', image: image, class: 'w-full' %}
+  </div>
+{%- endif -%}
 
 {% schema %}
 {
   "name": "t:names.image",
-  "tag": null
+  "tag": null,
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:settings.image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.image"
+    }
+  ]
 }
 {% endschema %}

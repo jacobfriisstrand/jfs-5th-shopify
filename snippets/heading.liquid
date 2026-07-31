@@ -20,7 +20,7 @@
 
 {% liquid
   assign resolved_level = level | default: 2
-  assign heading_class = 'font-heading'
+  assign heading_class = 'font-heading leading-[1em]'
   if class != blank
     assign heading_class = heading_class | append: ' ' | append: class
   endif
