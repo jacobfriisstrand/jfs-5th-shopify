@@ -123,5 +123,19 @@
     </swiper-carousel>
   {%- endif -%}
 {%- else -%}
-  {{ 'product-1' | placeholder_svg_tag: 'h-auto w-full bg-foreground/5' }}
+  {%- if settings.product_fallback_image != blank -%}
+    <ul role="list" class="{{ gallery_list_class }}">
+      <li>
+        {% render 'image',
+          image: settings.product_fallback_image,
+          class: 'h-auto w-full',
+          width_max: 1200,
+          widths: '400, 600, 800, 1000, 1200',
+          sizes: '(min-width: 768px) 50vw, 100vw'
+        %}
+      </li>
+    </ul>
+  {%- else -%}
+    {{ 'product-1' | placeholder_svg_tag: 'h-auto w-full bg-foreground/5' }}
+  {%- endif -%}
 {%- endif -%}

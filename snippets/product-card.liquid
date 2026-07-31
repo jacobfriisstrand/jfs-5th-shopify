@@ -46,7 +46,7 @@
     endif
     assign card_price = variant.price
     assign card_url = product.url | append: '?variant=' | append: variant.id
-    if variant.option1 != blank
+    if variant.option1 != blank and variant.option1 != 'Default Title'
       assign card_title = product.title | append: ' — ' | append: variant.option1
     endif
   endif
@@ -57,10 +57,22 @@
   class="group flex flex-col gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
 >
   {%- if card_image != blank -%}
-    <div class="grid aspect-square w-full place-items-start overflow-hidden rounded-input bg-foreground/5">
+    <div class="grid aspect-square w-full place-items-start overflow-hidden rounded-input">
       {% render 'image',
         image: card_image,
         class: '[grid-area:1/1] h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]',
+        alt_fallback: card_title,
+        width_max: 800,
+        widths: '200, 300, 400, 600, 800',
+        sizes: '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw'
+      %}
+      {% render '_bundle-offer-pill', product: product, class: '[grid-area:1/1] m-2' %}
+    </div>
+  {%- elsif settings.product_fallback_image != blank -%}
+    <div class="grid aspect-square w-full place-items-start overflow-hidden rounded-input">
+      {% render 'image',
+        image: settings.product_fallback_image,
+        class: '[grid-area:1/1] h-full w-full object-contain p-10',
         alt_fallback: card_title,
         width_max: 800,
         widths: '200, 300, 400, 600, 800',
