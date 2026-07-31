@@ -1,0 +1,112 @@
+{% liquid
+  assign heading = section.settings.heading
+  assign body = section.settings.body
+  assign button_label = section.settings.button_label
+  assign button_link = section.settings.button_link
+  assign button_variant = section.settings.button_variant
+  assign button_size = section.settings.button_size
+%}
+
+<section class="grid-12 grid">
+  <div class="col-content">
+    <div class="grid gap-6 lg:grid-cols-2">
+      <div class="space-y-4 lg:max-w-2/3 lg:sticky lg:top-[calc(var(--header-height)+2rem)] lg:h-fit">
+        <div>
+          {%- if heading != blank -%}
+            {% render 'heading', text: heading, level: 2, class: 'text-2xl' %}
+          {%- endif -%}
+          {%- if body != blank -%}
+            <p>{{ body | escape }}</p>
+          {%- endif -%}
+        </div>
+        {%- if button_label != blank and button_link != blank -%}
+          {% render 'button',
+            text: button_label,
+            href: button_link,
+            variant: button_variant,
+            size: button_size,
+            class: 'w-fit'
+          %}
+        {%- endif -%}
+      </div>
+      <div class="max-lg:space-y-4">
+        {% content_for 'blocks' %}
+        </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "t:names.vertical_image_block",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:settings.heading"
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "t:settings.body"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:settings.button_label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:settings.button_link"
+    },
+    {
+      "type": "select",
+      "id": "button_variant",
+      "label": "t:settings.button_variant",
+      "options": [
+        {
+          "value": "base",
+          "label": "t:options.base"
+        },
+        {
+          "value": "link",
+          "label": "t:options.link"
+        },
+        {
+          "value": "noIcon",
+          "label": "t:options.no_icon"
+        }
+      ],
+      "default": "base"
+    },
+    {
+      "type": "select",
+      "id": "button_size",
+      "label": "t:settings.button_size",
+      "options": [
+        {
+          "value": "base",
+          "label": "t:options.base"
+        },
+        {
+          "value": "large",
+          "label": "t:options.large"
+        }
+      ],
+      "default": "base"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.vertical_image_block",
+      "category": "t:categories.basic"
+    }
+  ]
+}
+{% endschema %}

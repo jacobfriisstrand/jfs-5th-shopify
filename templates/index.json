@@ -19,16 +19,45 @@
         "button_link": "shopify://collections"
       }
     },
-    "featured_collection": {
-      "type": "featured-collection",
+    "vertical_image_block_eGXkcA": {
+      "type": "vertical-image-block",
+      "blocks": {
+        "image_Yqw3Gg": {
+          "type": "image",
+          "name": "t:names.image",
+          "settings": {
+            "image": "shopify://shop_images/6U6A8834_1_3-2.png"
+          },
+          "blocks": {}
+        },
+        "image_qtVFRY": {
+          "type": "image",
+          "name": "t:names.image",
+          "settings": {
+            "image": "shopify://shop_images/6U6A8834_1_3.png"
+          },
+          "blocks": {}
+        },
+        "image_zJmQMA": {
+          "type": "image",
+          "name": "t:names.image",
+          "settings": {
+            "image": "shopify://shop_images/6U6A8834_1_3-1.png"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": ["image_Yqw3Gg", "image_qtVFRY", "image_zJmQMA"],
+      "name": "t:names.vertical_image_block",
       "settings": {
-        "heading": "Featured products",
-        "subheading": "This is some products of ours.",
-        "collection": "collection1",
-        "products_to_show": 6,
-        "link_text": "View all"
+        "heading": "Who we are",
+        "body": "We started with a few friends, a stopwatch, and a stretch of asphalt. Now we're one of Copenhagen's fastest-growing training communities — runners, lifters, climbers, and first-timers, all training side by side. No egos, no gatekeeping, no pressure to be anything other than someone who wants to get better. Show up once and you'll see what we mean.",
+        "button_label": "Read more about us",
+        "button_link": "shopify://collections",
+        "button_variant": "base",
+        "button_size": "base"
       }
     }
   },
-  "order": ["home_hero", "featured_collection"]
+  "order": ["home_hero", "vertical_image_block_eGXkcA"]
 }
