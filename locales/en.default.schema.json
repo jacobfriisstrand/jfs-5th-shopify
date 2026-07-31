@@ -360,6 +360,7 @@
     "media_with_text": "Media with text",
     "menu": "Menu",
     "newsletter_signup": "Newsletter signup",
+    "next_event_teaser": "Next event teaser",
     "header_menu_link": "Menu link",
     "header_megamenu": "Megamenu",
     "header_menu_column": "Megamenu column",
@@ -815,6 +816,7 @@
     "button": "Button",
     "button_label": "Button label",
     "button_link": "Button link",
+    "cta_text": "Button text",
     "button_size": "Button size",
     "button_variant": "Button variant",
     "button_text_case": "Text case",
@@ -1202,6 +1204,7 @@
     "text_on_images": "Text on images",
     "x_position": "Horizontal position",
     "y_position": "Vertical position",
+    "event_product": "Event product",
     "newsletter_signup": {
       "klaviyo_public_key": "Public API key",
       "klaviyo_public_key_info": "Found in Klaviyo under Settings → API Keys → Public API Key / Site ID",

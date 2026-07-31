@@ -47,7 +47,11 @@
           "blocks": {}
         }
       },
-      "block_order": ["image_Yqw3Gg", "image_qtVFRY", "image_zJmQMA"],
+      "block_order": [
+        "image_Yqw3Gg",
+        "image_qtVFRY",
+        "image_zJmQMA"
+      ],
       "name": "t:names.vertical_image_block",
       "settings": {
         "heading": "Who we are",
@@ -57,7 +61,21 @@
         "button_variant": "base",
         "button_size": "base"
       }
+    },
+    "next_event_teaser_gkzeqL": {
+      "type": "next-event-teaser",
+      "name": "t:names.next_event_teaser",
+      "settings": {
+        "event_product": "100km-track-run",
+        "teaser_title": "Our next event",
+        "body": "Eight runners. One team. 8,849 meters of elevation tackled lap by lap until we've climbed a mountain together. Bring your legs, your lungs, and someone who'll cheer when you can't talk anymore. Spots are limited — sign up while they last.",
+        "cta_text": "Read more and sign up here"
+      }
     }
   },
-  "order": ["home_hero", "vertical_image_block_eGXkcA"]
+  "order": [
+    "home_hero",
+    "vertical_image_block_eGXkcA",
+    "next_event_teaser_gkzeqL"
+  ]
 }
