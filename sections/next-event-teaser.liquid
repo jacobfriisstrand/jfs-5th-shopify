@@ -6,41 +6,13 @@
   assign heading_id = 'next-event-teaser-' | append: section.id
 
   if event_product != blank
-    assign variant = event_product.selected_or_first_available_variant
     assign event_title = event_product.title
     assign event_url = event_product.url
     assign event_image = event_product.featured_image
 
-    assign event_data = variant.metafields.event_ticketing.event_v2.value
-    assign event_starts_at = event_data.starts_at
-
-    if event_starts_at == blank
-      assign product_event_data = event_product.metafields.event_ticketing.event_v2.value
-      assign event_starts_at = product_event_data.starts_at
-    endif
-
-    if event_starts_at != blank
-      assign day = event_starts_at | date: '%d' | plus: 0
-      if day >= 11 and day <= 13
-        assign ordinal = 'th'
-      else
-        assign day_mod = day | modulo: 10
-        if day_mod == 1
-          assign ordinal = 'st'
-        elsif day_mod == 2
-          assign ordinal = 'nd'
-        elsif day_mod == 3
-          assign ordinal = 'rd'
-        else
-          assign ordinal = 'th'
-        endif
-      endif
-      assign month_year = event_starts_at | date: '%B %Y'
-      assign event_date = day | append: ordinal | append: ' of ' | append: month_year
-    elsif event_data.date != blank
-      assign event_date = event_data.date
-    else
-      assign event_date = product_event_data.date
+    assign event_start_date = event_product.metafields.custom.event_start_date
+    if event_start_date != blank
+      assign event_date = event_start_date | date: '%B %d, %Y'
     endif
   endif
 %}

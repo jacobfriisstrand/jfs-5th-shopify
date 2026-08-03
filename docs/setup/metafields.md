@@ -151,6 +151,18 @@ One row of cells in a `size_chart`.
 - **Used by:** `sections/main-product.liquid` (standalone section "Disclaimer")
 - **Notes:** Rendered below partners as an `<h2>` heading + prose. Hidden if blank.
 
+### `custom.event_start_date` — _required for event cards_
+
+- **Type:** Date
+- **Used by:** `sections/next-event-teaser.liquid` (formatted date in header), `snippets/event-card.liquid` (event status badge: upcoming / ongoing / previous)
+- **Notes:** Used together with `custom.event_end_date` in event-card to compute status. next-event-teaser formats this as e.g. "23rd of March 2026". Hidden if blank.
+
+### `custom.event_end_date` — _required for event cards_
+
+- **Type:** Date
+- **Used by:** `snippets/event-card.liquid` (event status badge)
+- **Notes:** Used together with `custom.event_start_date`. Compared against `'now'` to determine status: upcoming (`start > now`), ongoing (`start <= now <= end`), previous (`end < now`). Hidden if blank.
+
 ---
 
 ## Maintenance
