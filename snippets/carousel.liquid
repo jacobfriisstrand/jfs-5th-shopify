@@ -87,7 +87,7 @@
               text: heading,
               level: resolved_heading_level,
               id: heading_id,
-              class: 'font-body text-2xl font-bold sm:text-3xl'
+              class: 'text-2xl sm:text-3xl'
             %}
           {%- endif -%}
           {%- if subheading != blank -%}
@@ -98,23 +98,24 @@
 
       <div class="flex items-center gap-4">
         {%- if link_url != blank -%}
-          <a
-            href="{{ link_url }}"
-            class="underline-offset-4 hover:underline text-sm sm:text-base"
-          >
-            {{ link_text | escape }}
-          </a>
+          {% render 'button',
+            text: link_text,
+            href: link_url,
+            variant: 'primary'
+          %}
         {%- endif -%}
       </div>
     </header>
   {%- endif -%}
 
-  <ul role="list" class="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
+  <ul role="list" class="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3">
     {%- for item in items limit: item_count -%}
       <li>
         {%- case type -%}
           {%- when 'product' -%}
             {% render 'product-card', product: item, heading_level: card_heading_level %}
+          {%- when 'event' -%}
+            {% render 'event-card', product: item, heading_level: card_heading_level %}
           {%- else -%}
             {{ 'Unknown carousel card type: ' | append: type }}
         {%- endcase -%}
@@ -128,17 +129,17 @@
         type="button"
         data-carousel-prev
         aria-label="Previous"
-        class="border-foreground/20 text-foreground flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+        class="rounded-full bg-brand p-1.5 aspect-square hover:bg-transparent border border-brand transition-colors duration-150 aria-disabled:cursor-not-allowed aria-disabled:opacity-40 aria-disabled:pointer-events-none"
       >
-        <span aria-hidden="true">&larr;</span>
+        {% render 'icon', icon: 'arrow-left', size: 24 %}
       </button>
       <button
         type="button"
         data-carousel-next
         aria-label="Next"
-        class="border-foreground/20 text-foreground flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+        class="rounded-full bg-brand p-1.5 aspect-square hover:bg-transparent border border-brand transition-colors duration-150 aria-disabled:cursor-not-allowed aria-disabled:opacity-40 aria-disabled:pointer-events-none"
       >
-        <span aria-hidden="true">&rarr;</span>
+        {% render 'icon', icon: 'arrow-right', size: 24 %}
       </button>
     </div>
     </swiper-carousel>

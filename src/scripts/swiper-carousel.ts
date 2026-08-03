@@ -36,9 +36,8 @@ declare global {
 
 const DEFAULT_SLIDES_PER_VIEW = "1.2";
 const DEFAULT_BREAKPOINTS = {
-  "640": { slidesPerView: 2.5, spaceBetween: 16 },
-  "1024": { slidesPerView: 3.5, spaceBetween: 20 },
-  "1280": { slidesPerView: 4.5, spaceBetween: 24 },
+  "640": { slidesPerView: 2, spaceBetween: 16 },
+  "1024": { slidesPerView: 3, spaceBetween: 20 },
 };
 
 function parseSlidesPerView(raw: string): number | "auto" {

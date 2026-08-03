@@ -297,6 +297,11 @@
       "label": "Featured collection"
     },
     "event": {
+      "status": {
+        "upcoming": "Upcoming",
+        "ongoing": "Ongoing",
+        "previous": "Previous"
+      },
       "about": "What is this event about?",
       "who_for": "Who is this event for?",
       "participate": "What does it take to participate?",

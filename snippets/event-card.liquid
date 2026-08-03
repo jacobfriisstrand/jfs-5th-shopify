@@ -1,0 +1,121 @@
+{% doc %}
+  Renders an event product card. Accepts a product and renders its image,
+  title, and event-status badge. Designed to be rendered inside a carousel
+  `<li>`.
+
+  Reads custom.event_start_date and custom.event_end_date metafields to
+  determine the event's status (upcoming / ongoing / previous).
+
+  Mobile: description below image.
+  Desktop: description slides up from bottom on hover.
+
+  @param {product} product - The product to render. Required.
+  @param {number} [heading_level] - Heading level for the product title.
+    Defaults to 3.
+
+  @example
+  {% render 'event-card', product: item, heading_level: 3 %}
+{% enddoc %}
+
+{% liquid
+  assign resolved_heading_level = heading_level | default: 3
+
+  assign now_ts = 'now' | date: '%s' | plus: 0
+  assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0
+  assign end_ts = product.metafields.custom.event_end_date | date: '%s' | plus: 0
+
+  assign event_status = ''
+  if start_ts != 0 and end_ts != 0
+    if start_ts > now_ts
+      assign event_status = 'upcoming'
+    elsif start_ts <= now_ts and end_ts >= now_ts
+      assign event_status = 'ongoing'
+    else
+      assign event_status = 'previous'
+    endif
+    assign event_status_key = 'sections.event.status.' | append: event_status
+  endif
+
+  assign event_description = product.description | strip_html | truncate: 120
+%}
+
+<a
+  href="{{ product.url }}"
+  class="group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+>
+  <div class="grid relative">
+    <!-- Image -->
+    {%- if product.featured_image != blank -%}
+      <div class="[grid-area:1/1] aspect-[3/4]">
+        {% render 'image',
+          image: product.featured_image,
+          alt_fallback: product.title,
+          class: 'object-cover w-full h-full'
+        %}
+      </div>
+    {%- elsif settings.product_fallback_image != blank -%}
+      <div class="[grid-area:1/1] aspect-[3/4]">
+        {% render 'image',
+          image: settings.product_fallback_image,
+          alt_fallback: product.title,
+          class: 'object-contain m-auto size-full p-20'
+        %}
+      </div>
+    {%- endif -%}
+
+    <!-- Overlay -->
+    {% render 'image-overlay',
+      class: '[grid-area:1/1] z-0'
+      opacity: '100%'
+    %}
+
+    <!-- Heading + description over image -->
+    {%- if event_description != blank -%}
+      <div class="[grid-area:1/1] hidden md:grid place-content-end grid-rows-[auto_0fr] group-hover:grid-rows-[auto_1fr] transition-[grid-template-rows] duration-200 z-10 h-fit mt-auto">
+
+        <div class="py-1 px-4">
+          {% render 'heading',
+            text: product.title,
+            level: resolved_heading_level,
+            class: 'text-xl text-balance'
+          %}
+        </div>
+        <div class="overflow-hidden">
+          <p class="px-4 pb-4 text-sm text-balance">{{ event_description }}</p>
+        </div>
+      </div>
+
+      <!-- Mobile heading (no animation) -->
+      <div class="[grid-area:1/1] flex items-end md:hidden z-10 p-4">
+        {% render 'heading',
+          text: product.title,
+          level: resolved_heading_level,
+          class: 'text-xl text-balance'
+        %}
+      </div>
+    {%- else -%}
+      <div class="[grid-area:1/1] flex items-end z-10 p-4">
+        {% render 'heading',
+          text: product.title,
+          level: resolved_heading_level,
+          class: 'text-xl text-balance'
+        %}
+      </div>
+    {%- endif -%}
+
+    <!-- Status badge -->
+    {%- if event_status != '' -%}
+      <div class="[grid-area:1/1] z-10 p-2" data-event-status="{{ event_status }}">
+        <span class="text-xs uppercase tracking-wide">
+          {{- event_status_key | t -}}
+        </span>
+      </div>
+    {%- endif -%}
+
+  </div>
+
+  <!-- Mobile: description below image -->
+  {%- if event_description != blank -%}
+    <p class="md:hidden text-sm px-4">{{ event_description }}</p>
+  {%- endif -%}
+</a>
