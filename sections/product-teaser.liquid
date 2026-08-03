@@ -7,7 +7,6 @@
   assign heading_id = 'product-teaser-' | append: section.id
 
   if teaser_product != blank
-    assign product_title = teaser_product.title
     assign product_url = teaser_product.url
     if teaser_image == blank
       assign teaser_image = teaser_product.featured_image
