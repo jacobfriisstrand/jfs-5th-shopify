@@ -1,5 +1,5 @@
 {% liquid
-  assign logo = block.settings.logo
+  assign logo = settings.logo
 %}
 
 <a
@@ -26,13 +26,6 @@
 {% schema %}
 {
   "name": "t:names.logo",
-  "tag": null,
-  "settings": [
-    {
-      "type": "image_picker",
-      "id": "logo",
-      "label": "t:settings.logo"
-    }
-  ]
+  "tag": null
 }
 {% endschema %}

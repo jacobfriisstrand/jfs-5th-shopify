@@ -1,0 +1,150 @@
+{% liquid
+  assign event_product = section.settings.event_product
+  assign teaser_title = section.settings.teaser_title
+  assign body = section.settings.body
+  assign cta_text = section.settings.cta_text | default: 'Learn more'
+  assign heading_id = 'next-event-teaser-' | append: section.id
+
+  if event_product != blank
+    assign variant = event_product.selected_or_first_available_variant
+    assign event_title = event_product.title
+    assign event_url = event_product.url
+    assign event_image = event_product.featured_image
+
+    assign event_data = variant.metafields.event_ticketing.event_v2.value
+    assign event_starts_at = event_data.starts_at
+
+    if event_starts_at == blank
+      assign product_event_data = event_product.metafields.event_ticketing.event_v2.value
+      assign event_starts_at = product_event_data.starts_at
+    endif
+
+    if event_starts_at != blank
+      assign day = event_starts_at | date: '%d' | plus: 0
+      if day >= 11 and day <= 13
+        assign ordinal = 'th'
+      else
+        assign day_mod = day | modulo: 10
+        if day_mod == 1
+          assign ordinal = 'st'
+        elsif day_mod == 2
+          assign ordinal = 'nd'
+        elsif day_mod == 3
+          assign ordinal = 'rd'
+        else
+          assign ordinal = 'th'
+        endif
+      endif
+      assign month_year = event_starts_at | date: '%B %Y'
+      assign event_date = day | append: ordinal | append: ' of ' | append: month_year
+    elsif event_data.date != blank
+      assign event_date = event_data.date
+    else
+      assign event_date = product_event_data.date
+    endif
+  endif
+%}
+
+{%- if event_product != blank -%}
+  <section
+    class="grid-12"
+    aria-labelledby="{{ heading_id }}"
+  >
+    <div class="col-content">
+      <div class="grid lg:grid-cols-3 lg:gap-x-10">
+        {% if teaser_title != blank %}
+          {% render 'heading',
+            text: teaser_title,
+            level: 2,
+            id: heading_id,
+            class: 'text-xl lg:text-4xl'
+          %}
+        {% endif %}
+
+        {% if event_title != blank %}
+          <p class="font-heading text-4xl lg:text-2xl">
+            {{ event_title }}
+          </p>
+        {% endif %}
+
+        {% if event_date != blank %}
+          <p class="font-heading text-xl lg:text-right">
+            {{ event_date }}
+          </p>
+        {% endif %}
+
+        {% if body != blank %}
+          <div class="max-lg:my-4 lg:col-start-2 lg:row-start-2">
+            {{ body }}
+          </div>
+        {% endif %}
+
+        {% render 'button',
+          text: cta_text,
+          href: event_url
+          class: 'lg:col-start-3 lg:w-fit lg:mt-auto lg:ml-auto'
+        %}
+      </div>
+
+       <div class="aspect-video my-8 lg:my-13 max-h-120 m-auto w-full">
+        {% if event_image != blank %}
+          {% render 'image',
+            image: event_image,
+            class: 'h-full w-full object-cover',
+            width_max: 1200,
+            widths: '480, 768, 1024, 1200',
+            sizes: '(max-width: 767px) 100vw, 50vw'
+          %}
+        {% elsif settings.product_fallback_image != blank %}
+          {% render 'image',
+            image: settings.product_fallback_image,
+            class: 'h-full w-full object-contain',
+            width_max: 1200,
+            widths: '480, 768, 1024, 1200',
+            sizes: '(max-width: 767px) 100vw, 50vw'
+          %}
+        {% endif %}
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.next_event_teaser",
+  "enabled_on": {
+    "templates": [
+      "index"
+    ]
+  },
+  "settings": [
+    {
+      "type": "product",
+      "id": "event_product",
+      "label": "t:settings.event_product"
+    },
+    {
+      "type": "text",
+      "id": "teaser_title",
+      "label": "t:settings.heading"
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "t:settings.body"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "t:settings.cta_text",
+      "default": "Learn more"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.next_event_teaser",
+      "category": "t:categories.banners"
+    }
+  ]
+}
+{% endschema %}
