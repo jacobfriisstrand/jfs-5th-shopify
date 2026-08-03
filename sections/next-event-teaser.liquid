@@ -82,11 +82,11 @@
         {% render 'button',
           text: cta_text,
           href: event_url
-          class: 'lg:col-start-1 lg:w-fit lg:mt-auto'
+          class: 'lg:col-start-3 lg:w-fit lg:mt-auto lg:ml-auto'
         %}
       </div>
 
-       <div class="aspect-video my-8 lg:my-13 max-h-120 m-auto">
+       <div class="aspect-video my-8 lg:my-13 max-h-120 m-auto w-full">
         {% if event_image != blank %}
           {% render 'image',
             image: event_image,

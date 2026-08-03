@@ -124,6 +124,9 @@ async function loadGlobalSettingIds(): Promise<Set<string>> {
   );
 }
 
+// Shopify system keys that live in settings_data.json but are not theme settings
+const SHOPIFY_SYSTEM_KEYS = new Set(["sections", "content_for_index"]);
+
 function collectUnknownKeys(
   file: string,
   path: string,
@@ -135,7 +138,7 @@ function collectUnknownKeys(
   if (!values || !validIds || validIds.size === 0) return [];
 
   return Object.keys(values)
-    .filter((key) => !validIds.has(key))
+    .filter((key) => !validIds.has(key) && !SHOPIFY_SYSTEM_KEYS.has(key))
     .map((key) => ({
       file,
       path: `${path}.${key}`,
