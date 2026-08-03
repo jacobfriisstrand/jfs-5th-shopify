@@ -1,0 +1,105 @@
+{% liquid
+  assign teaser_product = section.settings.product
+  assign title = section.settings.title
+  assign subtitle = section.settings.subtitle
+  assign teaser_image = section.settings.image
+  assign link_text = section.settings.link_text | default: 'Shop now'
+  assign heading_id = 'product-teaser-' | append: section.id
+
+  if teaser_product != blank
+    assign product_title = teaser_product.title
+    assign product_url = teaser_product.url
+    if teaser_image == blank
+      assign teaser_image = teaser_product.featured_image
+    endif
+  endif
+%}
+
+{%- if teaser_product != blank -%}
+  <section
+    class="grid-12"
+    aria-labelledby="{{ heading_id }}"
+  >
+    <div class="col-content grid place-items-start">
+      {% if teaser_image != blank %}
+        <div class="relative grid [grid-area:1/1]">
+          {% render 'image',
+            image: teaser_image,
+            class: 'h-full w-full object-cover aspect-3/4 lg:aspect-video',
+            width_max: 1200,
+            widths: '480, 768, 1024, 1200',
+            sizes: '100vw'
+          %}
+          {% render 'image-overlay', opacity: '75%' %}
+        </div>
+      {% endif %}
+
+      <div class="[grid-area:1/1] mt-auto p-4 z-10 space-y-4">
+        <div>
+          {% if title != blank %}
+            {% render 'heading',
+              text: title,
+              level: 2,
+              id: heading_id,
+              class: 'text-4xl lg:text-6xl'
+            %}
+          {% endif %}
+          {% if subtitle != blank %}
+            <p>
+              {{ subtitle }}
+            </p>
+          {% endif %}
+        </div>
+
+        {% if link_text != blank %}
+          {% render 'button',
+            text: link_text,
+            variant: 'link',
+            href: product_url,
+            class: 'w-fit'
+          %}
+        {% endif %}
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.product_teaser",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:settings.product"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:settings.heading"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "t:settings.subheading"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:settings.image"
+    },
+    {
+      "type": "text",
+      "id": "link_text",
+      "label": "t:settings.cta_text",
+      "default": "Shop now"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_teaser",
+      "category": "t:categories.banners"
+    }
+  ]
+}
+{% endschema %}
