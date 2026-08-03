@@ -12,4 +12,5 @@
 @theme {
   --color-background: var(--color-dark);
   --color-foreground: var(--color-light);
+  --color-brand: var(--color-brand);
 }
