@@ -47,11 +47,7 @@
           "blocks": {}
         }
       },
-      "block_order": [
-        "image_Yqw3Gg",
-        "image_qtVFRY",
-        "image_zJmQMA"
-      ],
+      "block_order": ["image_Yqw3Gg", "image_qtVFRY", "image_zJmQMA"],
       "name": "t:names.vertical_image_block",
       "settings": {
         "heading": "Who we are",
