@@ -16,7 +16,8 @@
   must be string literals in Liquid, hence the explicit dispatch.
 
   @param {string} icon - Name of the icon to render. One of: `search`,
-    `cart`, `user`, `error`, `close`, `play`, `pause`, `arrow-up-right`.
+    `cart`, `user`, `error`, `close`, `play`, `pause`, `arrow-up-right`,
+    `arrow-left`, `arrow-right`.
   @param {number} [size] - Width and height of the box in pixels.
     Defaults to 16.
   @param {string} [class] - Extra CSS classes to add to the `<svg>`.
@@ -41,6 +42,10 @@
     {%- render 'icon-play', size: size, icon_class: class -%}
   {%- when 'pause' -%}
     {%- render 'icon-pause', size: size, icon_class: class -%}
+  {%- when 'arrow-left' -%}
+    {%- render 'icon-arrow-left', size: size, icon_class: class -%}
+  {%- when 'arrow-right' -%}
+    {%- render 'icon-arrow-right', size: size, icon_class: class -%}
   {%- when 'arrow-up-right' -%}
     {%- render 'icon-arrow-up-right', size: size, icon_class: class -%}
 {%- endcase -%}

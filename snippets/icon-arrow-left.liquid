@@ -1,7 +1,6 @@
 {% doc %}
-  The `arrow-up-right` icon as a complete inline `<svg>`. Render via the
-  `icon` wrapper rather than directly:
-  `{% render 'icon', icon: 'arrow-up-right' %}`.
+  Left arrow icon for carousel prev buttons.
+  `{% render 'icon', icon: 'arrow-left' %}`.
 
   @param {number} [size] - Width and height in pixels. Defaults to 16.
   @param {string} [icon_class] - Extra CSS classes for the `<svg>`.
@@ -20,8 +19,8 @@
   stroke-width="1.5"
   focusable="false"
   aria-hidden="true"
-  class="icon icon-arrow-up-right{% if icon_extra_class != '' %} {{ icon_extra_class }}{% endif %}"
+  class="icon icon-arrow-left{% if icon_extra_class != '' %} {{ icon_extra_class }}{% endif %}"
 >
-  <line x1="7" y1="17" x2="17" y2="7" />
-  <polyline points="7 7 17 7 17 17" />
+  <line x1="19" y1="12" x2="5" y2="12" />
+  <polyline points="12 19 5 12 12 5" />
 </svg>
