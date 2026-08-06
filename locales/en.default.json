@@ -146,6 +146,13 @@
     },
     "log_out": "Log out"
   },
+  "footer": {
+    "improve": "Improve",
+    "and": "and",
+    "empower": "empower",
+    "instagram": "Instagram",
+    "tiktok": "TikTok"
+  },
   "content": {
     "discount": "Discount",
     "discount_savings": "You save",

@@ -386,6 +386,7 @@ export interface SectionSchema {
   tag?: string | null;
   class?: string;
   limit?: number;
+  max_blocks?: number;
   settings?: ShopifySetting[];
   blocks?: BlockReference[];
   presets?: SectionPreset[];
