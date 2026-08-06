@@ -1,6 +1,7 @@
-# Used by `vp fmt` (oxfmt) as the ignore source when no .oxfmtrc is present.
-# Keep Liquid files away from oxfmt — it parses them as HTML and silently
-# rewrites Liquid filter chains (e.g. `image_tag: a, b, c | append: 'px'`
-# becomes `image_tag: a | append: 'px'`), which changes the rendered output.
-# Liquid is formatted via the Shopify VS Code extension on save instead.
-*.liquid
+# Liquid is intentionally NOT listed here.
+# The Shopify theme-check-vscode formatter (the on-save formatter for
+# `.liquid` files, see .vscode/settings.json) skips any file matched by
+# this file, so listing `*.liquid` here would disable formatting entirely.
+# Keep Liquid out of `vp fmt` (oxfmt) via .oxfmtrc.json instead — oxfmt
+# would otherwise parse it as HTML and silently rewrite Liquid filter
+# chains, changing rendered output.
