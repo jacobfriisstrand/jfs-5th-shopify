@@ -14,26 +14,24 @@
     "footer": {
       "type": "footer",
       "blocks": {
-        "menu-support": {
+        "menu-company": {
           "type": "menu",
           "settings": {
-            "heading": "Support",
             "menu": "footer"
           },
           "blocks": {}
         },
-        "menu-company": {
+        "menu-support": {
           "type": "menu",
           "settings": {
-            "heading": "Company",
-            "menu": "footer"
+            "menu": "footer",
+            "show_legal_links": true
           },
           "blocks": {}
         },
         "menu-shop": {
           "type": "menu",
           "settings": {
-            "heading": "Shop",
             "menu": "main-menu"
           },
           "blocks": {}
@@ -43,15 +41,9 @@
           "static": true,
           "settings": {},
           "blocks": {}
-        },
-        "footer-policy-list": {
-          "type": "footer-policy-list",
-          "static": true,
-          "settings": {},
-          "blocks": {}
         }
       },
-      "block_order": ["menu-support", "menu-company", "menu-shop"],
+      "block_order": ["menu-company", "menu-support", "menu-shop"],
       "settings": {}
     }
   },
