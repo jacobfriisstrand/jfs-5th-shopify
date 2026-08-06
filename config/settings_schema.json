@@ -45,6 +45,21 @@
     ]
   },
   {
+    "name": "Social",
+    "settings": [
+      {
+        "type": "url",
+        "id": "instagram_url",
+        "label": "Instagram URL"
+      },
+      {
+        "type": "url",
+        "id": "tiktok_url",
+        "label": "TikTok URL"
+      }
+    ]
+  },
+  {
     "name": "Cart",
     "settings": [
       {

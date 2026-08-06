@@ -8,18 +8,60 @@
   footer navigations stay byte-identical at the link level.
 {% endcomment %}
 
-{%- assign linklist = linklists[block.settings.menu] -%}
+{% liquid
+  assign linklist = linklists[block.settings.menu]
+  assign nav_label = linklist.title
+  assign show_legal_links = block.settings.show_legal_links
+  assign privacy_policy = blank
+  for policy in shop.policies
+    if policy.url contains 'privacy-policy'
+      assign privacy_policy = policy
+      break
+    endif
+  endfor
+
+  assign cookie_policy = blank
+  for policy in shop.policies
+    if policy.url contains 'shopifyReshowConsentBanner'
+      assign cookie_policy = policy
+      break
+    endif
+  endfor
+%}
+
 {%- if linklist != blank and linklist.links.size > 0 -%}
-  {%- assign nav_label = block.settings.heading | default: linklist.title -%}
   <nav data-menu aria-label="{{ nav_label | escape }}" class="flex flex-col gap-3">
-    {%- if block.settings.heading != blank -%}
-      <h2 class="text-sm font-semibold uppercase tracking-wide">{{ block.settings.heading | escape }}</h2>
-    {%- endif -%}
     {%- render 'menu-list',
       linklist: linklist,
       list_classes: 'flex flex-col gap-2 text-sm',
-      link_classes: 'underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
+      link_classes: 'link'
     -%}
+    {%- if show_legal_links -%}
+      {%- if privacy_policy != blank or cookie_policy != blank -%}
+      <ul role="list" class="flex flex-col gap-2 text-sm">
+        {%- if privacy_policy != blank -%}
+          <li>
+            <a
+              href="{{ privacy_policy.url }}"
+              class="link"
+            >
+              {{- privacy_policy.title -}}
+            </a>
+          </li>
+        {%- endif -%}
+        {%- if cookie_policy != blank -%}
+          <li>
+            <a
+              href="{{ cookie_policy.url }}"
+              class="link"
+            >
+              {{- cookie_policy.title -}}
+            </a>
+          </li>
+        {%- endif -%}
+      </ul>
+      {%- endif -%}
+    {%- endif -%}
   </nav>
 {%- endif -%}
 
@@ -29,15 +71,16 @@
   "tag": null,
   "settings": [
     {
-      "type": "text",
-      "id": "heading",
-      "label": "t:content.heading"
-    },
-    {
       "type": "link_list",
       "id": "menu",
       "label": "t:content.menu",
       "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_legal_links",
+      "label": "t:content.show_legal_links",
+      "default": false
     }
   ],
   "presets": [
