@@ -316,6 +316,7 @@
     "email_signup": "Email signup",
     "excerpt": "Excerpt",
     "event_card": "Event card",
+    "events_collection": "Events collection",
     "facets": "Facets",
     "faq_section": "FAQ",
     "featured_collection": "Featured collection",
@@ -329,6 +330,7 @@
     // Footer block containing copyright, policies, and social links
     "footer_utilities": "Footer utilities",
     "grid_layout_selector": "Grid layout selector",
+    "generic_header": "Generic header",
     // Layout container block that groups other content
     "group": "Group",
     "header": "Header",
