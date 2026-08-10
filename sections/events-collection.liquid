@@ -1,0 +1,105 @@
+{%- comment -%}
+  events-collection: renders all events from a collection in a single grid.
+  Sort controlled by html[data-event-sort] set by generic-header toggle.
+  Each card carries its own status badge (rendered by event-card snippet).
+{%- endcomment -%}
+
+{%- liquid
+  assign cta_text = section.settings.cta_text | default: 'View event'
+  assign now_ts = 'now' | date: '%s' | plus: 0
+  assign section_id = section.id
+-%}
+
+<style>
+  html[data-event-sort="all"] .events-sort-all-{{ section_id }},
+  html[data-event-sort="upcoming"] .events-sort-upcoming-{{ section_id }},
+  html[data-event-sort="previous"] .events-sort-previous-{{ section_id }} {
+    display: block;
+  }
+</style>
+
+<section
+  class="grid-12"
+  aria-label="{{ 'sections.events.label' | t }}"
+>
+  <div class="col-content flex flex-col gap-8">
+    {%- if collection.products.size > 0 -%}
+      {%- comment -%} All events (upcoming-first order) {%- endcomment -%}
+      <div class="events-sort-all-{{ section_id }} hidden">
+        <ul role="list" class="grid gap-20 lg:gap-40">
+          {%- for product in collection.products -%}
+            {%- assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0 -%}
+            {%- if start_ts > now_ts -%}
+              <li>
+                {%- render 'event-card-plp', product: product, heading_level: 3, cta_text: cta_text -%}
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+          {%- for product in collection.products -%}
+            {%- assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0 -%}
+            {%- unless start_ts > now_ts -%}
+              <li>
+                {%- render 'event-card-plp', product: product, heading_level: 3, cta_text: cta_text -%}
+              </li>
+            {%- endunless -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+
+      {%- comment -%} Upcoming only {%- endcomment -%}
+      <div class="events-sort-upcoming-{{ section_id }} hidden">
+        <ul role="list" class="grid gap-40">
+          {%- for product in collection.products -%}
+            {%- assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0 -%}
+            {%- if start_ts > now_ts -%}
+              <li>
+                {%- render 'event-card-plp', product: product, heading_level: 3, cta_text: cta_text -%}
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+
+      {%- comment -%} Previous only {%- endcomment -%}
+      <div class="events-sort-previous-{{ section_id }} hidden">
+        <ul role="list" class="grid gap-40">
+          {%- for product in collection.products -%}
+            {%- assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0 -%}
+            {%- unless start_ts > now_ts -%}
+              <li>
+                {%- render 'event-card-plp', product: product, heading_level: 3, cta_text: cta_text -%}
+              </li>
+            {%- endunless -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- else -%}
+      <p>{{ 'content.no_products_found' | t }}</p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "t:names.events_collection",
+  "enabled_on": {
+    "templates": [
+      "collection"
+    ]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "t:settings.cta_text",
+      "default": "View event"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.events_collection",
+      "category": "t:categories.product_list"
+    }
+  ]
+}
+{% endschema %}

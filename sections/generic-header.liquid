@@ -1,0 +1,158 @@
+{%- comment -%}
+  generic-header: full-bleed hero section with image, heading, and subheading.
+  On collection templates, falls back to collection.image / collection.title
+  when no explicit settings are provided. On collection.events, includes
+  event sort toggle (All / Upcoming / Previous).
+{%- endcomment -%}
+
+{%- liquid
+  assign heading = section.settings.heading
+  assign subheading = section.settings.subheading
+  assign image = section.settings.image
+
+  if heading == blank and collection != blank
+    assign heading = collection.title
+  endif
+  if image == blank and collection != blank
+    assign image = collection.image
+  endif
+
+  assign sort_id = 'event-sort-' | append: section.id
+
+  if template.name == 'collection' and template.suffix == 'events' and collection != blank
+    assign now_ts = 'now' | date: '%s' | plus: 0
+    assign upcoming_count = 0
+    assign previous_count = 0
+    for product in collection.products
+      assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0
+      if start_ts > now_ts
+        assign upcoming_count = upcoming_count | plus: 1
+      else
+        assign previous_count = previous_count | plus: 1
+      endif
+    endfor
+    assign all_count = upcoming_count | plus: previous_count
+    assign sort_all_label = 'sections.events.sort_all' | t | append: ' (' | append: all_count | append: ')'
+    assign sort_upcoming_label = 'sections.events.sort_upcoming' | t | append: ' (' | append: upcoming_count | append: ')'
+    assign sort_previous_label = 'sections.events.sort_previous' | t | append: ' (' | append: previous_count | append: ')'
+    assign sort_all_id = sort_id | append: '-all'
+    assign sort_upcoming_id = sort_id | append: '-upcoming'
+    assign sort_previous_id = sort_id | append: '-previous'
+  endif
+-%}
+
+<section class="grid-12 -mt-[calc(var(--header-height)+var(--announcement-bar-height,0))]">
+  {%- if image != blank -%}
+    <div class="full-bleed relative">
+      {% render 'image',
+        image: image,
+        priority: 'lcp',
+        class: 'h-[50svh] lg:h-[60svh] w-full object-cover',
+        width_max: 3000,
+        widths: '480, 768, 1024, 1440, 1920, 2560, 3000',
+        sizes: '100vw'
+      %}
+      {% render 'image-overlay', direction: 'top', opacity: '70%' %}
+    </div>
+  {%- endif -%}
+
+  <div class="col-content pt-10 lg:pt-14 flex justify-between items-end flex-wrap gap-10">
+    <div>
+      {%- if heading != blank -%}
+        {% render 'heading', text: heading, level: 1, class: 'text-3xl lg:text-5xl' %}
+      {%- endif -%}
+      {%- if subheading != blank -%}
+        <p class="lg:mt-4 text-base max-w-sm">
+          {{- subheading | escape -}}
+        </p>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} Event sort toggle {%- endcomment -%}
+    {%- if template.name == 'collection' and template.suffix == 'events' -%}
+      <fieldset class="flex gap-2" role="radiogroup" aria-label="{{ 'actions.sort' | t }}">
+        <legend class="sr-only">{{ 'actions.sort' | t }}</legend>
+
+        {% render 'sort-button',
+          id: sort_all_id,
+          name: sort_id,
+          value: 'all',
+          text: sort_all_label,
+          checked: true
+        %}
+
+        {% render 'sort-button',
+          id: sort_upcoming_id,
+          name: sort_id,
+          value: 'upcoming',
+          text: sort_upcoming_label
+        %}
+
+        {% render 'sort-button',
+          id: sort_previous_id,
+          name: sort_id,
+          value: 'previous',
+          text: sort_previous_label
+        %}
+      </fieldset>
+
+      <style>
+        input[name="{{ sort_id }}"]:checked + label {
+          background: var(--color-foreground);
+          color: var(--color-background);
+          border-color: var(--color-foreground);
+        }
+      </style>
+
+      <script>
+        (function () {
+          var radios = document.querySelectorAll('input[name="{{ sort_id }}"]');
+          var set = function (v) {
+            document.documentElement.setAttribute('data-event-sort', v);
+          };
+          radios.forEach(function (r) {
+            r.addEventListener('change', function () {
+              set(r.value);
+            });
+            if (r.checked) set(r.value);
+          });
+        })();
+      </script>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "t:names.generic_header",
+  "enabled_on": {
+    "templates": [
+      "page",
+      "collection"
+    ]
+  },
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:settings.image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:settings.heading"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "t:settings.subheading"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.generic_header",
+      "category": "t:categories.banners"
+    }
+  ]
+}
+{% endschema %}
