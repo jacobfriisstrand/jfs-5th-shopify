@@ -72,10 +72,15 @@ trap cleanup EXIT
 #                    src/schemas/** and intentionally diverges; same ignore
 #                    as the `theme dev --theme-editor-sync` invocation below
 echo "[dev] Aligning remote dev theme with local files..."
-shopify theme push \
+if ! shopify theme push \
   --development \
   --nodelete \
-  --json >/dev/null
+  --json; then
+  echo "[dev] ERROR: shopify theme push failed. Run it manually to diagnose:" >&2
+  echo "  shopify theme push --development --nodelete --json" >&2
+  echo "[dev] Then re-run bin/dev.sh." >&2
+  exit 1
+fi
 
 # 4. Start `shopify theme dev` in the background, mirroring its output to a
 #    log file so we can grep for the "Preview your theme" ready banner.
@@ -84,7 +89,6 @@ SHOPIFY_LOG=$(mktemp -t shopify-dev.XXXXXX)
 
 shopify theme dev \
   --live-reload=hot-reload \
-  --theme-editor-sync \
   --ignore "config/settings_data.json" \
   "${STORE_PASSWORD_FLAG[@]}" \
   2>&1 | tee "$SHOPIFY_LOG" &
