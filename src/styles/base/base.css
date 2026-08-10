@@ -130,5 +130,6 @@ video-toggle video {
 :root {
   /* Header height is measured dynamically by header-component via
      ResizeObserver. This is a fallback for the first paint frame. */
-  --header-height: 64px;
+  --header-height: 75px;
+  --announcement-bar-height: 36px;
 }

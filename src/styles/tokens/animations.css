@@ -167,6 +167,20 @@ dialog[data-drawer="bottom"].dialog-closing {
   }
 }
 
+/* -------------------------------------------------------------------------- */
+/* Announcement bar marquee                                                   */
+/* -------------------------------------------------------------------------- */
+
+@keyframes marquee {
+  to {
+    translate: -10% 0;
+  }
+}
+
+@utility animate-marquee {
+  animation: marquee var(--marquee-duration, 20s) linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

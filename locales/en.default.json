@@ -46,7 +46,8 @@
     "video": "Video",
     "notifications": "Notifications",
     "unit_price": "Unit price",
-    "find_country": "Find country"
+    "find_country": "Find country",
+    "announcement_bar": "Announcement bar"
   },
   "blocks": {
     "newsletter_signup": {
