@@ -219,22 +219,29 @@ class HeaderComponent extends Component {
     }
   }
 
-  /** Keep --header-height in sync with actual rendered header height. */
+  /** Keep --header-height in sync with header, --announcement-bar-height with bar. */
   #observeHeaderHeight() {
     const group = document.getElementById("header-group");
+    const bar = document.querySelector<HTMLElement>(".announcement-bar aside");
     if (!group) return;
-    const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const h = entry.borderBoxSize?.[0]?.blockSize;
-        if (h) {
-          document.documentElement.style.setProperty(
-            "--header-height",
-            `${h}px`,
-          );
-        }
+
+    const update = () => {
+      document.documentElement.style.setProperty(
+        "--header-height",
+        `${group.offsetHeight}px`,
+      );
+      if (bar) {
+        document.documentElement.style.setProperty(
+          "--announcement-bar-height",
+          `${bar.offsetHeight}px`,
+        );
       }
-    });
+    };
+
+    update();
+    const ro = new ResizeObserver(() => update());
     ro.observe(group);
+    if (bar) ro.observe(bar);
   }
 
   #toggleMobileNav() {

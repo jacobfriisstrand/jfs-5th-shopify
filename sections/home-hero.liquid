@@ -7,7 +7,7 @@
   assign button_link = section.settings.button_link
 %}
 
-<section class="relative -mt-[var(--header-height)] isolate w-full overflow-hidden bg-background text-foreground min-h-[110dvh]">
+<section class="relative -mt-[calc(var(--header-height)+var(--announcement-bar-height,0px))] isolate w-full overflow-hidden bg-background text-foreground min-h-[110dvh]">
   {%- if video != blank -%}
     <div class="absolute inset-0 -z-10 bg-black" style="background-color: #000">
       {% render 'video',

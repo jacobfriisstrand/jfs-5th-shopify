@@ -24,6 +24,7 @@
     {% render 'page-transition' %}
     <script defer src="{{ 'video-blur.js' | asset_url }}"></script>
     {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
+    {% section 'announcement-bar' %}
     <div id="header-group">
       {% sections 'header-group' %}
     </div>
