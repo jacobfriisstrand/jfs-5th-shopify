@@ -16,7 +16,7 @@
   assign contact_email = shop.email
 %}
 
-<div class="grid-12 mt-20">
+<div class="grid-12 mt-20 lg:mt-40">
   <div class="col-content flex flex-col gap-8">
     {%- if section.blocks.size > 0 -%}
       <div data-footer-menus class="flex max-lg:flex-col justify-between gap-10">
@@ -97,9 +97,7 @@
   "name": "t:names.footer",
   "max_blocks": 3,
   "enabled_on": {
-    "groups": [
-      "footer"
-    ]
+    "groups": ["footer"]
   },
   "blocks": [
     {
