@@ -1,0 +1,99 @@
+{% doc %}
+  Renders an event product card for PLP (product list page) grids.
+  Three-column layout: image center, date + title left, description + CTA right.
+
+  Reads custom.event_start_date and custom.event_end_date metafields to
+  determine event status and formatted date.
+
+  @param {product} product - The product to render. Required.
+  @param {number} [heading_level] - Heading level for the product title. Defaults to 3.
+  @param {string} [cta_text] - CTA button label. Optional. Defaults to 'View event'.
+
+  @example
+  {% render 'event-card-plp', product: product, heading_level: 3, cta_text: 'View event' %}
+{% enddoc %}
+
+{% liquid
+  assign resolved_heading_level = heading_level | default: 3
+  assign resolved_cta_text = cta_text | default: 'View event'
+
+  assign now_ts = 'now' | date: '%s' | plus: 0
+  assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0
+  assign end_ts = product.metafields.custom.event_end_date | date: '%s' | plus: 0
+
+  assign event_status = ''
+  if start_ts != 0
+    if start_ts > now_ts
+      assign event_status = 'upcoming'
+    elsif end_ts != 0 and end_ts >= now_ts
+      assign event_status = 'ongoing'
+    else
+      assign event_status = 'previous'
+    endif
+    assign event_status_key = 'sections.event.status.' | append: event_status
+    assign event_status_label = event_status_key | t
+    if event_status == 'upcoming' or event_status == 'ongoing'
+      assign badge_variant = 'brand'
+    else
+      assign badge_variant = 'dark'
+    endif
+  endif
+
+  assign event_date = product.metafields.custom.event_start_date
+  if event_date != blank
+    assign event_date_formatted = event_date | date: '%B %d, %Y'
+  endif
+
+  assign event_description = product.description | strip_html | truncate: 120
+%}
+
+<div class="grid lg:grid-cols-[1fr_2fr_1fr] gap-x-4 gap-y-3">
+  {%- comment -%} Image with badge overlay {%- endcomment -%}
+  <div class="grid lg:col-start-2 lg:row-span-4">
+    {%- if product.featured_image != blank -%}
+      <div class="[grid-area:1/1] aspect-video overflow-hidden">
+        {% render 'image',
+          image: product.featured_image,
+          alt_fallback: product.title,
+          class: 'h-full w-full object-cover'
+        %}
+      </div>
+    {%- elsif settings.product_fallback_image != blank -%}
+      <div class="[grid-area:1/1] aspect-video overflow-hidden">
+        {% render 'image',
+          image: settings.product_fallback_image,
+          alt_fallback: product.title,
+          class: 'h-full w-full object-contain'
+        %}
+      </div>
+    {%- endif -%}
+
+    {%- if event_status != '' -%}
+      <div class="[grid-area:1/1] z-10 p-2">
+        {% render 'badge', text: event_status_label, variant: badge_variant %}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} Date {%- endcomment -%}
+  {%- if event_date_formatted != blank -%}
+    <p class="lg:col-start-1 lg:row-start-4 text-2xl lg:text-4xl font-heading mt-auto leading-1">
+      {{ event_date_formatted }}
+    </p>
+  {%- endif -%}
+
+  {%- comment -%} Title {%- endcomment -%}
+  <div class="col-start-1 row-start-1">
+    {% render 'heading', text: product.title, level: resolved_heading_level, class: 'text-2xl' %}
+  </div>
+
+  {%- comment -%} Description {%- endcomment -%}
+  {%- if event_description != blank -%}
+    <p class="lg:col-start-3 text-sm lg:text-base lg:row-start-1 text-balance">{{ event_description }}</p>
+  {%- endif -%}
+
+  {%- comment -%} CTA button {%- endcomment -%}
+  <div class="lg:col-start-3 lg:row-start-4 mt-auto">
+    {% render 'button', text: resolved_cta_text, href: product.url, class: 'w-fit lg:ml-auto' %}
+  </div>
+</div>

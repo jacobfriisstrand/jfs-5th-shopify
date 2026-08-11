@@ -30,36 +30,32 @@
 %}
 
 {%- if linklist != blank and linklist.links.size > 0 -%}
-  <nav data-menu aria-label="{{ nav_label | escape }}" class="flex flex-col gap-3">
-    {%- render 'menu-list',
-      linklist: linklist,
-      list_classes: 'flex flex-col gap-2 text-sm',
-      link_classes: 'link'
-    -%}
+  <nav data-menu aria-label="{{ nav_label | escape }}" class="flex flex-col gap-2">
+    {%- render 'menu-list', linklist: linklist, list_classes: 'flex flex-col gap-2 text-sm', link_classes: 'link' -%}
     {%- if show_legal_links -%}
       {%- if privacy_policy != blank or cookie_policy != blank -%}
-      <ul role="list" class="flex flex-col gap-2 text-sm">
-        {%- if privacy_policy != blank -%}
-          <li>
-            <a
-              href="{{ privacy_policy.url }}"
-              class="link"
-            >
-              {{- privacy_policy.title -}}
-            </a>
-          </li>
-        {%- endif -%}
-        {%- if cookie_policy != blank -%}
-          <li>
-            <a
-              href="{{ cookie_policy.url }}"
-              class="link"
-            >
-              {{- cookie_policy.title -}}
-            </a>
-          </li>
-        {%- endif -%}
-      </ul>
+        <ul role="list" class="flex flex-col gap-2 text-sm">
+          {%- if privacy_policy != blank -%}
+            <li>
+              <a
+                href="{{ privacy_policy.url }}"
+                class="link"
+              >
+                {{- privacy_policy.title -}}
+              </a>
+            </li>
+          {%- endif -%}
+          {%- if cookie_policy != blank -%}
+            <li>
+              <a
+                href="{{ cookie_policy.url }}"
+                class="link"
+              >
+                {{- cookie_policy.title -}}
+              </a>
+            </li>
+          {%- endif -%}
+        </ul>
       {%- endif -%}
     {%- endif -%}
   </nav>

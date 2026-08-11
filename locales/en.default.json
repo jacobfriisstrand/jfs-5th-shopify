@@ -301,6 +301,12 @@
     }
   },
   "sections": {
+    "events": {
+      "label": "Events",
+      "sort_all": "All events",
+      "sort_upcoming": "Upcoming",
+      "sort_previous": "Previous"
+    },
     "featured_collection": {
       "label": "Featured collection"
     },

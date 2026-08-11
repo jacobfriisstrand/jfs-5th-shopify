@@ -12,9 +12,12 @@
   @param {product} product - The product to render. Required.
   @param {number} [heading_level] - Heading level for the product title.
     Defaults to 3.
+  @param {string} [cta_text] - Optional CTA button label. When provided,
+    a styled button appears at the bottom of the card. The entire card
+    already links to the product URL.
 
   @example
-  {% render 'event-card', product: item, heading_level: 3 %}
+  {% render 'event-card', product: item, heading_level: 3, cta_text: 'View event' %}
 {% enddoc %}
 
 {% liquid
@@ -25,15 +28,21 @@
   assign end_ts = product.metafields.custom.event_end_date | date: '%s' | plus: 0
 
   assign event_status = ''
-  if start_ts != 0 and end_ts != 0
+  if start_ts != 0
     if start_ts > now_ts
       assign event_status = 'upcoming'
-    elsif start_ts <= now_ts and end_ts >= now_ts
+    elsif end_ts != 0 and end_ts >= now_ts
       assign event_status = 'ongoing'
     else
       assign event_status = 'previous'
     endif
     assign event_status_key = 'sections.event.status.' | append: event_status
+    assign event_status_label = event_status_key | t
+    if event_status == 'upcoming' or event_status == 'ongoing'
+      assign badge_variant = 'brand'
+    else
+      assign badge_variant = 'dark'
+    endif
   endif
 
   assign event_description = product.description | strip_html | truncate: 120
@@ -105,10 +114,8 @@
 
     <!-- Status badge -->
     {%- if event_status != '' -%}
-      <div class="[grid-area:1/1] z-10 p-2" data-event-status="{{ event_status }}">
-        <span class="text-xs uppercase tracking-wide">
-          {{- event_status_key | t -}}
-        </span>
+      <div class="[grid-area:1/1] z-10 p-2">
+        {% render 'badge', text: event_status_label, variant: badge_variant, class: 'uppercase tracking-wide' %}
       </div>
     {%- endif -%}
 
@@ -117,5 +124,12 @@
   <!-- Mobile: description below image -->
   {%- if event_description != blank -%}
     <p class="md:hidden text-sm px-4">{{ event_description }}</p>
+  {%- endif -%}
+
+  <!-- CTA button affordance -->
+  {%- if cta_text != blank -%}
+    <span class="inline-block mt-3 rounded-input border border-foreground/20 px-4 py-2 text-sm font-medium transition-colors group-hover:bg-foreground group-hover:text-background">
+      {{- cta_text | escape -}}
+    </span>
   {%- endif -%}
 </a>

@@ -280,13 +280,15 @@
   @media (min-width: 768px) {
     position: fixed;
     inset: auto;
-    top: var(--header-height, 0);
+    top: calc(var(--header-height, 0px) + var(--announcement-bar-height, 0px));
     left: 0;
     right: 0;
     /* Sits behind the header (z:40) so the nav bar stays on top. */
     z-index: 39;
     height: auto;
-    max-height: calc(100dvh - var(--header-height, 0px));
+    max-height: calc(
+      100dvh - var(--header-height, 0px) - var(--announcement-bar-height, 0px)
+    );
   }
 }
 
@@ -309,7 +311,8 @@ dialog.header-menu-megamenu::backdrop {
   inset: 0;
 
   @media (min-width: 768px) {
-    inset: var(--header-height, 0) 0 0 0;
+    inset: calc(var(--header-height, 0px) + var(--announcement-bar-height, 0px))
+      0 0 0;
   }
 }
 

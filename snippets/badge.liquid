@@ -1,0 +1,35 @@
+{% doc %}
+  Renders a badge/pill.
+
+  @param {string} text - The badge text. Required.
+  @param {string} [variant] - 'light', 'dark', or 'brand'. Default: 'dark'.
+  @param {string} [class] - Extra classes appended to the badge.
+
+  @example
+  {% render 'badge', text: 'Upcoming', variant: 'light' %}
+  {% render 'badge', text: 'Sold out', variant: 'dark' %}
+  {% render 'badge', text: 'Save 20%', variant: 'brand' %}
+{% enddoc %}
+
+{% liquid
+  assign variant_classes = 'bg-foreground text-background'
+
+  case variant
+    when 'light'
+      assign variant_classes = 'bg-background text-foreground border border-foreground/20'
+    when 'brand'
+      assign variant_classes = 'text-white'
+      assign brand_style = 'background: var(--color-brand)'
+    else
+      assign variant_classes = 'bg-foreground text-background'
+  endcase
+%}
+
+<span
+  class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium w-fit {{ variant_classes }} {{ class }}"
+  {% if brand_style %}
+    style="{{ brand_style }}"
+  {% endif %}
+>
+  {{- text -}}
+</span>
