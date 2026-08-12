@@ -9,15 +9,6 @@
   assign accordion_product_specifications = product.metafields.custom.product_specifications
   assign accordion_care = product.metafields.custom.care
   assign accordion_shipping = product.metafields.custom.shipping
-  assign has_accordion = false
-  if accordion_details != blank or accordion_product_specifications != blank or accordion_care != blank or accordion_shipping != blank
-    assign has_accordion = true
-  endif
-
-  capture is_event_product
-    render '_is-event-product', product: product
-  endcapture
-  assign is_event_product = is_event_product | strip
 
   assign accordion_label_details = 'products.product.accordion.details' | t
   assign accordion_label_product_specifications = 'products.product.accordion.product_specifications' | t
@@ -39,6 +30,18 @@
   assign event_label_practical_information = 'sections.event.practical_information' | t
   assign event_label_partners = 'sections.event.partners' | t
   assign event_label_disclaimer = 'sections.event.disclaimer' | t
+
+  assign now_ts = 'now' | date: '%s' | plus: 0
+  assign event_end_ts = product.metafields.custom.event_end_date | date: '%s' | plus: 0
+  assign event_start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0
+  assign event_is_past = false
+  if event_end_ts != 0
+    if event_end_ts < now_ts
+      assign event_is_past = true
+    endif
+  elsif event_start_ts != 0 and event_start_ts < now_ts
+    assign event_is_past = true
+  endif
 %}
 <script src="{{ 'product-form.js'  | asset_url }}" type="module" fetchpriority="low"></script>
 <script src="{{ 'product-price.js' | asset_url }}" type="module" fetchpriority="low"></script>
@@ -47,33 +50,77 @@
 <script src="{{ 'swiper-carousel.js' | asset_url }}" type="module" fetchpriority="low"></script>
 
 <section
-  class="grid-12 py-12 sm:py-16"
+  class="grid-12 pt-4 lg:pt-8"
   aria-labelledby="main-product-{{ section.id }}-title"
 >
   <div class="col-content grid gap-8 md:grid-cols-2 md:gap-12">
-    <div>
+    <div
+      class="md:self-start md:sticky"
+      style="top: calc(var(--header-height, 0px) + var(--announcement-bar-height, 0px) + 2rem)"
+    >
       {% render 'product-gallery', product: product %}
     </div>
     <div class="flex flex-col gap-6">
       {% content_for 'block', id: 'product-title', type: 'product-title' %}
-      {% content_for 'block', id: 'bundle-offer-pill', type: 'bundle-offer-pill' %}
-      {% content_for 'block', id: 'price', type: 'price' %}
+      {%- if product.metafields.custom.bundle_offer_pill != blank -%}
+        {% content_for 'block', id: 'bundle-offer-pill', type: 'bundle-offer-pill' %}
+      {%- endif -%}
       {% content_for 'block', id: 'product-description', type: 'product-description' %}
-      {% content_for 'block', id: 'variant-picker', type: 'variant-picker' %}
-      {% render 'product-size-guide', product: product, section_id: section.id %}
-      {% content_for 'block', id: 'quantity', type: 'quantity' %}
-      {% content_for 'block', id: 'add-to-cart', type: 'add-to-cart' %}
-      {% content_for 'block', id: 'buy-buttons', type: 'buy-buttons' %}
-      {%- if is_event_product != 'true' and has_accordion -%}
+      {% content_for 'block', id: 'price', type: 'price' %}
+      {%- unless event_is_past -%}
+        {% content_for 'block', id: 'variant-picker', type: 'variant-picker' %}
+        {% render 'product-size-guide', product: product, section_id: section.id %}
+        {% content_for 'block', id: 'quantity', type: 'quantity' %}
+        {% content_for 'block', id: 'add-to-cart', type: 'add-to-cart' %}
+      {%- else -%}
+        <p class="text-foreground/60 text-sm">{{ 'sections.event.past_event' | t }}</p>
+      {%- endunless -%}
+      {%- if accordion_details != blank
+        or accordion_product_specifications != blank
+        or accordion_care != blank
+        or accordion_shipping != blank
+        or event_about != blank
+        or event_who_for != blank
+        or event_participate != blank
+        or event_included != blank
+      -%}
         <div class="accordion-group">
+          {%- if event_about != blank -%}
+            <details class="accordion-row">
+              <summary>
+                {% render 'heading', text: event_label_about, level: 3, class: 'text-lg font-medium !leading-0' %}
+              </summary>
+              <div class="prose">{{ event_about | metafield_tag }}</div>
+            </details>
+          {%- endif -%}
+          {%- if event_who_for != blank -%}
+            <details class="accordion-row">
+              <summary>
+                {% render 'heading', text: event_label_who_for, level: 3, class: 'text-lg font-medium !leading-0' %}
+              </summary>
+              <div class="prose">{{ event_who_for | metafield_tag }}</div>
+            </details>
+          {%- endif -%}
+          {%- if event_participate != blank -%}
+            <details class="accordion-row">
+              <summary>
+                {% render 'heading', text: event_label_participate, level: 3, class: 'text-lg font-medium !leading-0' %}
+              </summary>
+              <div class="prose">{{ event_participate | metafield_tag }}</div>
+            </details>
+          {%- endif -%}
+          {%- if event_included != blank -%}
+            <details class="accordion-row">
+              <summary>
+                {% render 'heading', text: event_label_included, level: 3, class: 'text-lg font-medium !leading-0' %}
+              </summary>
+              <div class="prose">{{ event_included | metafield_tag }}</div>
+            </details>
+          {%- endif -%}
           {%- if accordion_details != blank -%}
             <details class="accordion-row">
               <summary>
-                {% render 'heading',
-                  text: accordion_label_details,
-                  level: 3,
-                  class: 'text-base font-medium'
-                %}
+                {% render 'heading', text: accordion_label_details, level: 3, class: 'text-lg font-medium !leading-0' %}
               </summary>
               <div class="prose">{{ accordion_details | metafield_tag }}</div>
             </details>
@@ -84,7 +131,7 @@
                 {% render 'heading',
                   text: accordion_label_product_specifications,
                   level: 3,
-                  class: 'text-base font-medium'
+                  class: 'text-lg font-medium !leading-0'
                 %}
               </summary>
               <div class="prose">{{ accordion_product_specifications | metafield_tag }}</div>
@@ -93,11 +140,7 @@
           {%- if accordion_care != blank -%}
             <details class="accordion-row">
               <summary>
-                {% render 'heading',
-                  text: accordion_label_care,
-                  level: 3,
-                  class: 'text-base font-medium'
-                %}
+                {% render 'heading', text: accordion_label_care, level: 3, class: 'text-lg font-medium !leading-0' %}
               </summary>
               <div class="prose">{{ accordion_care | metafield_tag }}</div>
             </details>
@@ -105,11 +148,7 @@
           {%- if accordion_shipping != blank -%}
             <details class="accordion-row">
               <summary>
-                {% render 'heading',
-                  text: accordion_label_shipping,
-                  level: 3,
-                  class: 'text-base font-medium'
-                %}
+                {% render 'heading', text: accordion_label_shipping, level: 3, class: 'text-lg font-medium !leading-0' %}
               </summary>
               <div class="prose">{{ accordion_shipping | metafield_tag }}</div>
             </details>
@@ -117,102 +156,31 @@
         </div>
       {%- endif -%}
 
-      {%- if is_event_product == 'true' -%}
-        {%- if event_about != blank or event_who_for != blank or event_participate != blank or event_included != blank -%}
-          <div class="accordion-group">
-            {%- if event_about != blank -%}
-              <details class="accordion-row" open>
-                <summary>
-                  {% render 'heading',
-                    text: event_label_about,
-                    level: 3,
-                    class: 'text-base font-medium'
-                  %}
-                </summary>
-                <div class="prose">{{ event_about | metafield_tag }}</div>
-              </details>
-            {%- endif -%}
-            {%- if event_who_for != blank -%}
-              <details class="accordion-row">
-                <summary>
-                  {% render 'heading',
-                    text: event_label_who_for,
-                    level: 3,
-                    class: 'text-base font-medium'
-                  %}
-                </summary>
-                <div class="prose">{{ event_who_for | metafield_tag }}</div>
-              </details>
-            {%- endif -%}
-            {%- if event_participate != blank -%}
-              <details class="accordion-row">
-                <summary>
-                  {% render 'heading',
-                    text: event_label_participate,
-                    level: 3,
-                    class: 'text-base font-medium'
-                  %}
-                </summary>
-                <div class="prose">{{ event_participate | metafield_tag }}</div>
-              </details>
-            {%- endif -%}
-            {%- if event_included != blank -%}
-              <details class="accordion-row">
-                <summary>
-                  {% render 'heading',
-                    text: event_label_included,
-                    level: 3,
-                    class: 'text-base font-medium'
-                  %}
-                </summary>
-                <div class="prose">{{ event_included | metafield_tag }}</div>
-              </details>
-            {%- endif -%}
-          </div>
-        {%- endif -%}
+      {%- if event_practical_info != blank -%}
+        <div class="mt-8">
+          {% render 'heading', text: event_label_practical_information, level: 2, class: 'text-2xl font-medium' %}
+          <div class="prose mt-4">{{ event_practical_info | metafield_tag }}</div>
+        </div>
+      {%- endif -%}
 
-        {%- if event_practical_info != blank -%}
-          <div>
-            {% render 'heading',
-              text: event_label_practical_information,
-              level: 2,
-              class: 'text-xl font-medium'
-            %}
-            <div class="prose mt-4">{{ event_practical_info | metafield_tag }}</div>
+      {%- if event_partners != blank -%}
+        <div class="mt-8">
+          {% render 'heading', text: event_label_partners, level: 2, class: 'text-2xl font-medium' %}
+          <div class="mt-4 flex flex-wrap gap-4">
+            {%- for file in event_partners.value -%}
+              <div class="w-24 h-24">
+                {% render 'image', image: file.preview_image, width_max: 200, class: 'w-full h-full object-contain' %}
+              </div>
+            {%- endfor -%}
           </div>
-        {%- endif -%}
+        </div>
+      {%- endif -%}
 
-        {%- if event_partners != blank -%}
-          <div>
-            {% render 'heading',
-              text: event_label_partners,
-              level: 2,
-              class: 'text-xl font-medium'
-            %}
-            <div class="mt-4 flex flex-wrap gap-4">
-              {%- for file in event_partners.value -%}
-                <div class="w-24 h-24">
-                  {% render 'image',
-                    image: file.preview_image,
-                    width_max: 200,
-                    class: 'w-full h-full object-contain'
-                  %}
-                </div>
-              {%- endfor -%}
-            </div>
-          </div>
-        {%- endif -%}
-
-        {%- if event_disclaimer != blank -%}
-          <div>
-            {% render 'heading',
-              text: event_label_disclaimer,
-              level: 2,
-              class: 'text-xl font-medium'
-            %}
-            <div class="prose mt-4">{{ event_disclaimer | metafield_tag }}</div>
-          </div>
-        {%- endif -%}
+      {%- if event_disclaimer != blank -%}
+        <div class="mt-8">
+          {% render 'heading', text: event_label_disclaimer, level: 2, class: 'text-2xl font-medium' %}
+          <div class="prose mt-4">{{ event_disclaimer | metafield_tag }}</div>
+        </div>
       {%- endif -%}
     </div>
   </div>

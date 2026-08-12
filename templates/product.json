@@ -53,39 +53,6 @@
           "static": true,
           "settings": {},
           "blocks": {}
-        },
-        "buy-buttons": {
-          "type": "buy-buttons",
-          "static": true,
-          "settings": {},
-          "blocks": {}
-        },
-        "accordion-row-1": {
-          "type": "_accordion-row",
-          "static": true,
-          "settings": {
-            "summary": "Accordion 1",
-            "content": "<p>Content</p>"
-          },
-          "blocks": {}
-        },
-        "accordion-row-2": {
-          "type": "_accordion-row",
-          "static": true,
-          "settings": {
-            "summary": "",
-            "content": ""
-          },
-          "blocks": {}
-        },
-        "accordion-row-3": {
-          "type": "_accordion-row",
-          "static": true,
-          "settings": {
-            "summary": "",
-            "content": ""
-          },
-          "blocks": {}
         }
       },
       "settings": {}

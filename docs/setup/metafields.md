@@ -10,15 +10,12 @@ rg "\.metafields\." -t liquid
 
 ## Scoping
 
-This theme uses Shopify products for two distinct purposes: **regular products** (physical goods) and **event tickets** (powered by the [GM Event Ticketing](https://apps.shopify.com/event-ticketing) app). The separation is enforced at two levels:
+This theme uses Shopify products for two distinct purposes: **regular products** (physical goods) and **events**. Both use the same `product.json` template and `main-product.liquid` section. No product-type detection — the PDP renders every section whose metafield is populated. A product with only event metafields looks like an event page; a product with only product metafields looks like a product page. The merchant's only responsibility is to populate the desired metafields.
 
-1. **Template level** — regular products use `product.json`; event products use `product.event.json` (assign via the product admin's "Theme template" dropdown). The event template omits product-specific blocks (`bundle-offer-pill`, `_accordion-row`).
-2. **Liquid guards** — inline metafield content (metafield accordion, size guide, bundle pill) checks `product.type` via `_is-event-product` snippet. Belt-and-suspenders: guards fire even if the wrong template is assigned.
-
-| Scope | Template | Product type filter | Purpose |
-| --- | --- | --- | --- |
-| **Product** | `product` | All types EXCEPT event types | Physical/digital goods — details, care, shipping, sizing |
-| **Event** | `product.event` | `Event` or `Ticket` | Event date, venue, schedule, ticket tiers |
+| Scope | Template | Purpose |
+| --- | --- | --- |
+| **Product** | `product` | Physical/digital goods — details, care, shipping, sizing |
+| **Event** | `product` | Event date, venue, schedule, ticket tiers |
 
 Each section below declares its scope in the heading. When a metafield is scoped to products, it must NOT render on event-ticket pages (and vice versa).
 
@@ -33,9 +30,7 @@ Each section below declares its scope in the heading. When a metafield is scoped
 
 ## Product metafields (scope: regular products)
 
-> These metafields apply to **regular products only**. They are guarded at two levels:
-> 1. **Template** — `product.event.json` omits product-specific blocks (`bundle-offer-pill`, `_accordion-row`).
-> 2. **Liquid** — `_is-event-product` snippet check (via `product.type`) suppresses inline metafield content (accordion, size guide, bundle pill) on event products.
+> These metafields apply to **regular products**. They render only when populated — no type gates, no template guards. If left blank, nothing renders.
 
 ### `custom.details` — _optional_
 
@@ -107,7 +102,7 @@ One row of cells in a `size_chart`.
 
 ## Event metafields (scope: event tickets)
 
-> These metafields apply to **event products only** (product type `Event` or `Ticket`). They are rendered inline by `sections/main-product.liquid` when the `_is-event-product` snippet returns `true`. All fields are rendered below the add-to-cart button.
+> These metafields apply to **event products**. They render only when populated — no type gates.
 
 ### `custom.event_about` — _optional_
 

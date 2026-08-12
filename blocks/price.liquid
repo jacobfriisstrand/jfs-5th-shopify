@@ -6,18 +6,18 @@
   data-block-id="{{ block.id }}"
   data-product-id="{{ product.id }}"
 >
-  <div ref="priceContainer" class="text-xl font-medium">
+  <div ref="priceContainer" class="text-2xl font-heading font-medium">
     {%- if variant.compare_at_price > variant.price -%}
       <span class="text-foreground/60 line-through me-2">
         <span class="sr-only">{{ 'content.price_regular' | t }}: </span>
-        {{- variant.compare_at_price | money -}}
+        {{- variant.compare_at_price | money_without_trailing_zeros -}}
       </span>
       <span>
         <span class="sr-only">{{ 'content.price_sale' | t }}: </span>
-        {{- variant.price | money -}}
+        {{- variant.price | money_without_trailing_zeros -}}
       </span>
     {%- else -%}
-      {{ variant.price | money }}
+      {{ variant.price | money_without_trailing_zeros }}
     {%- endif -%}
   </div>
 </product-price>

@@ -20,8 +20,6 @@
   assign pill_text = product.metafields.custom.bundle_offer_pill
 %}
 
-{%- capture is_event_product -%}{%- render '_is-event-product', product: product -%}{%- endcapture -%}
-
-{%- if is_event_product != 'true' and pill_text != blank -%}
+{%- if pill_text != blank -%}
   {% render 'badge', text: pill_text, variant: 'dark', class: class %}
 {%- endif -%}

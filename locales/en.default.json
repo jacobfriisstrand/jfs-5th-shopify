@@ -60,7 +60,6 @@
   },
   "actions": {
     "add": "Add",
-    "add_ticket_to_cart": "Add ticket to cart",
     "add_to_cart": "Add to cart",
     "added": "Added",
     "apply": "Apply",
@@ -322,7 +321,8 @@
       "included": "What is included in the price?",
       "practical_information": "Practical information",
       "partners": "Our partners for this challenge",
-      "disclaimer": "Disclaimer"
+      "disclaimer": "Disclaimer",
+      "past_event": "This event has ended and is no longer available for purchase."
     }
   }
 }
