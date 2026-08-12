@@ -12,6 +12,7 @@
 @import "./components/page-transition.css";
 @import "./components/button.css";
 @import "./components/prose.css";
+@import "./components/swiper.css";
 
 @source "../../sections/**/*.liquid";
 @source "../../blocks/**/*.liquid";
