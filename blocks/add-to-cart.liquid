@@ -12,13 +12,8 @@
 {% liquid
   assign variant = product.selected_or_first_available_variant
   assign form_id = 'product-form-' | append: section.id
-  assign t = product.type | downcase
   if variant.available
-    if t == 'event' or t == 'ticket'
-      assign btn_text = 'actions.add_ticket_to_cart' | t
-    else
-      assign btn_text = 'actions.add_to_cart' | t
-    endif
+    assign btn_text = 'actions.add_to_cart' | t
     assign btn_disabled = false
   else
     assign btn_text = 'blocks.sold_out' | t
@@ -51,7 +46,7 @@
       {% render 'button',
         text: btn_text,
         type: 'submit',
-        variant: 'primary',
+        variant: 'noIcon',
         class: 'w-full',
         disabled: btn_disabled,
         ref: 'addToCartButton'

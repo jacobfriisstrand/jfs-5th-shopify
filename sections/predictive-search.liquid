@@ -53,7 +53,7 @@
             {%- endif -%}
             <span class="flex-1 min-w-0">
               <span class="block truncate text-sm font-medium">{{ product.title }}</span>
-              <span class="block text-xs opacity-70">{{ product.price | money }}</span>
+              <span class="block text-xs opacity-70">{{ product.price | money_without_trailing_zeros }}</span>
             </span>
           </a>
         </li>

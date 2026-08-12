@@ -60,9 +60,9 @@
           <p class="text-foreground flex flex-col items-end gap-0.5 text-sm font-medium sm:text-base">
             <span class="group-data-[updating=true]:hidden">
               {%- if has_line_discount -%}
-                <span class="text-foreground/50 mr-1 line-through">{{ line.original_line_price | money }}</span>
+                <span class="text-foreground/50 mr-1 line-through">{{ line.original_line_price | money_without_trailing_zeros }}</span>
               {%- endif -%}
-              {{ line.final_line_price | money }}
+              {{ line.final_line_price | money_without_trailing_zeros }}
             </span>
             {% render 'skeleton', class: 'hidden h-4 w-16 align-middle group-data-[updating=true]:inline-block' %}
           </p>

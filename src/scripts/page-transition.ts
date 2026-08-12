@@ -16,6 +16,9 @@
     if (!link || !link.href) return;
     if (link.hasAttribute("data-header-cart")) return;
     if (link.target && link.target !== "_self") return;
+    /* Let the browser handle modified clicks (new tab/window). */
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (e.button !== 0) return;
     if (link.getAttribute("download") != null) return;
 
     var url;

@@ -1,7 +1,5 @@
 {% doc %}
-  Renders the product title as the PDP <h1>, optionally followed by a small
-  paragraph listing the current variant's option values (e.g. "Color: White")
-  for products with variants.
+  Renders the product title as the PDP <h1>.
 
   Used by `sections/main-product.liquid` via `{% content_for 'block', type: 'product-title' %}`.
   The element id is derived from `section.id` so the parent section can reference
@@ -9,28 +7,10 @@
 {% enddoc %}
 
 {% liquid
-  assign current_variant = product.selected_or_first_available_variant
   assign heading_id = 'main-product-' | append: section.id | append: '-title'
 %}
 
-{% render 'heading',
-  text: product.title,
-  level: 1,
-  id: heading_id,
-  class: 'text-2xl font-medium sm:text-3xl'
-%}
-
-{%- if product.has_only_default_variant == false and current_variant -%}
-  <p class="text-foreground/70 text-sm">
-    {%- for option in product.options_with_values -%}
-      <span>
-        <span class="font-medium">{{ option.name }}:</span>
-        {{ current_variant.options[forloop.index0] }}
-      </span>
-      {%- unless forloop.last %} · {% endunless -%}
-    {%- endfor -%}
-  </p>
-{%- endif -%}
+{% render 'heading', text: product.title, level: 1, id: heading_id, class: 'text-4xl lg:text-6xl' %}
 
 {% schema %}
 {
