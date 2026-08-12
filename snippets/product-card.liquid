@@ -87,5 +87,5 @@
   {%- endif -%}
 
   {% render 'heading', text: card_title, level: resolved_heading_level, class: 'text-base font-medium' %}
-  <p class="text-sm">{{ card_price | money }}</p>
+  <p class="text-sm">{{ card_price | money_without_trailing_zeros }}</p>
 </a>
