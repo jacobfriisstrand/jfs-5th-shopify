@@ -22,6 +22,11 @@
     aria_label: cart_label,
     attrs: 'data-header-cart'
   %}
+  <span
+    data-cart-badge
+    aria-hidden="true"
+    class="bg-brand pointer-events-none absolute -top-0.5 -right-0.5 size-2 rounded-full animate-pulse {% if cart.item_count == 0 %}hidden{% endif %}"
+  ></span>
 </div>
 
 <script src="{{ 'header-cart.js' | asset_url }}" type="module" fetchpriority="low"></script>

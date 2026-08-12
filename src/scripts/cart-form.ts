@@ -187,7 +187,10 @@ export class CartFormComponent extends Component {
     // Notify other listeners (header cart count, future cart drawer, etc.)
     // that the cart has changed. The section render only refreshes the
     // cart section itself — the header lives in a separate section group.
-    this.dispatchEvent(
+    // Dispatch on document, not `this`: the morph above detaches the old
+    // form node, so an event dispatched on `this` would never reach
+    // document-level listeners (header cart badge, drawer refresh).
+    document.dispatchEvent(
       new CartUpdateEvent({}, this.id || "cart-form-component", {
         source: "cart-form-component",
       }),

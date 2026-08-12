@@ -22,6 +22,7 @@ import { ThemeEvents } from "@theme/events";
 
 const cartCountSelector = "[data-cart-count]";
 const cartCountA11ySelector = "[data-cart-count-a11y]";
+const cartBadgeSelector = "[data-cart-badge]";
 const headerCartSelector = "[data-header-cart]";
 const drawerSelector = "cart-drawer-component";
 
@@ -49,6 +50,11 @@ async function refresh() {
       const lastColon = text.lastIndexOf(":");
       el.textContent =
         lastColon >= 0 ? `${text.slice(0, lastColon + 1)} ${count}` : count;
+    }
+    for (const el of document.querySelectorAll<HTMLElement>(
+      cartBadgeSelector,
+    )) {
+      el.classList.toggle("hidden", cart.item_count === 0);
     }
   } catch {
     // Ignore — next event will retry.
