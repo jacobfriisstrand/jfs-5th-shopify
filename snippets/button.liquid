@@ -71,7 +71,7 @@
     assign hide_icon = true
   endif
 
-  assign base_classes = 'block h-fit font-body font-medium whitespace-nowrap select-none transition-opacity duration-100 group disabled:opacity-50 disabled:pointer-events-none aria-disabled:opacity-50 aria-disabled:pointer-events-none rounded-full'
+  assign base_classes = 'block h-fit font-body font-medium whitespace-nowrap select-none [transition-property:opacity,background-color,border-color] duration-150 group disabled:opacity-50 disabled:pointer-events-none aria-disabled:opacity-50 aria-disabled:pointer-events-none rounded-full'
 
   case resolved_size
     when 'link'
@@ -94,7 +94,7 @@
       when 'link'
         assign variant_classes = 'btn-variant--link'
       when 'noIcon'
-        assign variant_classes = 'btn-variant--noIcon [transition-property:opacity,background-color,border-color]'
+        assign variant_classes = 'btn-variant--noIcon'
       else
         assign variant_classes = 'btn-variant--base'
     endcase
@@ -130,7 +130,7 @@
           {{ text | escape }}
           {%- unless hide_icon -%}
             <span class="inline-flex items-center justify-center rounded-full bg-foreground p-1">
-              {%- render 'icon', icon: 'arrow-up-right', size: icon_size, class: 'text-background transition-transform duration-300 group-hover:rotate-45' -%}
+              {%- render 'icon', icon: 'arrow-up-right', size: icon_size, class: 'text-background transition-transform duration-150 group-hover:rotate-45' -%}
             </span>
           {%- endunless -%}
         </span>
@@ -163,7 +163,7 @@
           {{ text | escape }}
           {%- unless hide_icon -%}
             <span class="inline-flex items-center justify-center rounded-full bg-foreground p-1">
-              {%- render 'icon', icon: 'arrow-up-right', size: icon_size, class: 'text-background transition-transform duration-300 group-hover:rotate-45' -%}
+              {%- render 'icon', icon: 'arrow-up-right', size: icon_size, class: 'text-background transition-transform duration-150 group-hover:rotate-45' -%}
             </span>
           {%- endunless -%}
         </span>
