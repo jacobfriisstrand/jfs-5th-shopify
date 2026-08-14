@@ -10,8 +10,9 @@
        "product-form-component").
     2. Click on the header cart icon (`[data-header-cart]`).
 
-  The drawer is a SUBSET of `/cart`: line items, subtotal, View cart link,
-  Checkout button. No shipping calc, notes, discount, accelerated checkout.
+  The drawer is a SUBSET of `/cart`: line items, subtotal, Checkout button.
+  No shipping calc, notes, discount, accelerated checkout. The cart page
+  (`/cart`) is reached only by navigating to it directly.
 
   Defer-load: the `<cart-drawer-component>` registration script is dynamic-
   imported by `header-cart.js` on first hover/focus of the cart anchor (or
@@ -36,7 +37,6 @@
   assign subtotal_label = 'content.cart_subtotal' | t
   assign savings_label = 'content.discount_savings' | t
   assign taxes_note = 'content.taxes_at_checkout_shipping_at_checkout_without_policy_without_discounts' | t
-  assign view_cart_label = 'actions.view_cart' | t
   assign checkout_label = 'content.checkout' | t
   assign empty_heading = 'content.your_cart_is_empty' | t
   assign continue_label = 'actions.continue_shopping' | t
@@ -119,12 +119,8 @@
                   type: 'submit',
                   name: 'checkout',
                   value: '',
-                  variant: 'primary'
-                %}
-                {% render 'button',
-                  text: view_cart_label,
-                  href: routes.cart_url,
-                  variant: 'secondary'
+                  variant: 'primary',
+                  noIcon: true
                 %}
               </div>
             </footer>
