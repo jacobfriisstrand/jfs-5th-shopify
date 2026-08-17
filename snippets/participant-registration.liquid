@@ -58,24 +58,18 @@
   assign dialog_title_id = dialog_id | append: '-title'
   assign register_attrs = 'data-register-trigger aria-haspopup="dialog" aria-controls="' | append: dialog_id | append: '"'
 
-  assign team_min = registration.min_team_size | default: 1
-  if team_min == blank or team_min < 1
-    assign team_min = 1
+  assign team_size = product.metafields.custom.team_size | default: 1
+  if team_size == blank or team_size < 1
+    assign team_size = 1
   endif
 
-  assign team_max = registration.max_team_size
   assign inventory_max = nil
   if variant.inventory_management != blank and variant.inventory_policy == 'deny'
     assign inventory_max = variant.inventory_quantity
   endif
 
-  assign max_qty = nil
-  if team_max != blank and team_max > 0
-    assign max_qty = team_max
-    if inventory_max != blank and inventory_max < team_max
-      assign max_qty = inventory_max
-    endif
-  elsif inventory_max != blank
+  assign max_qty = team_size
+  if inventory_max != blank and inventory_max < team_size
     assign max_qty = inventory_max
   endif
 %}
@@ -94,8 +88,8 @@
           <quantity-selector-component class="inline-block">
             {% render 'quantity-input',
               input_id: team_size_id,
-              value: team_min,
-              min: team_min,
+              value: 1,
+              min: 1,
               max: max_qty,
               step: 1,
               name: 'quantity'

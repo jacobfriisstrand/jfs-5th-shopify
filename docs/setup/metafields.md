@@ -107,8 +107,6 @@ Event registration config — whether an event is single-person or team-based, a
 | `name`  | Single line text                | Yes      | Display name in the admin picker (set as the "display name")                              |
 | `mode`  | Select (`individual` \| `team`) | Yes      | `individual` = buyer buys one ticket for themselves; `team` = one buyer buys N tickets      |
 | `fields`| List of refs → `participant_field` | No    | Optional text fields collected per participant                                            |
-| `min_team_size` | Integer                  | No       | Minimum team size (default 1). Team mode only. Ignored for `individual`.                    |
-| `max_team_size` | Integer                  | No       | Maximum team size. Set equal to `min_team_size` for a fixed team size (e.g. teams of exactly 5). Capped by variant inventory. Team mode only. |
 
 ### `participant_field`
 
@@ -185,7 +183,19 @@ One participant field. There are no hard-coded fields — every field the buyer 
 
 - **Type:** Metaobject reference → `participant_fields` (see above)
 - **Used by:** `snippets/participant-registration.liquid`, `sections/main-product.liquid`
-- **Notes:** When set, the PDP replaces the standard quantity + add-to-cart with a participant registration form. `mode` selects `individual` (one ticket for self) or `team` (one buyer for N tickets). Every participant collects the fields configured on the referenced metaobject. There are no hard-coded fields; use the `required` flag on each `participant_field` entry to mark it mandatory. On submit, one cart line item is added per participant (quantity 1), each carrying its own line-item properties. Past events hide the form (same as ATC).
+- **Notes:** When set, the PDP replaces the standard quantity + add-to-cart with a participant registration form. `mode` selects `individual` (one ticket for self) or `team` (one buyer for N tickets). Every participant collects the fields configured on the referenced metaobject. There are no hard-coded fields; use the `required` flag on each `participant_field` entry to mark it mandatory. On submit, one cart line item is added per participant (quantity 1), each carrying its own line-item properties. Past events hide the form (same as ATC). Team size is defined per event via `custom.team_size` (below), not on this metaobject.
+
+### `custom.team_size` — _optional (team mode max team size)_
+
+- **Type:** Integer
+- **Used by:** `snippets/participant-registration.liquid` (team stepper max)
+- **Notes:** Maximum team size for a team-based event (default 1). Unique per event product — set on each event's product metafield, not on the `participant_fields` metaobject. Capped by variant inventory. Team mode only; ignored for `individual`.
+
+---
+
+## Removed
+
+- **`participant_fields.min_team_size` / `max_team_size`** (metaobject fields, removed) — team size moved to per-event product metafield `custom.team_size`. Merchants: remove these two fields from the `participant_fields` metaobject definition and populate `custom.team_size` on each event product.
 
 ---
 
