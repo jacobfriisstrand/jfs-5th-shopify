@@ -22,6 +22,7 @@
   assign event_practical_info = product.metafields.custom.event_practical_info
   assign event_partners = product.metafields.custom.event_partners
   assign event_disclaimer = product.metafields.custom.event_disclaimer
+  assign registration = product.metafields.custom.participant_fields.value
 
   assign event_label_about = 'sections.event.about' | t
   assign event_label_who_for = 'sections.event.who_for' | t
@@ -48,6 +49,9 @@
 <script src="{{ 'component-quantity-selector.js' | asset_url }}" type="module" fetchpriority="low"></script>
 <script src="{{ 'variant-picker-form.js' | asset_url }}" type="module" fetchpriority="low"></script>
 <script src="{{ 'swiper-carousel.js' | asset_url }}" type="module" fetchpriority="low"></script>
+{%- if registration != blank -%}
+  <script src="{{ 'participant-registration-form.js' | asset_url }}" type="module" fetchpriority="low"></script>
+{%- endif -%}
 
 <section
   class="grid-12 pt-4 lg:pt-8"
@@ -70,8 +74,12 @@
       {%- unless event_is_past -%}
         {% content_for 'block', id: 'variant-picker', type: 'variant-picker' %}
         {% render 'product-size-guide', product: product, section_id: section.id %}
-        {% content_for 'block', id: 'quantity', type: 'quantity' %}
-        {% content_for 'block', id: 'add-to-cart', type: 'add-to-cart' %}
+        {%- if registration != blank -%}
+          {% render 'participant-registration', product: product, section: section, variant: product.selected_or_first_available_variant %}
+        {%- else -%}
+          {% content_for 'block', id: 'quantity', type: 'quantity' %}
+          {% content_for 'block', id: 'add-to-cart', type: 'add-to-cart' %}
+        {%- endif -%}
       {%- else -%}
         <p class="text-foreground/60 text-sm">{{ 'sections.event.past_event' | t }}</p>
       {%- endunless -%}

@@ -15,6 +15,14 @@
       "cart-drawer": {
         "type": "cart-drawer",
         "settings": {}
+      },
+      "announcement-bar": {
+        "type": "announcement-bar",
+        "settings": {
+          "text_1": "Next training session",
+          "text_2": "6PM @ Søndermarken, CPH",
+          "speed": 20
+        }
       }
     },
     "content_for_index": []

@@ -34,6 +34,11 @@
   .btn-variant--base {
     /* default button: background, text color, border, hover state */
     background: var(--color-brand);
+    border: 1px solid var(--color-brand);
+
+    &:hover {
+      background: transparent;
+    }
   }
 
   .btn-variant--link {

@@ -1,9 +1,8 @@
 {% doc %}
-  Header cart icon. Renders as an `<a href>` link to `/cart` per ADR-0005.
-
-  Slice 1 ships the bare anchor (works with JS disabled). Slice 11 will
-  attach a JS click handler to open the cart drawer instead of navigating;
-  the anchor remains the JS-disabled fallback.
+  Header cart icon. Renders as a button that opens the cart drawer via
+  `src/scripts/header-cart.ts` (`[data-header-cart]`). It is deliberately NOT a
+  `/cart` link — the cart page is only reached by navigating to `/cart`
+  directly.
 
   @example
   {% content_for 'block', type: '_header-cart', id: 'header-cart' %}
@@ -18,7 +17,6 @@
     icon: 'cart',
     icon_size: 24,
     variant: 'icon',
-    href: routes.cart_url,
     aria_label: cart_label,
     attrs: 'data-header-cart'
   %}

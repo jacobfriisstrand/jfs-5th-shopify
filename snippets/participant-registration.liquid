@@ -1,0 +1,177 @@
+{% doc %}
+  Renders the participant registration form for event products that carry a
+  `custom.participant_fields` metaobject reference.
+
+  Both modes are driven by a single `<participant-registration-form>` custom
+  element (see `src/scripts/participant-registration-form.ts`):
+
+  - `individual` — a "Register" button that opens a dialog holding one
+    participant form.
+  - `team` — a team-size stepper plus a "Register team" button that opens a
+    dialog holding one participant accordion per ticket.
+
+  Every participant collects the fields configured on the referenced metaobject
+  — there are no hard-coded fields. On submit the element batch-adds one cart
+  line item per participant (quantity 1), each carrying its own line-item
+  properties.
+
+  @param {object} product - The product. Required.
+  @param {object} section - The parent section (for scoped ids). Required.
+  @param {object} variant - The selected/available variant. Required.
+
+  @example
+  {% render 'participant-registration', product: product, section: section, variant: variant %}
+{% enddoc %}
+
+{% liquid
+  assign registration = product.metafields.custom.participant_fields.value
+  assign mode = registration.mode.value | default: registration.mode | default: 'individual'
+  assign fields = registration.fields.value
+
+  assign variant = variant | default: product.selected_or_first_available_variant
+
+  if mode == 'team'
+    assign submit_text = 'sections.event.registration.submit_team' | t
+    assign dialog_title_text = 'sections.event.registration.dialog_title' | t
+  else
+    assign submit_text = 'sections.event.registration.submit_individual' | t
+    assign dialog_title_text = 'sections.event.registration.submit_individual' | t
+  endif
+
+  assign submit_disabled = false
+  if variant.available == false
+    assign submit_disabled = true
+    assign submit_text = 'blocks.sold_out' | t
+  endif
+
+  assign label_team_size = 'sections.event.registration.team_size' | t
+  assign label_participant = 'sections.event.registration.participant' | t
+  assign label_your_information = 'sections.event.registration.your_information' | t
+  assign label_close = 'accessibility.close_dialog' | t
+  assign label_add_to_cart = 'products.product.add_to_cart' | t
+
+  assign input_class = 'rounded-input border border-current/30 bg-transparent px-3 py-2 text-sm'
+  assign label_class = 'text-foreground/70 text-sm font-medium'
+
+  assign team_size_id = 'team-size-' | append: section.id
+  assign dialog_id = 'registration-dialog-' | append: section.id
+  assign dialog_title_id = dialog_id | append: '-title'
+  assign register_attrs = 'data-register-trigger aria-haspopup="dialog" aria-controls="' | append: dialog_id | append: '"'
+
+  assign team_min = registration.min_team_size | default: 1
+  if team_min == blank or team_min < 1
+    assign team_min = 1
+  endif
+
+  assign team_max = registration.max_team_size
+  assign inventory_max = nil
+  if variant.inventory_management != blank and variant.inventory_policy == 'deny'
+    assign inventory_max = variant.inventory_quantity
+  endif
+
+  assign max_qty = nil
+  if team_max != blank and team_max > 0
+    assign max_qty = team_max
+    if inventory_max != blank and inventory_max < team_max
+      assign max_qty = inventory_max
+    endif
+  elsif inventory_max != blank
+    assign max_qty = inventory_max
+  endif
+%}
+
+{%- if registration != blank -%}
+  <participant-registration-form
+    data-mode="{{ mode }}"
+    data-variant-id="{{ variant.id }}"
+    data-product-id="{{ product.id }}"
+    data-product-title="{{ product.title | escape }}"
+  >
+    <div class="flex flex-col gap-4">
+      {%- if mode == 'team' -%}
+        <div class="flex flex-col gap-2">
+          <label for="{{ team_size_id }}" class="{{ label_class }}">{{ label_team_size }}</label>
+          <quantity-selector-component class="inline-block">
+            {% render 'quantity-input',
+              input_id: team_size_id,
+              value: team_min,
+              min: team_min,
+              max: max_qty,
+              step: 1,
+              name: 'quantity'
+            %}
+          </quantity-selector-component>
+        </div>
+
+        <p class="text-foreground/70 text-sm">{{ 'sections.event.registration.instructions' | t }}</p>
+      {%- endif -%}
+
+      {% render 'button',
+        text: submit_text,
+        variant: 'noIcon',
+        class: 'w-full',
+        disabled: submit_disabled,
+        attrs: register_attrs
+      %}
+    </div>
+
+    {%- capture dialog_body -%}
+      <div class="flex h-full flex-col">
+        <header class="flex items-center justify-between gap-4 border-b border-current/15 p-4">
+          {% render 'heading', text: dialog_title_text, level: 2, id: dialog_title_id, class: 'text-lg font-medium' %}
+          {% render 'drawer-close-button', label: label_close %}
+        </header>
+        <div class="flex flex-1 flex-col gap-4 overflow-y-auto p-4">
+          <form on:submit="participant-registration-form/handleSubmit" novalidate class="flex flex-col gap-4">
+            <div data-participants class="flex flex-col gap-4"></div>
+            {% render 'button',
+              text: label_add_to_cart,
+              variant: 'noIcon',
+              type: 'submit',
+              class: 'w-full',
+              ref: 'submitButton'
+            %}
+          </form>
+        </div>
+      </div>
+    {%- endcapture -%}
+
+    {% render 'drawer',
+      id: dialog_id,
+      side: 'right',
+      class: 'p-0 drawer-responsive-bottom',
+      aria_labelledby: dialog_title_id,
+      content: dialog_body
+    %}
+
+    <template>
+      <details class="rounded-input border border-current/15">
+        <summary class="cursor-pointer select-none p-4 text-base font-medium">
+          {%- if mode == 'individual' -%}
+            {{ label_your_information }}
+          {%- else -%}
+            {{ label_participant }} <span data-participant-number>1</span>
+          {%- endif -%}
+        </summary>
+
+        <div class="flex flex-col gap-4 p-4 pt-0">
+        {%- for field in fields -%}
+          {%- if field.label != blank -%}
+            <div class="flex flex-col gap-1.5">
+              <label for="reg-opt-{{ forloop.index0 }}" class="{{ label_class }}">{{ field.label | escape }}</label>
+              <input
+                id="reg-opt-{{ forloop.index0 }}"
+                type="text"
+                data-property="{{ field.label | escape }}"
+                data-role="{{ field.role.value | default: field.role | escape }}"
+                {%- if field.required == true or field.required == 'true' %} required aria-required="true"{% endif -%}
+                class="{{ input_class }}"
+              >
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+        </div>
+      </details>
+    </template>
+  </participant-registration-form>
+{%- endif -%}

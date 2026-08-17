@@ -282,6 +282,7 @@
       "unavailable": "Unavailable",
       "options": "Options",
       "quantity": "Quantity",
+      "per_person": "Per person",
       "increase_quantity": "Increase quantity",
       "decrease_quantity": "Decrease quantity",
       "quantity_increments": "Increments of {{ increment }}",
@@ -322,7 +323,16 @@
       "practical_information": "Practical information",
       "partners": "Our partners for this challenge",
       "disclaimer": "Disclaimer",
-      "past_event": "This event has ended and is no longer available for purchase."
+      "past_event": "This event has ended and is no longer available for purchase.",
+      "registration": {
+        "team_size": "Team size",
+        "participant": "Participant",
+        "your_information": "Your information",
+        "instructions": "Please fill out the participant information to register your team.",
+        "dialog_title": "Register your team",
+        "submit_individual": "Register",
+        "submit_team": "Register team"
+      }
     }
   }
 }

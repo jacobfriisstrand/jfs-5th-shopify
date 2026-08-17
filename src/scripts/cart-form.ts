@@ -103,6 +103,15 @@ export class CartFormComponent extends Component {
   };
 
   #onSubmit = (event: SubmitEvent) => {
+    // Allow the checkout button's native submit — Shopify redirects a POST to
+    // /cart with a name="checkout" submitter to the checkout. We only intercept
+    // quantity updates.
+    if (
+      event.submitter instanceof HTMLButtonElement &&
+      event.submitter.name === "checkout"
+    ) {
+      return;
+    }
     // When JS is enabled we own quantity updates; prevent the native submit
     // (e.g. Enter inside a quantity input would otherwise submit with the
     // first per-line remove button as submitter and drop that line).
