@@ -127,10 +127,17 @@ class SwiperCarousel extends HTMLElement {
     }
 
     list.replaceWith(container);
+    container.style.width = this.offsetWidth + "px";
+
+    const isMobile = window.innerWidth < 768;
+    if (!isMobile) {
+      container.classList.add("swiper-fill-host");
+    }
 
     Object.assign(container, {
       slidesPerView: parseSlidesPerView(slidesPerView),
       spaceBetween: 16,
+      autoHeight: isMobile,
       breakpoints,
       keyboard: true,
       a11y: true,
@@ -140,6 +147,7 @@ class SwiperCarousel extends HTMLElement {
     // @ts-expect-error — `initialize` is added by the swiper-element bundle.
     container.initialize();
     this.dataset.upgraded = "true";
+    this.style.visibility = "";
   }
 }
 

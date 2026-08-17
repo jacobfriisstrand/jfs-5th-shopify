@@ -20,13 +20,13 @@
      open. The hamburger (top-right) morphs into an X and acts as the
      close control — see `[data-menu-trigger][aria-expanded="true"]` below. */
   position: fixed;
-  inset: var(--header-height, 0) auto 0 0;
+  inset: calc(var(--header-height, 0px) + var(--announcement-bar-height, 0px))
+    auto 0 0;
   z-index: 50;
   display: flex;
   flex-direction: column;
   width: 100%;
   max-width: 100vw;
-  height: calc(100dvh - var(--header-height, 0px));
   padding: 0;
   background: var(--color-background);
   color: var(--color-foreground);
@@ -131,7 +131,8 @@
   position: fixed;
   /* Start below the header so the header (and its hamburger→X trigger)
      stays visible and clickable while the mobile drawer is open. */
-  inset: var(--header-height, 0) 0 0 0;
+  inset: calc(var(--header-height, 0px) + var(--announcement-bar-height, 0px)) 0
+    0 0;
   z-index: 38;
   background: rgb(0 0 0 / 0.4);
   backdrop-filter: blur(8px);
@@ -280,13 +281,15 @@
   @media (min-width: 768px) {
     position: fixed;
     inset: auto;
-    top: var(--header-height, 0);
+    top: calc(var(--header-height, 0px) + var(--announcement-bar-height, 0px));
     left: 0;
     right: 0;
     /* Sits behind the header (z:40) so the nav bar stays on top. */
     z-index: 39;
     height: auto;
-    max-height: calc(100dvh - var(--header-height, 0px));
+    max-height: calc(
+      100dvh - var(--header-height, 0px) - var(--announcement-bar-height, 0px)
+    );
   }
 }
 
@@ -309,7 +312,8 @@ dialog.header-menu-megamenu::backdrop {
   inset: 0;
 
   @media (min-width: 768px) {
-    inset: var(--header-height, 0) 0 0 0;
+    inset: calc(var(--header-height, 0px) + var(--announcement-bar-height, 0px))
+      0 0 0;
   }
 }
 

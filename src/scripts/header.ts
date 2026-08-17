@@ -217,24 +217,50 @@ class HeaderComponent extends Component {
     } else {
       group.removeAttribute("data-scrolled");
     }
+
+    // Reduce visible announcement-bar offset as user scrolls past it
+    this.#updateAnnouncementOffset();
   }
 
-  /** Keep --header-height in sync with actual rendered header height. */
+  #baseBarHeight = 0;
+
+  #updateAnnouncementOffset() {
+    if (this.#baseBarHeight === 0) return;
+    const realScrollY =
+      Math.abs(parseInt(document.body.style.top) || 0) || window.scrollY;
+    const visible = Math.max(0, this.#baseBarHeight - realScrollY);
+    document.documentElement.style.setProperty(
+      "--announcement-bar-height",
+      `${visible}px`,
+    );
+  }
+
+  /** Keep --header-height in sync with header-only height, bar from section wrapper. */
   #observeHeaderHeight() {
     const group = document.getElementById("header-group");
+    const bar = document.querySelector<HTMLElement>(
+      ".shopify-section.announcement-bar",
+    );
     if (!group) return;
-    const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const h = entry.borderBoxSize?.[0]?.blockSize;
-        if (h) {
-          document.documentElement.style.setProperty(
-            "--header-height",
-            `${h}px`,
-          );
-        }
-      }
+
+    const update = () => {
+      const barH = bar?.offsetHeight ?? 0;
+      const barInGroup = bar ? group.contains(bar) : false;
+      this.#baseBarHeight = barH;
+      document.documentElement.style.setProperty(
+        "--header-height",
+        `${barInGroup ? group.offsetHeight - barH : group.offsetHeight}px`,
+      );
+    };
+
+    update();
+    this.#updateAnnouncementOffset();
+    const ro = new ResizeObserver(() => {
+      update();
+      this.#updateAnnouncementOffset();
     });
     ro.observe(group);
+    if (bar) ro.observe(bar);
   }
 
   #toggleMobileNav() {
@@ -249,6 +275,23 @@ class HeaderComponent extends Component {
     const nav = this.#nav;
     const trigger = this.#menuTrigger;
     if (!nav || !trigger) return;
+
+    // Measure actual DOM heights directly — bypass CSS variables entirely
+    const group = document.getElementById("header-group");
+    const bar = document.querySelector<HTMLElement>(
+      ".shopify-section.announcement-bar",
+    );
+    const groupH = group?.offsetHeight ?? 0;
+    const barH = bar?.offsetHeight ?? 0;
+    const barInGroup = bar ? group?.contains(bar) : false;
+    const headerOnlyH = barInGroup ? groupH - barH : groupH;
+    const realScrollY =
+      Math.abs(parseInt(document.body.style.top) || 0) || window.scrollY;
+    const visibleBarH = Math.max(0, barH - realScrollY);
+    nav.style.top = `${headerOnlyH + visibleBarH}px`;
+
+    // Also update CSS vars for any other consumers
+    this.#updateAnnouncementOffset();
 
     nav.setAttribute("data-open", "true");
     trigger.setAttribute("aria-expanded", "true");
@@ -283,6 +326,8 @@ class HeaderComponent extends Component {
       "aria-label",
       trigger.dataset.openLabel ?? "Open menu",
     );
+
+    nav.style.top = "";
 
     document
       .getElementById("header-group")
@@ -372,6 +417,35 @@ class HeaderComponent extends Component {
     if (!trigger) return; // Not one of our dialogs (e.g. cart drawer).
     trigger.setAttribute("aria-expanded", "true");
     this.#openMegamenus.add(id);
+
+    // Set megamenu top directly to avoid CSS variable mismatch on scroll.
+    // After showDialog() locks body with position:fixed, window.scrollY
+    // becomes 0. Recover the real scroll from body.style.top.
+    const dialogComponent = document.getElementById(id);
+    if (dialogComponent) {
+      const group = document.getElementById("header-group");
+      const bar = document.querySelector<HTMLElement>(
+        ".shopify-section.announcement-bar",
+      );
+      const groupH = group?.offsetHeight ?? 0;
+      const barH = bar?.offsetHeight ?? 0;
+      const barInGroup = bar ? group?.contains(bar) : false;
+      const headerOnlyH = barInGroup ? groupH - barH : groupH;
+      const realScrollY = Math.abs(parseInt(document.body.style.top) || 0);
+      const visibleBarH = Math.max(0, barH - realScrollY);
+      const topPx = `${headerOnlyH + visibleBarH}px`;
+      // dialog-component uses display:contents; set on inner <dialog>
+      const innerDialog = dialogComponent.querySelector("dialog");
+      if (innerDialog) {
+        innerDialog.style.setProperty("top", topPx, "important");
+        innerDialog.style.setProperty(
+          "max-height",
+          `calc(100dvh - ${topPx})`,
+          "important",
+        );
+      }
+    }
+
     this.#showBackdrop();
     this.#syncMegamenuOpenAttr();
   };
@@ -391,6 +465,17 @@ class HeaderComponent extends Component {
     trigger.setAttribute("aria-expanded", "false");
     trigger.focus();
     this.#openMegamenus.delete(id);
+
+    // Clear inline styles set on open
+    const dialogComponent = document.getElementById(id);
+    if (dialogComponent) {
+      const innerDialog = dialogComponent.querySelector("dialog");
+      if (innerDialog) {
+        innerDialog.style.removeProperty("top");
+        innerDialog.style.removeProperty("max-height");
+      }
+    }
+
     this.#maybeHideBackdrop();
     this.#syncMegamenuOpenAttr();
   };

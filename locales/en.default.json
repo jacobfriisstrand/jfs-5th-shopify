@@ -46,7 +46,8 @@
     "video": "Video",
     "notifications": "Notifications",
     "unit_price": "Unit price",
-    "find_country": "Find country"
+    "find_country": "Find country",
+    "announcement_bar": "Announcement bar"
   },
   "blocks": {
     "newsletter_signup": {
@@ -59,7 +60,6 @@
   },
   "actions": {
     "add": "Add",
-    "add_ticket_to_cart": "Add ticket to cart",
     "add_to_cart": "Add to cart",
     "added": "Added",
     "apply": "Apply",
@@ -145,6 +145,13 @@
       "title": "Addresses"
     },
     "log_out": "Log out"
+  },
+  "footer": {
+    "improve": "Improve",
+    "and": "and",
+    "empower": "empower",
+    "instagram": "Instagram",
+    "tiktok": "TikTok"
   },
   "content": {
     "discount": "Discount",
@@ -275,6 +282,7 @@
       "unavailable": "Unavailable",
       "options": "Options",
       "quantity": "Quantity",
+      "per_person": "Per person",
       "increase_quantity": "Increase quantity",
       "decrease_quantity": "Decrease quantity",
       "quantity_increments": "Increments of {{ increment }}",
@@ -293,6 +301,12 @@
     }
   },
   "sections": {
+    "events": {
+      "label": "Events",
+      "sort_all": "All events",
+      "sort_upcoming": "Upcoming",
+      "sort_previous": "Previous"
+    },
     "featured_collection": {
       "label": "Featured collection"
     },
@@ -308,7 +322,17 @@
       "included": "What is included in the price?",
       "practical_information": "Practical information",
       "partners": "Our partners for this challenge",
-      "disclaimer": "Disclaimer"
+      "disclaimer": "Disclaimer",
+      "past_event": "This event has ended and is no longer available for purchase.",
+      "registration": {
+        "team_size": "Team size",
+        "participant": "Participant",
+        "your_information": "Your information",
+        "instructions": "Please fill out the participant information to register your team.",
+        "dialog_title": "Register your team",
+        "submit_individual": "Register",
+        "submit_team": "Register team"
+      }
     }
   }
 }

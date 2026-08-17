@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "hero": {
+      "type": "generic-header",
+      "settings": {}
+    },
+    "events": {
+      "type": "events-collection",
+      "settings": {}
+    }
+  },
+  "order": ["hero", "events"]
+}

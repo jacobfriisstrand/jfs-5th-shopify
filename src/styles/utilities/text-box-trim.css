@@ -1,0 +1,28 @@
+/* -------------------------------------------------------------------------- */
+/* Text-box trim (leading trim) utilities.                                    */
+/* Trims space above/below text box based on font metrics.                    */
+/* -------------------------------------------------------------------------- */
+
+@utility trim {
+  text-box: trim-both cap alphabetic;
+}
+
+@utility trim-cap {
+  text-box: trim-both cap alphabetic;
+}
+
+@utility trim-ex {
+  text-box: trim-both ex alphabetic;
+}
+
+@utility trim-none {
+  text-box-trim: none;
+}
+
+@utility trim-start {
+  text-box-trim: trim-start;
+}
+
+@utility trim-end {
+  text-box-trim: trim-end;
+}

@@ -1,0 +1,4 @@
+/* Make swiper-container fill its host on desktop (where host has md:h-[80dvh]) */
+swiper-carousel swiper-container.swiper-fill-host {
+  height: 100%;
+}

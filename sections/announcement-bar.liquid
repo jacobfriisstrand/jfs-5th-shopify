@@ -1,0 +1,100 @@
+{%- comment -%}
+  announcement-bar: CSS-only marquee with 1-2 text items.
+  Renders 10 copies so track always exceeds viewport width.
+  Animates translateX(-10%) — one copy width — for seamless infinite scroll.
+  All but the first copy are aria-hidden.
+  Text items separated by an em dash. Trailing dash at end of each segment.
+{%- endcomment -%}
+
+{%- liquid
+  assign text_1 = section.settings.text_1
+  assign text_2 = section.settings.text_2
+  assign speed = section.settings.speed | default: 20
+
+  assign item_count = 0
+  if text_1 != blank
+    assign item_count = item_count | plus: 1
+  endif
+  if text_2 != blank
+    assign item_count = item_count | plus: 1
+  endif
+
+  if item_count == 0
+    assign text_1 = shop.name
+    assign item_count = 1
+  endif
+-%}
+
+{%- if item_count > 0 -%}
+  <aside
+    class="relative z-[60] overflow-hidden bg-brand text-background px-4 py-2 text-sm min-h-9"
+    aria-label="{{ 'accessibility.announcement_bar' | t }}"
+  >
+    <span class="invisible whitespace-nowrap" aria-hidden="true">
+      {%- if text_1 != blank -%}
+        {{- text_1 -}}
+        &nbsp;&nbsp;&mdash;&nbsp;&nbsp;
+      {%- endif -%}
+      {%- if text_2 != blank -%}
+        {{- text_2 -}}
+        &nbsp;&nbsp;&mdash;
+      {%- endif -%}
+    </span>
+    <div
+      class="absolute inset-0 flex w-max animate-marquee py-2 text-sm gap-2"
+      style="--marquee-duration: {{ speed }}s"
+    >
+      {%- for copy in (1..10) -%}
+        <span
+          {% if copy > 1 %}
+            aria-hidden="true"
+          {% endif %}
+        >
+          {%- if text_1 != blank -%}
+            {{- text_1 -}}
+            &nbsp;&nbsp;&mdash;&nbsp;&nbsp;
+          {%- endif -%}
+          {%- if text_2 != blank -%}
+            {{- text_2 -}}
+            &nbsp;&nbsp;&mdash;
+          {%- endif -%}
+        </span>
+      {%- endfor -%}
+    </div>
+  </aside>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.announcement_bar",
+  "class": "announcement-bar",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text_1",
+      "label": "t:settings.announcement_text"
+    },
+    {
+      "type": "text",
+      "id": "text_2",
+      "label": "t:settings.announcement_text_2"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "t:settings.announcement_speed",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "s",
+      "default": 20,
+      "info": "t:settings.announcement_speed_info"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.announcement_bar"
+    }
+  ]
+}
+{% endschema %}

@@ -98,6 +98,7 @@
     "mobile_media_2": "Mobile media 2",
     // Section header for navigation menu settings in theme editor
     "menu": "Menu",
+    "show_legal_links": "Show legal links",
     "mobile_column_optimization": "Columns will automatically optimize for mobile",
     "mobile_layout": "Mobile layout",
     "mobile_size": "Mobile size",
@@ -315,6 +316,7 @@
     "email_signup": "Email signup",
     "excerpt": "Excerpt",
     "event_card": "Event card",
+    "events_collection": "Events collection",
     "facets": "Facets",
     "faq_section": "FAQ",
     "featured_collection": "Featured collection",
@@ -328,6 +330,7 @@
     // Footer block containing copyright, policies, and social links
     "footer_utilities": "Footer utilities",
     "grid_layout_selector": "Grid layout selector",
+    "generic_header": "Generic header",
     // Layout container block that groups other content
     "group": "Group",
     "header": "Header",
@@ -362,6 +365,7 @@
     "menu": "Menu",
     "newsletter_signup": "Newsletter signup",
     "next_event_teaser": "Next event teaser",
+    "product_teaser": "Product teaser",
     "header_menu_link": "Menu link",
     "header_megamenu": "Megamenu",
     "header_menu_column": "Megamenu column",
@@ -784,6 +788,10 @@
     "aspect_ratio": "Aspect ratio",
     "custom_mobile_media": "Show different media on mobile",
     "stack_media_on_mobile": "Stack media",
+    "announcement_text": "Announcement text",
+    "announcement_text_2": "Announcement text 2",
+    "announcement_speed": "Scroll speed",
+    "announcement_speed_info": "Seconds for one full scroll cycle",
     "auto_rotate_announcements": "Auto-rotate announcements",
     "auto_rotate_slides": "Auto-rotate slides",
     "auto_load_products": "Auto load products on scroll",

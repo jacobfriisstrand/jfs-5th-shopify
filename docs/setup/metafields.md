@@ -10,15 +10,12 @@ rg "\.metafields\." -t liquid
 
 ## Scoping
 
-This theme uses Shopify products for two distinct purposes: **regular products** (physical goods) and **event tickets** (powered by the [GM Event Ticketing](https://apps.shopify.com/event-ticketing) app). The separation is enforced at two levels:
+This theme uses Shopify products for two distinct purposes: **regular products** (physical goods) and **events**. Both use the same `product.json` template and `main-product.liquid` section. No product-type detection — the PDP renders every section whose metafield is populated. A product with only event metafields looks like an event page; a product with only product metafields looks like a product page. The merchant's only responsibility is to populate the desired metafields.
 
-1. **Template level** — regular products use `product.json`; event products use `product.event.json` (assign via the product admin's "Theme template" dropdown). The event template omits product-specific blocks (`bundle-offer-pill`, `_accordion-row`).
-2. **Liquid guards** — inline metafield content (metafield accordion, size guide, bundle pill) checks `product.type` via `_is-event-product` snippet. Belt-and-suspenders: guards fire even if the wrong template is assigned.
-
-| Scope | Template | Product type filter | Purpose |
-| --- | --- | --- | --- |
-| **Product** | `product` | All types EXCEPT event types | Physical/digital goods — details, care, shipping, sizing |
-| **Event** | `product.event` | `Event` or `Ticket` | Event date, venue, schedule, ticket tiers |
+| Scope | Template | Purpose |
+| --- | --- | --- |
+| **Product** | `product` | Physical/digital goods — details, care, shipping, sizing |
+| **Event** | `product` | Event date, venue, schedule, ticket tiers |
 
 Each section below declares its scope in the heading. When a metafield is scoped to products, it must NOT render on event-ticket pages (and vice versa).
 
@@ -33,9 +30,7 @@ Each section below declares its scope in the heading. When a metafield is scoped
 
 ## Product metafields (scope: regular products)
 
-> These metafields apply to **regular products only**. They are guarded at two levels:
-> 1. **Template** — `product.event.json` omits product-specific blocks (`bundle-offer-pill`, `_accordion-row`).
-> 2. **Liquid** — `_is-event-product` snippet check (via `product.type`) suppresses inline metafield content (accordion, size guide, bundle pill) on event products.
+> These metafields apply to **regular products**. They render only when populated — no type gates, no template guards. If left blank, nothing renders.
 
 ### `custom.details` — _optional_
 
@@ -103,11 +98,34 @@ One row of cells in a `size_chart`.
 
 > **Important:** Both `headers` (on `size_chart`) and `cells` (on `size_chart_row`) must be **single line text** fields containing **comma-separated** values. The snippet splits on commas and trims whitespace, so `XS,84-88,70-74` and `XS, 84-88, 70-74` both work. Do not use list-type fields and do not put commas inside cell values (they would be split).
 
+### `participant_fields`
+
+Event registration config — whether an event is single-person or team-based, and which optional fields to collect per participant. One product references one `participant_fields` (reusable across events, like `size_chart`).
+
+| Field      | Type                            | Required | Purpose                                                                                     |
+| ------- | ------------------------------- | -------- | ------------------------------------------------------------------------------------------- |
+| `name`  | Single line text                | Yes      | Display name in the admin picker (set as the "display name")                              |
+| `mode`  | Select (`individual` \| `team`) | Yes      | `individual` = buyer buys one ticket for themselves; `team` = one buyer buys N tickets      |
+| `fields`| List of refs → `participant_field` | No    | Optional text fields collected per participant                                            |
+| `min_team_size` | Integer                  | No       | Minimum team size (default 1). Team mode only. Ignored for `individual`.                    |
+| `max_team_size` | Integer                  | No       | Maximum team size. Set equal to `min_team_size` for a fixed team size (e.g. teams of exactly 5). Capped by variant inventory. Team mode only. |
+
+### `participant_field`
+
+One participant field. There are no hard-coded fields — every field the buyer fills is configured here. Mark a field `required` to make it mandatory.
+
+| Field      | Type             | Required | Purpose                                                                                          |
+| ---------- | ---------------- | -------- | ------------------------------------------------------------------------------------------------- |
+| `name`     | Single line text | Yes      | Display name in the admin picker                                                                   |
+| `label`    | Single line text | Yes      | Field label shown to the buyer, and the line-item property key                                    |
+| `role`     | Select (`name` \| `email` \| blank) | No | Marks the field as the participant's name or email, used to identify and display each cart line item. Blank = generic text. |
+| `required` | True/false       | No       | Whether the field is required before submit                                                        |
+
 ---
 
 ## Event metafields (scope: event tickets)
 
-> These metafields apply to **event products only** (product type `Event` or `Ticket`). They are rendered inline by `sections/main-product.liquid` when the `_is-event-product` snippet returns `true`. All fields are rendered below the add-to-cart button.
+> These metafields apply to **event products**. They render only when populated — no type gates.
 
 ### `custom.event_about` — _optional_
 
@@ -162,6 +180,12 @@ One row of cells in a `size_chart`.
 - **Type:** Date
 - **Used by:** `snippets/event-card.liquid` (event status badge)
 - **Notes:** Used together with `custom.event_start_date`. Compared against `'now'` to determine status: upcoming (`start > now`), ongoing (`start <= now <= end`), previous (`end < now`). Hidden if blank.
+
+### `custom.participant_fields` — _optional (enables participant registration)_
+
+- **Type:** Metaobject reference → `participant_fields` (see above)
+- **Used by:** `snippets/participant-registration.liquid`, `sections/main-product.liquid`
+- **Notes:** When set, the PDP replaces the standard quantity + add-to-cart with a participant registration form. `mode` selects `individual` (one ticket for self) or `team` (one buyer for N tickets). Every participant collects the fields configured on the referenced metaobject. There are no hard-coded fields; use the `required` flag on each `participant_field` entry to mark it mandatory. On submit, one cart line item is added per participant (quantity 1), each carrying its own line-item properties. Past events hide the form (same as ATC).
 
 ---
 

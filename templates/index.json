@@ -79,12 +79,24 @@
         "cta_url": "shopify://collections/all-events",
         "collection": "previous-events"
       }
+    },
+    "product_teaser_EGVdzd": {
+      "type": "product-teaser",
+      "name": "t:names.product_teaser",
+      "settings": {
+        "product": "crew-sock",
+        "title": "5th Element socks",
+        "subtitle": "Made for long miles, hard sessions, and the kind of training days you don't forget.",
+        "image": "shopify://shop_images/P1010835.jpg",
+        "link_text": "View all colorways"
+      }
     }
   },
   "order": [
     "home_hero",
     "vertical_image_block_eGXkcA",
     "next_event_teaser_gkzeqL",
-    "carousel_nTUUGb"
+    "carousel_nTUUGb",
+    "product_teaser_EGVdzd"
   ]
 }

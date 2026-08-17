@@ -72,10 +72,24 @@ trap cleanup EXIT
 #                    src/schemas/** and intentionally diverges; same ignore
 #                    as the `theme dev --theme-editor-sync` invocation below
 echo "[dev] Aligning remote dev theme with local files..."
-shopify theme push \
+if ! shopify theme push \
   --development \
   --nodelete \
-  --json >/dev/null
+  --json \
+  --ignore "config/settings_data.json" \
+  --ignore "sections/header-group.json"; then
+  echo "[dev] ERROR: shopify theme push failed. Run it manually to diagnose:" >&2
+  echo "  shopify theme push --development --nodelete --json" >&2
+  echo "[dev] Then re-run bin/dev.sh." >&2
+  exit 1
+fi
+
+# Pull remote (theme-editor) changes into local so they persist in files and
+# are visible locally. Runs AFTER the pre-push so local source files (which the
+# pre-push just aligned to remote) are not clobbered; this only brings back
+# editor-managed differences (settings, header group, etc.).
+echo "[dev] Pulling remote theme changes into local..."
+shopify theme pull --development --nodelete
 
 # 4. Start `shopify theme dev` in the background, mirroring its output to a
 #    log file so we can grep for the "Preview your theme" ready banner.
@@ -84,8 +98,8 @@ SHOPIFY_LOG=$(mktemp -t shopify-dev.XXXXXX)
 
 shopify theme dev \
   --live-reload=hot-reload \
-  --theme-editor-sync \
   --ignore "config/settings_data.json" \
+  --ignore "sections/header-group.json" \
   "${STORE_PASSWORD_FLAG[@]}" \
   2>&1 | tee "$SHOPIFY_LOG" &
 SHOPIFY_PID=$!

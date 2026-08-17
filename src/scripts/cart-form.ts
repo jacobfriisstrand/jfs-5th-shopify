@@ -103,6 +103,15 @@ export class CartFormComponent extends Component {
   };
 
   #onSubmit = (event: SubmitEvent) => {
+    // Allow the checkout button's native submit — Shopify redirects a POST to
+    // /cart with a name="checkout" submitter to the checkout. We only intercept
+    // quantity updates.
+    if (
+      event.submitter instanceof HTMLButtonElement &&
+      event.submitter.name === "checkout"
+    ) {
+      return;
+    }
     // When JS is enabled we own quantity updates; prevent the native submit
     // (e.g. Enter inside a quantity input would otherwise submit with the
     // first per-line remove button as submitter and drop that line).
@@ -187,7 +196,10 @@ export class CartFormComponent extends Component {
     // Notify other listeners (header cart count, future cart drawer, etc.)
     // that the cart has changed. The section render only refreshes the
     // cart section itself — the header lives in a separate section group.
-    this.dispatchEvent(
+    // Dispatch on document, not `this`: the morph above detaches the old
+    // form node, so an event dispatched on `this` would never reach
+    // document-level listeners (header cart badge, drawer refresh).
+    document.dispatchEvent(
       new CartUpdateEvent({}, this.id || "cart-form-component", {
         source: "cart-form-component",
       }),

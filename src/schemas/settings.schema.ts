@@ -13,6 +13,7 @@ import type {
   CheckboxSetting,
   ImagePickerSetting,
   RangeSetting,
+  UrlSetting,
 } from "./types";
 
 interface ThemeInfoGroup {
@@ -24,7 +25,7 @@ interface ThemeInfoGroup {
   theme_support_email?: string;
 }
 
-type Setting = ImagePickerSetting | RangeSetting | CheckboxSetting;
+type Setting = ImagePickerSetting | RangeSetting | CheckboxSetting | UrlSetting;
 
 interface SettingsGroup {
   name: string;
@@ -77,6 +78,22 @@ const groups: [ThemeInfoGroup, ...SettingsGroup[]] = [
         step: 50,
         unit: "px",
         default: 1400,
+      },
+    ],
+  },
+
+  {
+    name: "Social",
+    settings: [
+      {
+        type: "url",
+        id: "instagram_url",
+        label: "Instagram URL",
+      },
+      {
+        type: "url",
+        id: "tiktok_url",
+        label: "TikTok URL",
       },
     ],
   },

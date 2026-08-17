@@ -9,29 +9,93 @@
   predictability across routes.
 {% endcomment %}
 
-<div class="grid-12 py-8">
+{% liquid
+  assign logo = settings.logo
+  assign instagram_url = settings.instagram_url
+  assign tiktok_url = settings.tiktok_url
+  assign contact_email = shop.email
+%}
+
+<div class="grid-12 mt-20 lg:mt-40">
   <div class="col-content flex flex-col gap-8">
     {%- if section.blocks.size > 0 -%}
-      <div data-footer-menus class="grid grid-cols-2 gap-8 md:grid-cols-4">
-        {%- for block in section.blocks -%}
-          {% render block %}
-        {%- endfor -%}
+      <div data-footer-menus class="flex max-lg:flex-col justify-between gap-10">
+        <div class="flex max-lg:flex-col max-lg:gap-10 gap-20 w-full max-lg:justify-between">
+          {%- for block in section.blocks -%}
+            {% render block %}
+          {%- endfor -%}
+        </div>
+        <div class="flex flex-col justify-between lg:items-end gap-10 w-full">
+          <a
+            href="{{ routes.root_url }}"
+            rel="home"
+            class="inline-flex items-center focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-foreground justify-end"
+          >
+            {%- if logo != blank -%}
+              {% render 'image',
+                image: logo,
+                widths: '120, 240, 360, 480, 600',
+                width_max: 600,
+                sizes: '120px',
+                alt: shop.name,
+                class: 'h-auto w-12 lg:w-17'
+              %}
+            {%- else -%}
+              <span>{{ shop.name }}</span>
+            {%- endif -%}
+          </a>
+          <div class="flex flex-col items-start gap-4 sm:items-end">
+            {%- if contact_email != blank or instagram_url != blank or tiktok_url != blank -%}
+              <ul class="flex items-center gap-4 text-sm justify-between w-full">
+                {%- if contact_email != blank -%}
+                  <li>
+                    <a
+                      href="mailto:{{ contact_email }}"
+                      class="link"
+                    >
+                      {{- contact_email -}}
+                    </a>
+                  </li>
+                {%- endif -%}
+                {%- if instagram_url != blank -%}
+                  <li>
+                    <a
+                      href="{{ instagram_url }}"
+                      class="link"
+                    >
+                      {{- 'footer.instagram' | t -}}
+                    </a>
+                  </li>
+                {%- endif -%}
+                {%- if tiktok_url != blank -%}
+                  <li>
+                    <a
+                      href="{{ tiktok_url }}"
+                      class="link"
+                    >
+                      {{- 'footer.tiktok' | t -}}
+                    </a>
+                  </li>
+                {%- endif -%}
+              </ul>
+            {%- endif -%}
+          </div>
+        </div>
       </div>
     {%- endif -%}
 
-    <div
-      data-footer-row
-      class="flex flex-col items-start gap-4 border-t border-current/10 pt-6 sm:flex-row sm:items-center sm:justify-between"
-    >
-      {% content_for 'block', type: 'footer-copyright', id: 'footer-copyright' %}
-      {% content_for 'block', type: 'footer-policy-list', id: 'footer-policy-list' %}
-    </div>
+    <p class="font-heading text-[10vw] flex justify-between trim-cap leading-0">
+      <span class="trim-cap leading-0">{{ 'footer.improve' | t }}</span>
+      <span class="trim-cap leading-0">{{ 'footer.and' | t }}</span>
+      <span class="trim-cap leading-0">{{ 'footer.empower' | t }}</span>
+    </p>
   </div>
 </div>
 
 {% schema %}
 {
   "name": "t:names.footer",
+  "max_blocks": 3,
   "enabled_on": {
     "groups": [
       "footer"

@@ -128,7 +128,8 @@ video-toggle video {
 /* -------------------------------------------------------------------------- */
 
 :root {
-  /* Header height is measured dynamically by header-component via
-     ResizeObserver. This is a fallback for the first paint frame. */
-  --header-height: 64px;
+  /* Header measurements are set dynamically by header-component via
+     ResizeObserver + scroll. These are close-enough first-paint defaults. */
+  --header-height: 68px;
+  --announcement-bar-height: 36px;
 }

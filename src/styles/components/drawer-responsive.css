@@ -1,0 +1,24 @@
+/* Responsive drawer: slides from the right on desktop, becomes a bottom sheet
+   on mobile. Attach `.drawer-responsive-bottom` to a `<dialog>` rendered with
+   `data-drawer="right"` (see `snippets/drawer.liquid`). */
+
+@media (max-width: 1023px) {
+  dialog[data-drawer="right"].drawer-responsive-bottom {
+    inset: auto 0 0 0;
+    width: 100% !important;
+    max-width: none;
+    height: 66dvh;
+  }
+
+  dialog[data-drawer="right"].drawer-responsive-bottom[open]:not(
+      .dialog-closing
+    ) {
+    animation: drawer-in-bottom var(--motion-overlay-in-duration)
+      var(--motion-overlay-in-easing);
+  }
+
+  dialog[data-drawer="right"].drawer-responsive-bottom.dialog-closing {
+    animation: drawer-out-bottom var(--motion-overlay-out-duration)
+      var(--motion-overlay-out-easing) forwards;
+  }
+}
