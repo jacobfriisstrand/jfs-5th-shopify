@@ -21,6 +21,18 @@ import { CartAddEvent, ToastEvent } from "@theme/events";
  * validity (required) on submit, opening any collapsed participant that has an
  * invalid field before focusing it.
  */
+// Short random team id (base62, ~12 chars, ~71 bits). Collision probability
+// across real-world team counts is negligible; `byte % 62` bias is irrelevant
+// at this scale.
+function randomTeamId(): string {
+  const alphabet =
+    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  const bytes = crypto.getRandomValues(new Uint8Array(12));
+  let id = "";
+  for (const byte of bytes) id += alphabet[byte % 62];
+  return id;
+}
+
 export class ParticipantRegistrationForm extends Component {
   connectedCallback() {
     super.connectedCallback();
@@ -190,6 +202,9 @@ export class ParticipantRegistrationForm extends Component {
       properties: Record<string, string>;
     }> = [];
 
+    // One id per registration, shared by every participant of the same team.
+    const teamId = this.dataset.mode === "team" ? randomTeamId() : undefined;
+
     participants.forEach((details, index) => {
       const properties: Record<string, string> = {};
       details
@@ -211,6 +226,8 @@ export class ParticipantRegistrationForm extends Component {
       properties["_participant"] = String(index + 1);
       if (this.dataset.mode === "team") {
         properties["_team_size"] = String(participants.length);
+        // Links every participant line item back to a single team.
+        if (teamId) properties["_team_id"] = teamId;
       }
 
       items.push({ id: variantId, quantity: 1, properties });
