@@ -41,6 +41,12 @@ if [[ -n "${SHOPIFY_FLAG_STORE_PASSWORD:-}" ]]; then
   STORE_PASSWORD_FLAG=(--store-password "$SHOPIFY_FLAG_STORE_PASSWORD")
 fi
 
+# Live store — theme dev pushes/pulls/previews data against this store, not
+# the dev/playground store the CLI is otherwise bound to. Override in
+# .env.local if the live store ever moves.
+STORE="${SHOPIFY_FLAG_STORE_LIVE:-5th-element-dev.myshopify.com}"
+STORE_FLAG=(--store "$STORE")
+
 # 2. Cleanup trap (PIDs filled in below as watchers are launched).
 VP_PID=""
 ESBUILD_PID=""
@@ -54,42 +60,54 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# 3. Push local theme files to the remote dev theme BEFORE starting
-#    `shopify theme dev`. Without this, any divergence between local and
-#    the remote dev theme triggers an interactive "Reconciliation Strategy"
-#    prompt during `theme dev`'s initial sync. Because we background the CLI
-#    (so we can grep its log for the ready banner before starting watchers),
-#    keystrokes typed at this terminal go to the bash script's foreground
-#    process group rather than the backgrounded CLI — so the prompt is
-#    unanswerable. By aligning local→remote up front with a non-interactive
-#    `theme push`, the divergence (and therefore the prompt) never happens.
+# 3. Pull the PUBLISHED theme's data/config into local so the preview reflects
+#    the live store, not a blank dev theme. `shopify theme dev` builds its
+#    development theme from local files, so unless local carries the live
+#    theme's data-bearing config files (settings, header/footer groups) the
+#    preview renders with no header menu, logo, or announcement.
 #
-#    --development   target the linked dev theme (creates one if needed)
-#    --nodelete      don't delete remote-only files (some are managed by
-#                    Shopify, not us)
-#    --json          machine-readable, suppresses interactive prompts
-#    --ignore        config/settings_schema.json is generated locally from
-#                    src/schemas/** and intentionally diverges; same ignore
-#                    as the `theme dev --theme-editor-sync` invocation below
+#    Only the config/data files are pulled — local source code (sections,
+#    blocks, templates, assets) is left untouched for active development on
+#    the current branch.
+#
+#    --live   pull from the remote LIVE (published) theme
+#    --only   restrict the pull to the data-bearing files
+LIVE_CONFIG_FILES=(
+  "--only" "config/settings_data.json"
+  "--only" "sections/header-group.json"
+  "--only" "sections/footer-group.json"
+)
+echo "[dev] Pulling live theme data from the published store..."
+shopify theme pull "${STORE_FLAG[@]}" \
+  --live \
+  --nodelete \
+  "${LIVE_CONFIG_FILES[@]}"
+
+# 3b. Push local files (now including the live theme's data) to the remote dev
+#     theme BEFORE starting `shopify theme dev`. Without this, any divergence
+#     between local and the remote dev theme triggers an interactive
+#     "Reconciliation Strategy" prompt during `theme dev`'s initial sync.
+#     Because we background the CLI (so we can grep its log for the ready
+#     banner before starting watchers), keystrokes typed at this terminal go to
+#     the bash script's foreground process group rather than the backgrounded
+#     CLI — so the prompt is unanswerable. By aligning local→remote up front
+#     with a non-interactive `theme push`, the prompt never happens.
+#
+#     --development   target the linked dev theme (creates one if needed)
+#     --nodelete      don't delete remote-only files (some are managed by
+#                     Shopify, not us)
+#     --json          machine-readable, suppresses interactive prompts
 echo "[dev] Aligning remote dev theme with local files..."
 if ! shopify theme push \
+  "${STORE_FLAG[@]}" \
   --development \
   --nodelete \
-  --json \
-  --ignore "config/settings_data.json" \
-  --ignore "sections/header-group.json"; then
+  --json; then
   echo "[dev] ERROR: shopify theme push failed. Run it manually to diagnose:" >&2
   echo "  shopify theme push --development --nodelete --json" >&2
   echo "[dev] Then re-run bin/dev.sh." >&2
   exit 1
 fi
-
-# Pull remote (theme-editor) changes into local so they persist in files and
-# are visible locally. Runs AFTER the pre-push so local source files (which the
-# pre-push just aligned to remote) are not clobbered; this only brings back
-# editor-managed differences (settings, header group, etc.).
-echo "[dev] Pulling remote theme changes into local..."
-shopify theme pull --development --nodelete
 
 # 4. Start `shopify theme dev` in the background, mirroring its output to a
 #    log file so we can grep for the "Preview your theme" ready banner.
@@ -97,9 +115,8 @@ shopify theme pull --development --nodelete
 SHOPIFY_LOG=$(mktemp -t shopify-dev.XXXXXX)
 
 shopify theme dev \
+  "${STORE_FLAG[@]}" \
   --live-reload=hot-reload \
-  --ignore "config/settings_data.json" \
-  --ignore "sections/header-group.json" \
   "${STORE_PASSWORD_FLAG[@]}" \
   2>&1 | tee "$SHOPIFY_LOG" &
 SHOPIFY_PID=$!

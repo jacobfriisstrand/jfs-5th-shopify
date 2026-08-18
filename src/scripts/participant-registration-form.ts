@@ -1,5 +1,5 @@
 import { Component } from "@theme/component";
-import { CartAddEvent, ThemeEvents, ToastEvent } from "@theme/events";
+import { CartAddEvent, ToastEvent } from "@theme/events";
 
 /**
  * `<participant-registration-form>` — renders one participant fieldset per
@@ -24,20 +24,12 @@ import { CartAddEvent, ThemeEvents, ToastEvent } from "@theme/events";
 export class ParticipantRegistrationForm extends Component {
   connectedCallback() {
     super.connectedCallback();
-    this.addEventListener(
-      ThemeEvents.quantitySelectorUpdate,
-      this.#onQuantity as EventListener,
-    );
     this.addEventListener("click", this.#onClick);
     // Participants render when the trigger opens the dialog (both modes).
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    this.removeEventListener(
-      ThemeEvents.quantitySelectorUpdate,
-      this.#onQuantity as EventListener,
-    );
     this.removeEventListener("click", this.#onClick);
   }
 
@@ -53,21 +45,15 @@ export class ParticipantRegistrationForm extends Component {
   #onClick = (event: Event) => {
     const target = event.target as Element | null;
     if (!target?.closest("[data-register-trigger]")) return;
-    this.#syncParticipants(this.#quantity());
+    this.#syncParticipants(this.#teamSize());
     this.#dialog?.showDialog?.();
   };
 
-  #quantity(): number {
-    const input = this.querySelector<HTMLInputElement>(
-      "quantity-selector-component input",
-    );
-    const value = input ? Number.parseInt(input.value, 10) : 1;
+  // Team size is fixed on the event (no quantity counter).
+  #teamSize(): number {
+    const value = Number.parseInt(this.dataset.teamSize ?? "1", 10);
     return Number.isFinite(value) && value >= 1 ? value : 1;
   }
-
-  #onQuantity = () => {
-    this.#syncParticipants(this.#quantity());
-  };
 
   #syncParticipants(count: number) {
     const container = this.querySelector<HTMLElement>("[data-participants]");
