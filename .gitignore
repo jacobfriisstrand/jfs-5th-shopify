@@ -26,3 +26,8 @@ assets/
 
 # Local development files
 .env.*
+
+# Editor-managed section group data — sourced from the live store via
+# `bin/dev.sh` (`shopify theme pull --live`), never committed.
+sections/header-group.json
+sections/footer-group.json

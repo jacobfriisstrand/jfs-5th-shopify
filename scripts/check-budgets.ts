@@ -213,13 +213,22 @@ function walkSectionGroup(
   assets: Set<string>,
 ): void {
   const groupPath = join(SECTIONS_DIR, `${name}.json`);
-  if (!existsSync(groupPath)) return;
-  const group = readJSON<{ sections?: Record<string, { type: string }> }>(
-    groupPath,
-  );
-  for (const s of Object.values(group.sections ?? {})) {
-    walkLiquid(join(SECTIONS_DIR, `${s.type}.liquid`), seen, assets);
+  if (existsSync(groupPath)) {
+    const group = readJSON<{ sections?: Record<string, { type: string }> }>(
+      groupPath,
+    );
+    for (const s of Object.values(group.sections ?? {})) {
+      walkLiquid(join(SECTIONS_DIR, `${s.type}.liquid`), seen, assets);
+    }
+    return;
   }
+
+  // Group JSON absent (e.g. header-group/footer-group are gitignored and
+  // sourced from the live store). Fall back to the section named after the
+  // group, which is always rendered as part of the group chrome — otherwise
+  // every route would silently drop the header/footer asset graphs.
+  const base = name.replace(/-group$/, "");
+  walkLiquid(join(SECTIONS_DIR, `${base}.liquid`), seen, assets);
 }
 
 /**

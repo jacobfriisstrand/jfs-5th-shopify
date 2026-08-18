@@ -325,10 +325,11 @@
       "disclaimer": "Disclaimer",
       "past_event": "This event has ended and is no longer available for purchase.",
       "registration": {
-        "team_size": "Team size",
         "participant": "Participant",
+        "team_count": "Team of {{ count }} participants",
         "your_information": "Your information",
         "instructions": "Please fill out the participant information to register your team.",
+        "instructions_single": "Please fill out the participant information to register.",
         "dialog_title": "Register your team",
         "submit_individual": "Register",
         "submit_team": "Register team"
