@@ -1,5 +1,5 @@
 import { Component } from "@theme/component";
-import { CartAddEvent, ThemeEvents, ToastEvent } from "@theme/events";
+import { CartAddEvent, ToastEvent } from "@theme/events";
 
 /**
  * `<participant-registration-form>` — renders one participant fieldset per
@@ -21,23 +21,27 @@ import { CartAddEvent, ThemeEvents, ToastEvent } from "@theme/events";
  * validity (required) on submit, opening any collapsed participant that has an
  * invalid field before focusing it.
  */
+// Short random team id (base62, ~12 chars, ~71 bits). Collision probability
+// across real-world team counts is negligible; `byte % 62` bias is irrelevant
+// at this scale.
+function randomTeamId(): string {
+  const alphabet =
+    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  const bytes = crypto.getRandomValues(new Uint8Array(12));
+  let id = "";
+  for (const byte of bytes) id += alphabet[byte % 62];
+  return id;
+}
+
 export class ParticipantRegistrationForm extends Component {
   connectedCallback() {
     super.connectedCallback();
-    this.addEventListener(
-      ThemeEvents.quantitySelectorUpdate,
-      this.#onQuantity as EventListener,
-    );
     this.addEventListener("click", this.#onClick);
     // Participants render when the trigger opens the dialog (both modes).
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    this.removeEventListener(
-      ThemeEvents.quantitySelectorUpdate,
-      this.#onQuantity as EventListener,
-    );
     this.removeEventListener("click", this.#onClick);
   }
 
@@ -53,21 +57,15 @@ export class ParticipantRegistrationForm extends Component {
   #onClick = (event: Event) => {
     const target = event.target as Element | null;
     if (!target?.closest("[data-register-trigger]")) return;
-    this.#syncParticipants(this.#quantity());
+    this.#syncParticipants(this.#teamSize());
     this.#dialog?.showDialog?.();
   };
 
-  #quantity(): number {
-    const input = this.querySelector<HTMLInputElement>(
-      "quantity-selector-component input",
-    );
-    const value = input ? Number.parseInt(input.value, 10) : 1;
+  // Team size is fixed on the event (no quantity counter).
+  #teamSize(): number {
+    const value = Number.parseInt(this.dataset.teamSize ?? "1", 10);
     return Number.isFinite(value) && value >= 1 ? value : 1;
   }
-
-  #onQuantity = () => {
-    this.#syncParticipants(this.#quantity());
-  };
 
   #syncParticipants(count: number) {
     const container = this.querySelector<HTMLElement>("[data-participants]");
@@ -204,6 +202,9 @@ export class ParticipantRegistrationForm extends Component {
       properties: Record<string, string>;
     }> = [];
 
+    // One id per registration, shared by every participant of the same team.
+    const teamId = this.dataset.mode === "team" ? randomTeamId() : undefined;
+
     participants.forEach((details, index) => {
       const properties: Record<string, string> = {};
       details
@@ -225,6 +226,8 @@ export class ParticipantRegistrationForm extends Component {
       properties["_participant"] = String(index + 1);
       if (this.dataset.mode === "team") {
         properties["_team_size"] = String(participants.length);
+        // Links every participant line item back to a single team.
+        if (teamId) properties["_team_id"] = teamId;
       }
 
       items.push({ id: variantId, quantity: 1, properties });
