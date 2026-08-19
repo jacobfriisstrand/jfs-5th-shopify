@@ -330,6 +330,7 @@
         "instructions": "Please fill out the participant information to register your team.",
         "instructions_single": "Please fill out the participant information to register.",
         "dialog_title": "Register your team",
+        "upsell_title": "You can also check out our products here",
         "submit_individual": "Register",
         "submit_team": "Register team"
       }
