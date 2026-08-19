@@ -11,6 +11,7 @@
 
 import type {
   CheckboxSetting,
+  CollectionSetting,
   ImagePickerSetting,
   RangeSetting,
   UrlSetting,
@@ -25,7 +26,12 @@ interface ThemeInfoGroup {
   theme_support_email?: string;
 }
 
-type Setting = ImagePickerSetting | RangeSetting | CheckboxSetting | UrlSetting;
+type Setting =
+  | ImagePickerSetting
+  | RangeSetting
+  | CheckboxSetting
+  | UrlSetting
+  | CollectionSetting;
 
 interface SettingsGroup {
   name: string;
@@ -106,6 +112,18 @@ const groups: [ThemeInfoGroup, ...SettingsGroup[]] = [
         id: "show_add_discount_code",
         label: "Show discount-code field in cart",
         default: false,
+      },
+    ],
+  },
+
+  {
+    name: "Events",
+    settings: [
+      {
+        type: "collection",
+        id: "registration_upsell_collection",
+        label: "Registration upsell collection",
+        info: "Products shown in the upsell carousel inside the event registration drawer. Falls back to the 'all-products' collection when empty.",
       },
     ],
   },
