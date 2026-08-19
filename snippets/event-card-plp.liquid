@@ -2,8 +2,9 @@
   Renders an event product card for PLP (product list page) grids.
   Three-column layout: image center, date + title left, description + CTA right.
 
-  Reads custom.event_start_date and custom.event_end_date metafields to
-  determine event status and formatted date.
+  Reads custom.event_start_date metafield to determine event status
+  (upcoming / previous) and formatted date. Events that have started are
+  treated as previous; there is no ongoing state.
 
   @param {product} product - The product to render. Required.
   @param {number} [heading_level] - Heading level for the product title. Defaults to 3.
@@ -19,20 +20,17 @@
 
   assign now_ts = 'now' | date: '%s' | plus: 0
   assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0
-  assign end_ts = product.metafields.custom.event_end_date | date: '%s' | plus: 0
 
   assign event_status = ''
   if start_ts != 0
     if start_ts > now_ts
       assign event_status = 'upcoming'
-    elsif end_ts != 0 and end_ts >= now_ts
-      assign event_status = 'ongoing'
     else
       assign event_status = 'previous'
     endif
     assign event_status_key = 'sections.event.status.' | append: event_status
     assign event_status_label = event_status_key | t
-    if event_status == 'upcoming' or event_status == 'ongoing'
+    if event_status == 'upcoming'
       assign badge_variant = 'brand'
     else
       assign badge_variant = 'dark'
