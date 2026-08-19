@@ -313,7 +313,6 @@
     "event": {
       "status": {
         "upcoming": "Upcoming",
-        "ongoing": "Ongoing",
         "previous": "Previous"
       },
       "about": "What is this event about?",

@@ -12,10 +12,10 @@ rg "\.metafields\." -t liquid
 
 This theme uses Shopify products for two distinct purposes: **regular products** (physical goods) and **events**. Both use the same `product.json` template and `main-product.liquid` section. No product-type detection — the PDP renders every section whose metafield is populated. A product with only event metafields looks like an event page; a product with only product metafields looks like a product page. The merchant's only responsibility is to populate the desired metafields.
 
-| Scope | Template | Purpose |
-| --- | --- | --- |
+| Scope       | Template  | Purpose                                                  |
+| ----------- | --------- | -------------------------------------------------------- |
 | **Product** | `product` | Physical/digital goods — details, care, shipping, sizing |
-| **Event** | `product` | Event date, venue, schedule, ticket tiers |
+| **Event**   | `product` | Event date, venue, schedule, ticket tiers                |
 
 Each section below declares its scope in the heading. When a metafield is scoped to products, it must NOT render on event-ticket pages (and vice versa).
 
@@ -102,21 +102,21 @@ One row of cells in a `size_chart`.
 
 Event registration config — which optional fields to collect per participant. One product references one `participant_fields` (reusable across events, like `size_chart`). The team vs individual distinction is **not** stored here — it is derived from the per-event `custom.team_size` product metafield (`1` = individual, `> 1` = team).
 
-| Field      | Type                            | Required | Purpose                                                                                     |
-| ------- | ------------------------------- | -------- | ------------------------------------------------------------------------------------------- |
-| `name`  | Single line text                | Yes      | Display name in the admin picker (set as the "display name")                              |
-| `fields`| List of refs → `participant_field` | No    | Optional text fields collected per participant                                            |
+| Field    | Type                               | Required | Purpose                                                      |
+| -------- | ---------------------------------- | -------- | ------------------------------------------------------------ |
+| `name`   | Single line text                   | Yes      | Display name in the admin picker (set as the "display name") |
+| `fields` | List of refs → `participant_field` | No       | Optional text fields collected per participant               |
 
 ### `participant_field`
 
 One participant field. There are no hard-coded fields — every field the buyer fills is configured here. Mark a field `required` to make it mandatory.
 
-| Field      | Type             | Required | Purpose                                                                                          |
-| ---------- | ---------------- | -------- | ------------------------------------------------------------------------------------------------- |
-| `name`     | Single line text | Yes      | Display name in the admin picker                                                                   |
-| `label`    | Single line text | Yes      | Field label shown to the buyer, and the line-item property key                                    |
-| `role`     | Select (`name` \| `email` \| blank) | No | Marks the field as the participant's name or email, used to identify and display each cart line item. Blank = generic text. |
-| `required` | True/false       | No       | Whether the field is required before submit                                                        |
+| Field      | Type                                | Required | Purpose                                                                                                                     |
+| ---------- | ----------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `name`     | Single line text                    | Yes      | Display name in the admin picker                                                                                            |
+| `label`    | Single line text                    | Yes      | Field label shown to the buyer, and the line-item property key                                                              |
+| `role`     | Select (`name` \| `email` \| blank) | No       | Marks the field as the participant's name or email, used to identify and display each cart line item. Blank = generic text. |
+| `required` | True/false                          | No       | Whether the field is required before submit                                                                                 |
 
 ---
 
@@ -169,14 +169,14 @@ One participant field. There are no hard-coded fields — every field the buyer 
 ### `custom.event_start_date` — _required for event cards_
 
 - **Type:** Date
-- **Used by:** `sections/next-event-teaser.liquid` (formatted date in header), `snippets/event-card.liquid` (event status badge: upcoming / ongoing / previous)
-- **Notes:** Used together with `custom.event_end_date` in event-card to compute status. next-event-teaser formats this as e.g. "23rd of March 2026". Hidden if blank.
+- **Used by:** `sections/next-event-teaser.liquid` (formatted date in header), `snippets/event-card.liquid` and `snippets/event-card-plp.liquid` (event status badge: upcoming / previous)
+- **Notes:** Determines status on event cards: upcoming (`start > now`), previous (`start <= now`). There is no ongoing state. next-event-teaser formats this as e.g. "23rd of March 2026". Hidden if blank.
 
-### `custom.event_end_date` — _required for event cards_
+### `custom.event_end_date` — _optional (past-event detection)_
 
 - **Type:** Date
-- **Used by:** `snippets/event-card.liquid` (event status badge)
-- **Notes:** Used together with `custom.event_start_date`. Compared against `'now'` to determine status: upcoming (`start > now`), ongoing (`start <= now <= end`), previous (`end < now`). Hidden if blank.
+- **Used by:** `sections/main-product.liquid` (hides the registration form / ATC once the event has ended)
+- **Notes:** Compared against `'now'` to mark an event as past so the PDP shows "This event has ended" instead of the form. No longer used for the card status badge. Hidden if blank.
 
 ### `custom.participant_fields` — _optional (enables participant registration)_
 
