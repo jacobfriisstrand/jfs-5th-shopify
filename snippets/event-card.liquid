@@ -3,8 +3,9 @@
   title, and event-status badge. Designed to be rendered inside a carousel
   `<li>`.
 
-  Reads custom.event_start_date and custom.event_end_date metafields to
-  determine the event's status (upcoming / ongoing / previous).
+  Reads custom.event_start_date metafield to determine the event's status
+  (upcoming / previous). Events that have started (start date reached) are
+  treated as previous; there is no ongoing state.
 
   Mobile: description below image.
   Desktop: description slides up from bottom on hover.
@@ -25,20 +26,17 @@
 
   assign now_ts = 'now' | date: '%s' | plus: 0
   assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0
-  assign end_ts = product.metafields.custom.event_end_date | date: '%s' | plus: 0
 
   assign event_status = ''
   if start_ts != 0
     if start_ts > now_ts
       assign event_status = 'upcoming'
-    elsif end_ts != 0 and end_ts >= now_ts
-      assign event_status = 'ongoing'
     else
       assign event_status = 'previous'
     endif
     assign event_status_key = 'sections.event.status.' | append: event_status
     assign event_status_label = event_status_key | t
-    if event_status == 'upcoming' or event_status == 'ongoing'
+    if event_status == 'upcoming'
       assign badge_variant = 'brand'
     else
       assign badge_variant = 'dark'

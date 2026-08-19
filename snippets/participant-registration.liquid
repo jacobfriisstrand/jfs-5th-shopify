@@ -18,6 +18,10 @@
   line item per participant (quantity 1), each carrying its own line-item
   properties.
 
+  The drawer also renders a product upsell carousel below the form, sourced
+  from the global "Registration upsell collection" theme setting (falls back
+  to the merchant's "all products" collection when unset), capped at 8 items.
+
   @param {object} product - The product. Required.
   @param {object} section - The parent section (for scoped ids). Required.
   @param {object} variant - The selected/available variant. Required.
@@ -69,6 +73,16 @@
   assign dialog_id = 'registration-dialog-' | append: section.id
   assign dialog_title_id = dialog_id | append: '-title'
   assign register_attrs = 'data-register-trigger aria-haspopup="dialog" aria-controls="' | append: dialog_id | append: '"'
+
+  assign upsell_collection = settings.registration_upsell_collection | default: collections['all-products']
+  assign upsell_products = upsell_collection.products
+  assign upsell_products_count = upsell_collection.products_count
+  if upsell_products_count > 8
+    assign upsell_products_count = 8
+  endif
+  assign upsell_title_text = 'sections.event.registration.upsell_title' | t
+  assign upsell_heading_id = dialog_id | append: '-upsell-title'
+  assign upsell_breakpoints = '{"768": {"slidesPerView": 2, "spaceBetween": 16}}'
 %}
 
 {%- if registration != blank -%}
@@ -112,6 +126,23 @@
               ref: 'submitButton'
             %}
           </form>
+
+          {%- if upsell_products_count > 0 -%}
+            <section class="mt-2 border-t border-current/15 pt-6" aria-labelledby="{{ upsell_heading_id }}">
+              {% render 'carousel',
+                type: 'product',
+                items: upsell_products,
+                count: upsell_products_count,
+                min_for_carousel: 3,
+                slides_per_view: '1.2',
+                breakpoints: upsell_breakpoints,
+                heading: upsell_title_text,
+                heading_level: 3,
+                heading_id: upsell_heading_id,
+                heading_class: 'text-xl'
+              %}
+            </section>
+          {%- endif -%}
         </div>
       </div>
     {%- endcapture -%}
@@ -128,7 +159,10 @@
       <details class="accordion-row">
         <summary>
           {%- if team_size > 1 -%}
-            <span class="text-base font-medium">{{ label_participant }} <span data-participant-number>1</span></span>
+            <span class="text-base font-medium">
+              {{- label_participant }}
+              <span data-participant-number>1</span></span
+            >
           {%- else -%}
             <span class="text-base font-medium">{{ label_your_information }}</span>
           {%- endif -%}

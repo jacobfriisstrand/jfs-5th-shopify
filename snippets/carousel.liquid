@@ -15,31 +15,21 @@
     2. Add a `when '<type>'` branch in the `case type` block below.
 
   @param {string} type - Card type: 'product' (more to come).
-  @param {object} items - Items to render. Each item is passed to the card
-    snippet (a `product` for type='product'). Pass the full enumerable
-    (e.g. `collection.products`); use `count` to limit how many render.
-  @param {number} [count] - How many items to render from `items`. Caller is
-    responsible for clamping this to the collection size. Defaults to
-    `items.size` (which is unreliable on lazy product enumerables — pass
-    `count` explicitly for those).
-  @param {number} [min_for_carousel] - Minimum item count required to enhance
-    into a carousel. Below this, renders a plain grid (no JS loaded).
-    Default: 4.
-  @param {string} [slides_per_view] - Smallest-breakpoint slidesPerView
-    forwarded to `<swiper-carousel>`. Default: '1.2'.
+  @param {object} items - Items to render. Each item is passed to the card snippet (a `product` for type='product'). Pass the full enumerable (e.g. `collection.products`); use `count` to limit how many render.
+  @param {number} [count] - How many items to render from `items`. Caller is responsible for clamping this to the collection size. Defaults to `items.size` (which is unreliable on lazy product enumerables — pass `count` explicitly for those).
+  @param {number} [min_for_carousel] - Minimum item count required to enhance into a carousel. Below this, renders a plain grid (no JS loaded). Default: 4.
+  @param {string} [slides_per_view] - Smallest-breakpoint slidesPerView forwarded to `<swiper-carousel>`. Default: '1.2'.
+  @param {string} [breakpoints] - Optional JSON string of Swiper `breakpoints` (window-width px → Swiper options), e.g. `'{"768": {"slidesPerView": 2, "spaceBetween": 16}}'`. When blank, `<swiper-carousel>` falls back to its own defaults (640 → 2, 1024 → 3). Pass this to cap the slide count in narrow containers such as a drawer.
   @param {string} [heading] - Optional heading rendered in the header.
-  @param {number} [heading_level] - Heading level (1-6) for the carousel
-    heading. Defaults to 2. Card titles inside the carousel automatically
-    render one level deeper than this.
+  @param {number} [heading_level] - Heading level (1-6) for the carousel heading. Defaults to 2. Card titles inside the carousel automatically render one level deeper than this.
   @param {string} [subheading] - Optional subheading rendered under heading.
-  @param {string} [heading_id] - DOM id for the heading; lets the caller
-    wire `aria-labelledby` on its section. Required if `heading` is set.
+  @param {string} [heading_id] - DOM id for the heading; lets the caller wire `aria-labelledby` on its section. Required if `heading` is set.
+  @param {string} [heading_class] - Tailwind classes for the heading. Defaults to 'text-2xl sm:text-3xl' (full-width section heading). Pass a smaller size when the carousel renders in a narrow container such as a drawer.
   @param {string} [link_url] - Optional "view all" link target.
-  @param {string} [link_text] - Optional "view all" link label.
-    Default: 'View all'.
+  @param {string} [link_text] - Optional "view all" link label. Default: 'View all'.
 
   @example
-    {% render 'carousel',
+  {% render 'carousel',
       type: 'product',
       items: collection.products,
       count: 8,
@@ -55,9 +45,11 @@
 {% liquid
   assign min_for_carousel = min_for_carousel | default: 4
   assign slides_per_view = slides_per_view | default: '1.2'
+  assign breakpoints = breakpoints | default: ''
   assign item_count = count | default: items.size
   assign link_text = link_text | default: 'View all'
   assign resolved_heading_level = heading_level | default: 2
+  assign resolved_heading_class = heading_class | default: 'text-2xl sm:text-3xl'
   assign card_heading_level = resolved_heading_level | plus: 1
   assign use_carousel = false
   if item_count >= min_for_carousel
@@ -74,6 +66,9 @@
     <swiper-carousel
       data-bundle-url="{{ 'swiper-element-bundle.js' | asset_url }}"
       data-slides-per-view="{{ slides_per_view }}"
+      {%- if breakpoints != blank -%}
+        data-breakpoints='{{ breakpoints }}'
+      {%- endif -%}
       class="block"
     >
   {%- endif -%}
@@ -87,7 +82,7 @@
               text: heading,
               level: resolved_heading_level,
               id: heading_id,
-              class: 'text-2xl sm:text-3xl'
+              class: resolved_heading_class
             %}
           {%- endif -%}
           {%- if subheading != blank -%}
@@ -98,11 +93,7 @@
 
       <div class="flex items-center gap-4">
         {%- if link_url != blank -%}
-          {% render 'button',
-            text: link_text,
-            href: link_url,
-            variant: 'primary'
-          %}
+          {% render 'button', text: link_text, href: link_url, variant: 'primary' %}
         {%- endif -%}
       </div>
     </header>
