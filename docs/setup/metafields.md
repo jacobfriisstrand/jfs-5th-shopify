@@ -100,12 +100,11 @@ One row of cells in a `size_chart`.
 
 ### `participant_fields`
 
-Event registration config — whether an event is single-person or team-based, and which optional fields to collect per participant. One product references one `participant_fields` (reusable across events, like `size_chart`).
+Event registration config — which optional fields to collect per participant. One product references one `participant_fields` (reusable across events, like `size_chart`). The team vs individual distinction is **not** stored here — it is derived from the per-event `custom.team_size` product metafield (`1` = individual, `> 1` = team).
 
 | Field      | Type                            | Required | Purpose                                                                                     |
 | ------- | ------------------------------- | -------- | ------------------------------------------------------------------------------------------- |
 | `name`  | Single line text                | Yes      | Display name in the admin picker (set as the "display name")                              |
-| `mode`  | Select (`individual` \| `team`) | Yes      | `individual` = buyer buys one ticket for themselves; `team` = one buyer buys N tickets      |
 | `fields`| List of refs → `participant_field` | No    | Optional text fields collected per participant                                            |
 
 ### `participant_field`
@@ -183,18 +182,19 @@ One participant field. There are no hard-coded fields — every field the buyer 
 
 - **Type:** Metaobject reference → `participant_fields` (see above)
 - **Used by:** `snippets/participant-registration.liquid`, `sections/main-product.liquid`
-- **Notes:** When set, the PDP replaces the standard quantity + add-to-cart with a participant registration form. `mode` selects `individual` (one ticket for self) or `team` (one buyer for N tickets). Every participant collects the fields configured on the referenced metaobject. There are no hard-coded fields; use the `required` flag on each `participant_field` entry to mark it mandatory. On submit, one cart line item is added per participant (quantity 1), each carrying its own line-item properties. Past events hide the form (same as ATC). Team size is defined per event via `custom.team_size` (below), not on this metaobject.
+- **Notes:** When set, the PDP replaces the standard quantity + add-to-cart with a participant registration form. Every participant collects the fields configured on the referenced metaobject. There are no hard-coded fields; use the `required` flag on each `participant_field` entry to mark it mandatory. On submit, one cart line item is added per participant (quantity 1), each carrying its own line-item properties. Past events hide the form (same as ATC). Whether the event registers one buyer or a team of N is derived from `custom.team_size` (below) — not from this metaobject.
 
-### `custom.team_size` — _optional (team mode max team size)_
+### `custom.team_size` — _optional (team vs individual discriminator)_
 
 - **Type:** Integer
-- **Used by:** `snippets/participant-registration.liquid` (team stepper max)
-- **Notes:** Maximum team size for a team-based event (default 1). Unique per event product — set on each event's product metafield, not on the `participant_fields` metaobject. Capped by variant inventory. Team mode only; ignored for `individual`.
+- **Used by:** `snippets/participant-registration.liquid`, `blocks/price.liquid`, `src/scripts/participant-registration-form.ts`
+- **Notes:** The single source of truth for team vs individual registration. `1` (default) = the buyer registers one participant (individual wording, no team count). `> 1` = the buyer registers a team of exactly that many participants ("A team of N" count, "Register team" button, per-participant accordions, shared `_team_id` on cart lines, and a "Per person" price note). Unique per event product — set on each event's product metafield, not on the `participant_fields` metaobject. Capped by variant inventory.
 
 ---
 
 ## Removed
 
+- **`participant_fields.mode`** (metaobject field, removed) — redundant: the per-event `custom.team_size` product metafield is the single discriminator (`1` = individual, `> 1` = team). Merchants: remove the `mode` field from the `participant_fields` metaobject definition. Existing instances with a blank or stale `mode` need no migration — the theme no longer reads it.
 - **`participant_fields.min_team_size` / `max_team_size`** (metaobject fields, removed) — team size moved to per-event product metafield `custom.team_size`. Merchants: remove these two fields from the `participant_fields` metaobject definition and populate `custom.team_size` on each event product.
 
 ---
