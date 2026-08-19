@@ -30,21 +30,6 @@
     ]
   },
   {
-    "name": "Layout",
-    "settings": [
-      {
-        "type": "range",
-        "id": "page_width",
-        "label": "Page width",
-        "min": 1000,
-        "max": 1600,
-        "step": 50,
-        "unit": "px",
-        "default": 1400
-      }
-    ]
-  },
-  {
     "name": "Social",
     "settings": [
       {
@@ -56,17 +41,6 @@
         "type": "url",
         "id": "tiktok_url",
         "label": "TikTok URL"
-      }
-    ]
-  },
-  {
-    "name": "Cart",
-    "settings": [
-      {
-        "type": "checkbox",
-        "id": "show_add_discount_code",
-        "label": "Show discount-code field in cart",
-        "default": false
       }
     ]
   },

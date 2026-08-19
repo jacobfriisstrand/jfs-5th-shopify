@@ -10,10 +10,8 @@
  */
 
 import type {
-  CheckboxSetting,
   CollectionSetting,
   ImagePickerSetting,
-  RangeSetting,
   UrlSetting,
 } from "./types";
 
@@ -26,12 +24,7 @@ interface ThemeInfoGroup {
   theme_support_email?: string;
 }
 
-type Setting =
-  | ImagePickerSetting
-  | RangeSetting
-  | CheckboxSetting
-  | UrlSetting
-  | CollectionSetting;
+type Setting = ImagePickerSetting | UrlSetting | CollectionSetting;
 
 interface SettingsGroup {
   name: string;
@@ -73,22 +66,6 @@ const groups: [ThemeInfoGroup, ...SettingsGroup[]] = [
   },
 
   {
-    name: "Layout",
-    settings: [
-      {
-        type: "range",
-        id: "page_width",
-        label: "Page width",
-        min: 1000,
-        max: 1600,
-        step: 50,
-        unit: "px",
-        default: 1400,
-      },
-    ],
-  },
-
-  {
     name: "Social",
     settings: [
       {
@@ -100,18 +77,6 @@ const groups: [ThemeInfoGroup, ...SettingsGroup[]] = [
         type: "url",
         id: "tiktok_url",
         label: "TikTok URL",
-      },
-    ],
-  },
-
-  {
-    name: "Cart",
-    settings: [
-      {
-        type: "checkbox",
-        id: "show_add_discount_code",
-        label: "Show discount-code field in cart",
-        default: false,
       },
     ],
   },
