@@ -2,14 +2,16 @@
   Renders the participant registration form for event products that carry a
   `custom.participant_fields` metaobject reference.
 
-  Both modes are driven by a single `<participant-registration-form>` custom
-  element (see `src/scripts/participant-registration-form.ts`):
+  Driven by a single `<participant-registration-form>` custom element (see
+  `src/scripts/participant-registration-form.ts`). The team vs individual
+  distinction is derived from `custom.team_size` — it is the single source of
+  truth:
 
-  - `individual` — a "Register" button that opens a dialog holding one
-    participant form.
-  - `team` — a "Register team" button that opens a dialog holding exactly
-    `custom.team_size` participant accordions (team size is fixed on the event;
-    there is no quantity counter).
+  - `custom.team_size` `1` — a "Register" button that opens a dialog holding
+    one participant form (individual registration).
+  - `custom.team_size` `> 1` — a "Register team" button that opens a dialog
+    holding exactly that many participant accordions (team size is fixed on
+    the event; there is no quantity counter).
 
   Every participant collects the fields configured on the referenced metaobject
   — there are no hard-coded fields. On submit the element batch-adds one cart
@@ -26,13 +28,13 @@
 
 {% liquid
   assign registration = product.metafields.custom.participant_fields.value
-  assign mode = registration.mode.value | default: registration.mode | default: 'individual'
   assign fields = registration.fields.value
 
   assign variant = variant | default: product.selected_or_first_available_variant
 
-  # Team size is fixed on the event — there is no quantity counter. The form
-  # always renders exactly this many participant fieldsets.
+  # Team size is the sole discriminator: 1 = individual registration, > 1 =
+  # team registration. It is fixed on the event — no quantity counter — and
+  # the form always renders exactly this many participant fieldsets.
   assign team_size = product.metafields.custom.team_size | default: 1
   if team_size == blank or team_size < 1
     assign team_size = 1
@@ -40,7 +42,7 @@
 
   # Single-person events (team size 1) use generic wording; multi-person teams
   # use team-specific wording.
-  if mode == 'team' and team_size > 1
+  if team_size > 1
     assign submit_text = 'sections.event.registration.submit_team' | t
     assign dialog_title_text = 'sections.event.registration.dialog_title' | t
     assign instructions_text = 'sections.event.registration.instructions' | t
@@ -71,14 +73,13 @@
 
 {%- if registration != blank -%}
   <participant-registration-form
-    data-mode="{{ mode }}"
     data-team-size="{{ team_size }}"
     data-variant-id="{{ variant.id }}"
     data-product-id="{{ product.id }}"
     data-product-title="{{ product.title | escape }}"
   >
     <div class="flex flex-col gap-4">
-      {%- if mode == 'team' and team_size > 1 -%}
+      {%- if team_size > 1 -%}
         <p class="text-foreground text-md">
           {{ 'sections.event.registration.team_count' | t: count: team_size }}
         </p>
@@ -126,10 +127,10 @@
     <template>
       <details class="accordion-row">
         <summary>
-          {%- if mode == 'individual' -%}
-            <span class="text-base font-medium">{{ label_your_information }}</span>
-          {%- else -%}
+          {%- if team_size > 1 -%}
             <span class="text-base font-medium">{{ label_participant }} <span data-participant-number>1</span></span>
+          {%- else -%}
+            <span class="text-base font-medium">{{ label_your_information }}</span>
           {%- endif -%}
         </summary>
 

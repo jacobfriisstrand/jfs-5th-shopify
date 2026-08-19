@@ -8,9 +8,10 @@ import { CartAddEvent, ToastEvent } from "@theme/events";
  *
  * Server-rendered contract (see `snippets/participant-registration.liquid`):
  *
- *  - `data-mode`: `"individual"` or `"team"`. Both render a trigger button
- *    that opens a dialog; `team` also shows a team-size stepper driving N
- *    fieldsets.
+ *  - `data-team-size`: fixed team size on the event. `1` registers one
+ *    participant (individual); `> 1` registers that many participants as a
+ *    team (shared `_team_id`). This is the single source of truth for the
+ *    team vs individual distinction.
  *  - `data-variant-id`: the currently selected variant id.
  *  - `data-product-id`: the product id, forwarded on the cart-update event.
  *  - A single `<template>` holding one participant `<details>` whose inputs
@@ -65,6 +66,12 @@ export class ParticipantRegistrationForm extends Component {
   #teamSize(): number {
     const value = Number.parseInt(this.dataset.teamSize ?? "1", 10);
     return Number.isFinite(value) && value >= 1 ? value : 1;
+  }
+
+  // Team vs individual is derived solely from team size: > 1 means the buyer
+  // registers a team of that many participants.
+  #isTeam(): boolean {
+    return this.#teamSize() > 1;
   }
 
   #syncParticipants(count: number) {
@@ -203,7 +210,7 @@ export class ParticipantRegistrationForm extends Component {
     }> = [];
 
     // One id per registration, shared by every participant of the same team.
-    const teamId = this.dataset.mode === "team" ? randomTeamId() : undefined;
+    const teamId = this.#isTeam() ? randomTeamId() : undefined;
 
     participants.forEach((details, index) => {
       const properties: Record<string, string> = {};
@@ -224,7 +231,7 @@ export class ParticipantRegistrationForm extends Component {
 
       // Unique per participant so Shopify never merges two identical lines.
       properties["_participant"] = String(index + 1);
-      if (this.dataset.mode === "team") {
+      if (this.#isTeam()) {
         properties["_team_size"] = String(participants.length);
         // Links every participant line item back to a single team.
         if (teamId) properties["_team_id"] = teamId;

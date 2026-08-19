@@ -1,7 +1,7 @@
 {% liquid
   assign variant = product.selected_or_first_available_variant
   assign registration = product.metafields.custom.participant_fields.value
-  assign registration_mode = registration.mode.value | default: registration.mode
+  # Team vs individual is derived from team_size: 1 = individual, > 1 = team.
   assign team_size = product.metafields.custom.team_size | default: 1
 %}
 
@@ -22,7 +22,7 @@
     {%- else -%}
       <span class="text-2xl font-heading font-medium">{{ variant.price | money_without_trailing_zeros }}</span>
     {%- endif -%}
-    {%- if registration != blank and registration_mode == 'team' and team_size > 1 -%}
+    {%- if registration != blank and team_size > 1 -%}
       <p class="text-foreground/70 text-xs">{{ 'products.product.per_person' | t }}</p>
     {%- endif -%}
   </div>
