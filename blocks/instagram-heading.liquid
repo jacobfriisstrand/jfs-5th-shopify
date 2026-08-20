@@ -1,0 +1,31 @@
+{% doc %}
+  Renders a heading inside the Instagram section.
+
+  @param {string} [text] - Visible heading text. Required to render.
+{% enddoc %}
+
+{% liquid
+  assign text = block.settings.text
+%}
+
+{%- if text != blank -%}
+  {% render 'heading', text: text, level: 2, class: 'text-2xl lg:text-4xl' %}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.heading",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:settings.heading"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.heading"
+    }
+  ]
+}
+{% endschema %}

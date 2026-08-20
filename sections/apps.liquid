@@ -1,0 +1,38 @@
+{%- if section.blocks.size > 0 -%}
+  <section class="grid-12">
+    <div class="col-content flex flex-col items-center gap-6 text-center">
+      {% content_for 'blocks' %}
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.apps",
+  "blocks": [
+    {
+      "type": "instagram-heading"
+    },
+    {
+      "type": "instagram-button"
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.apps",
+      "category": "t:categories.basic",
+      "blocks": [
+        {
+          "type": "instagram-heading"
+        },
+        {
+          "type": "instagram-button"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
