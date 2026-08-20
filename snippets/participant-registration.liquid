@@ -21,6 +21,7 @@
   The drawer also renders a product upsell carousel below the form, sourced
   from the global "Registration upsell collection" theme setting (falls back
   to the merchant's "all products" collection when unset), capped at 8 items.
+  Its heading comes from the "Registration upsell heading" setting.
 
   @param {object} product - The product. Required.
   @param {object} section - The parent section (for scoped ids). Required.
@@ -80,7 +81,11 @@
   if upsell_products_count > 8
     assign upsell_products_count = 8
   endif
-  assign upsell_title_text = 'sections.event.registration.upsell_title' | t
+  if settings.registration_upsell_heading != blank
+    assign upsell_title_text = settings.registration_upsell_heading
+  else
+    assign upsell_title_text = 'sections.event.registration.upsell_title' | t
+  endif
   assign upsell_heading_id = dialog_id | append: '-upsell-title'
   assign upsell_breakpoints = '{"768": {"slidesPerView": 2, "spaceBetween": 16}}'
 %}
@@ -128,7 +133,7 @@
           </form>
 
           {%- if upsell_products_count > 0 -%}
-            <section class="mt-2 border-t border-current/15 pt-6" aria-labelledby="{{ upsell_heading_id }}">
+            <section class="mt-4 border-t border-current/15 pt-7" aria-labelledby="{{ upsell_heading_id }}">
               {% render 'carousel',
                 type: 'product',
                 items: upsell_products,

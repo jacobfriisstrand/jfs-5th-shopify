@@ -12,6 +12,7 @@
 import type {
   CollectionSetting,
   ImagePickerSetting,
+  TextSetting,
   UrlSetting,
 } from "./types";
 
@@ -24,7 +25,11 @@ interface ThemeInfoGroup {
   theme_support_email?: string;
 }
 
-type Setting = ImagePickerSetting | UrlSetting | CollectionSetting;
+type Setting =
+  | ImagePickerSetting
+  | TextSetting
+  | UrlSetting
+  | CollectionSetting;
 
 interface SettingsGroup {
   name: string;
@@ -89,6 +94,12 @@ const groups: [ThemeInfoGroup, ...SettingsGroup[]] = [
         id: "registration_upsell_collection",
         label: "Registration upsell collection",
         info: "Products shown in the upsell carousel inside the event registration drawer. Falls back to the 'all-products' collection when empty.",
+      },
+      {
+        type: "text",
+        id: "registration_upsell_heading",
+        label: "Registration upsell heading",
+        default: "You can also check out our products here",
       },
     ],
   },
