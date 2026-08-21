@@ -86,18 +86,6 @@ dialog[data-drawer]::backdrop {
 }
 
 /* --------------------------------------------------------------------------
-   Video blur for drawers / page transitions.
-   `will-change: filter` forces the composited video layer to repaint
-   with the filter applied — necessary because the GPU-composited `<video>`
-   layer can otherwise ignore `filter` on ancestor elements.
-   -------------------------------------------------------------------------- */
-
-[data-blur-videos] video {
-  filter: blur(12px);
-  transition: filter 300ms ease-out;
-}
-
-/* --------------------------------------------------------------------------
    Video background — Chrome shows a dark-purple internal background when
    the poster has been removed but the first frame hasn't decoded yet.
    Hardcoded #000 avoids the Tailwind CSS-variable load gap.                */
