@@ -57,7 +57,7 @@
   {%- endif -%}
 
   <div class="col-content pt-10 lg:pt-14 flex justify-between items-end flex-wrap gap-10">
-    <div>
+    <div class="space-y-2">
       {%- if heading != blank -%}
         {% render 'heading', text: heading, level: 1, class: 'text-3xl lg:text-5xl' %}
       {%- endif -%}
@@ -73,27 +73,11 @@
       <fieldset class="flex gap-2" role="radiogroup" aria-label="{{ 'actions.sort' | t }}">
         <legend class="sr-only">{{ 'actions.sort' | t }}</legend>
 
-        {% render 'sort-button',
-          id: sort_all_id,
-          name: sort_id,
-          value: 'all',
-          text: sort_all_label,
-          checked: true
-        %}
+        {% render 'sort-button', id: sort_all_id, name: sort_id, value: 'all', text: sort_all_label, checked: true %}
 
-        {% render 'sort-button',
-          id: sort_upcoming_id,
-          name: sort_id,
-          value: 'upcoming',
-          text: sort_upcoming_label
-        %}
+        {% render 'sort-button', id: sort_upcoming_id, name: sort_id, value: 'upcoming', text: sort_upcoming_label %}
 
-        {% render 'sort-button',
-          id: sort_previous_id,
-          name: sort_id,
-          value: 'previous',
-          text: sort_previous_label
-        %}
+        {% render 'sort-button', id: sort_previous_id, name: sort_id, value: 'previous', text: sort_previous_label %}
       </fieldset>
 
       <style>
@@ -126,10 +110,7 @@
 {
   "name": "t:names.generic_header",
   "enabled_on": {
-    "templates": [
-      "page",
-      "collection"
-    ]
+    "templates": ["page", "collection"]
   },
   "settings": [
     {
