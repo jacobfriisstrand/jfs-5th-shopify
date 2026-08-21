@@ -23,6 +23,9 @@
  *   - `data-breakpoints` (optional, JSON) — Swiper `breakpoints` object.
  *     Default: 640→2.5, 1024→3.5, 1280→4.5 (each breakpoint shows a
  *     half-card peek so the carousel-ness is visible).
+ *   - `data-auto-height` (optional) — when `"false"`, disables Swiper's
+ *     mobile `autoHeight` and makes the container fill the host's height
+ *     (use when the host supplies a stable aspect ratio / height).
  */
 
 import { loadSwiper } from "@theme/swiper-loader";
@@ -130,14 +133,15 @@ class SwiperCarousel extends HTMLElement {
     container.style.width = this.offsetWidth + "px";
 
     const isMobile = window.innerWidth < 768;
-    if (!isMobile) {
+    const autoHeight = this.getAttribute("data-auto-height") !== "false";
+    if (!isMobile || !autoHeight) {
       container.classList.add("swiper-fill-host");
     }
 
     Object.assign(container, {
       slidesPerView: parseSlidesPerView(slidesPerView),
       spaceBetween: 16,
-      autoHeight: isMobile,
+      autoHeight: isMobile && autoHeight,
       breakpoints,
       keyboard: true,
       a11y: true,
