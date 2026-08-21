@@ -20,7 +20,7 @@
 
 {%- if klaviyo_public_key != blank and klaviyo_list_id != blank -%}
   <newsletter-signup
-    class="flex flex-col gap-3"
+    class="flex flex-col gap-3 lg:col-span-3"
     data-public-key="{{ klaviyo_public_key | escape }}"
     data-list-id="{{ klaviyo_list_id | escape }}"
     data-success-message="{{ success_message | escape }}"
@@ -52,21 +52,16 @@
           class="flex-1 rounded-input border border-current/20 bg-transparent px-4 py-2 font-body text-base placeholder:text-current/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
         >
 
-        {% render 'button',
-          text: submit_label,
-          variant: 'primary',
-          type: 'submit',
-          size: 'md'
-        %}
+        {% render 'button', text: submit_label, variant: 'primary', type: 'submit', size: 'md' %}
       </div>
 
-      <div class="flex items-start gap-2">
+      <div class="flex gap-2 items-center">
         <input
           type="checkbox"
           name="consent"
           id="newsletter-consent-{{ block.id }}"
           required
-          class="mt-1 size-4 rounded-input border-current/20"
+          class="size-4 rounded-input border-current/20"
         >
         <label for="newsletter-consent-{{ block.id }}" class="text-sm">
           {{- consent_label | escape -}}

@@ -20,7 +20,7 @@
   <div class="col-content flex flex-col gap-8">
     {%- if section.blocks.size > 0 -%}
       <div data-footer-menus class="flex max-lg:flex-col justify-between gap-10">
-        <div class="flex max-lg:flex-col max-lg:gap-10 gap-20 w-full max-lg:justify-between">
+        <div class="grid gap-10 lg:grid-cols-[repeat(3,minmax(0,280px))]">
           {%- for block in section.blocks -%}
             {% render block %}
           {%- endfor -%}
@@ -95,7 +95,7 @@
 {% schema %}
 {
   "name": "t:names.footer",
-  "max_blocks": 3,
+  "max_blocks": 4,
   "enabled_on": {
     "groups": [
       "footer"

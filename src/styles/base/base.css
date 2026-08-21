@@ -30,6 +30,10 @@ html[scroll-lock] {
   overflow: hidden;
 }
 
+input {
+  accent-color: var(--color-brand, currentColor);
+}
+
 body {
   color: var(--color-foreground, currentColor);
   background-color: var(--color-background, transparent);
