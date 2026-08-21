@@ -1,0 +1,32 @@
+{% doc %}
+  Renders a single training session card from a `training_session`
+  metaobject entry. Content-only — styling is left to the caller.
+
+  @param {metaobject} session - The `training_session` metaobject entry. Required.
+  @param {number} [heading_level] - Heading level for the session name. Defaults to 3.
+
+  @example
+  {% render 'training-session-card', session: next_session, heading_level: 3 %}
+{% enddoc %}
+
+{% liquid
+  assign card_heading_level = heading_level | default: 3
+%}
+
+<article class="grid gap-4 pb-4">
+  <div>
+    {{ session.date_time.value | time_tag: '%d / %m / %Y' }}
+    <p>{{ session.date_time.value | date: '%H:%M' }}</p>
+  </div>
+  <div class="flex gap-2 flex-col lg:flex-row lg:justify-between lg:items-center">
+    {% render 'heading', text: session.name.value, level: card_heading_level, class: 'text-xl' %}
+    {%- if session.location.value != blank -%}
+      <p>{{ session.location.value }}</p>
+    {%- endif -%}
+  </div>
+  <div>
+    {%- if session.body.value != blank -%}
+      <div class="prose">{{ session.body | metafield_tag }}</div>
+    {%- endif -%}
+  </div>
+</article>

@@ -9,6 +9,10 @@
  */
 {
   "sections": {
+    "main": {
+      "type": "generic-header",
+      "settings": {}
+    },
     "media_column": {
       "type": "media-column",
       "settings": {}
@@ -18,5 +22,5 @@
       "settings": {}
     }
   },
-  "order": ["media_column", "video_module"]
+  "order": ["main", "media_column", "video_module"]
 }
