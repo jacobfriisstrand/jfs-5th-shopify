@@ -334,6 +334,12 @@
         "submit_individual": "Register",
         "submit_team": "Register team"
       }
+    },
+    "training": {
+      "label": "Training",
+      "next_session": "Next session",
+      "previous_sessions": "Previous sessions",
+      "no_upcoming": "No upcoming sessions scheduled."
     }
   }
 }

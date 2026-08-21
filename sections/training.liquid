@@ -1,0 +1,95 @@
+{%- comment -%}
+  training: surfaces sessions from the `training_session` metaobject
+  definition. Compares each session's `date_time` field against today
+  (epoch seconds so the shop's timezone is the single source of truth)
+  to split sessions into a single "next" session (earliest future
+  timestamp) and a count of previous sessions (timestamp before now).
+  Content-only — styling is left to the merchant.
+{%- endcomment -%}
+
+{%- liquid
+  assign today_ts = 'now' | date: '%s' | plus: 0
+  assign next_session = blank
+  assign next_ts = blank
+  assign previous_count = 0
+  assign label = 'sections.training.label' | t
+  assign next_session_heading = 'sections.training.next_session' | t
+  assign previous_sessions_heading = 'sections.training.previous_sessions' | t
+  assign no_upcoming = 'sections.training.no_upcoming' | t
+
+  for session in shop.metaobjects.training_session.values
+    assign session_ts = session.date_time.value | date: '%s' | plus: 0
+    if session_ts != blank
+      if session_ts >= today_ts
+        if next_session == blank or session_ts < next_ts
+          assign next_session = session
+          assign next_ts = session_ts
+        endif
+      else
+        assign previous_count = previous_count | plus: 1
+      endif
+    endif
+  endfor
+-%}
+
+<section class="grid-12" aria-label="{{ label }}">
+  <div class="col-content grid lg:grid-cols-[1fr_auto_1fr] gap-10">
+    {%- if next_session != blank -%}
+      <div class="space-y-5">
+        <div class="flex items-center gap-2">
+          <div class="size-2 bg-brand animate-pulse rounded-full"></div>
+          {% render 'heading', text: next_session_heading, level: 2, class: 'text-2xl lg:text-4xl' %}
+        </div>
+        {% render 'training-session-card', session: next_session, heading_level: 3 %}
+      </div>
+    {%- else -%}
+      <p>{{ no_upcoming }}</p>
+    {%- endif -%}
+    <div class="hidden: lg:block w-px h-full bg-foreground/15"></div>
+    {%- if previous_count > 0 -%}
+      <div class="space-y-5">
+        {% render 'heading', text: previous_sessions_heading, level: 2, class: 'text-2xl lg:text-4xl' %}
+        <ul class="divide-y divide-foreground/15 space-y-4" role="list">
+          {%- assign picked = '' -%}
+          {%- for i in (1..previous_count) -%}
+            {%- assign candidate = blank -%}
+            {%- assign candidate_ts = blank -%}
+            {%- for session in shop.metaobjects.training_session.values -%}
+              {%- assign session_ts = session.date_time.value | date: '%s' | plus: 0 -%}
+              {%- if session_ts != blank and session_ts < today_ts -%}
+                {%- unless picked contains session.id -%}
+                  {%- if candidate_ts == blank or session_ts > candidate_ts -%}
+                    {%- assign candidate = session -%}
+                    {%- assign candidate_ts = session_ts -%}
+                  {%- endif -%}
+                {%- endunless -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if candidate != blank -%}
+              {%- assign picked = picked | append: ',' | append: candidate.id -%}
+              <li>
+                {% render 'training-session-card', session: candidate, heading_level: 3 %}
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "t:names.training",
+  "enabled_on": {
+    "templates": [
+      "page"
+    ]
+  },
+  "presets": [
+    {
+      "name": "t:names.training"
+    }
+  ]
+}
+{% endschema %}
