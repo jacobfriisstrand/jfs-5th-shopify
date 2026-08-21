@@ -118,6 +118,23 @@ One participant field. There are no hard-coded fields — every field the buyer 
 | `role`     | Select (`name` \| `email` \| blank) | No       | Marks the field as the participant's name or email, used to identify and display each cart line item. Blank = generic text. |
 | `required` | True/false                          | No       | Whether the field is required before submit                                                                                 |
 
+### `training_session`
+
+A single training session rendered by `sections/training.liquid` on the training page. The section compares each entry's `date_time` against today to split sessions into one "next" session (earliest future date) and a list of previous sessions.
+
+| Field       | Type             | Required | Purpose                                                            |
+| ----------- | ---------------- | -------- | ------------------------------------------------------------------ |
+| `name`      | Single line text | Yes      | Session name shown as the heading. Set as the display name too.    |
+| `date_time` | Date and time    | Yes      | Session start. Compared against today for the next/previous split. |
+| `location`  | Single line text | No       | Venue line rendered under the session heading.                     |
+| `body`      | Rich text        | No       | Rich-text description, rendered via `metafield_tag`.               |
+
+**Admin setup:**
+
+1. Create the `training_session` metaobject definition.
+2. Enable **Storefront access** on the definition — otherwise `shop.metaobjects.training_session.values` is empty and nothing renders.
+3. Add one entry per session. Entries with a blank `date_time` are skipped by the next/previous split.
+
 ---
 
 ## Event metafields (scope: event tickets)
