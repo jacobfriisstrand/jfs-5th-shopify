@@ -1,0 +1,95 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "header",
+  "name": "Header",
+  "sections": {
+    "header": {
+      "type": "header",
+      "blocks": {
+        "header-menu": {
+          "type": "_header-menu",
+          "static": true,
+          "settings": {},
+          "blocks": {
+            "header_menu_link_BBRL9R": {
+              "type": "_header-menu-link",
+              "name": "t:names.header_menu_link",
+              "settings": {
+                "label": "Events",
+                "url": "shopify://collections/all-events"
+              },
+              "blocks": {}
+            },
+            "header_menu_link_NrxgP3": {
+              "type": "_header-menu-link",
+              "name": "t:names.header_menu_link",
+              "settings": {
+                "label": "Shop",
+                "url": "shopify://collections/all-products"
+              },
+              "blocks": {}
+            },
+            "header_menu_link_LgXELR": {
+              "type": "_header-menu-link",
+              "name": "t:names.header_menu_link",
+              "settings": {
+                "label": "Training",
+                "url": "shopify://pages/training"
+              },
+              "blocks": {}
+            },
+            "header_menu_link_LEwJz8": {
+              "type": "_header-menu-link",
+              "name": "t:names.header_menu_link",
+              "settings": {
+                "label": "About us",
+                "url": "shopify://pages/about-us"
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "header_menu_link_BBRL9R",
+            "header_menu_link_NrxgP3",
+            "header_menu_link_LgXELR",
+            "header_menu_link_LEwJz8"
+          ]
+        },
+        "header-logo": {
+          "type": "_header-logo",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "header-search": {
+          "type": "_header-search",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "header-account": {
+          "type": "_header-account",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "header-cart": {
+          "type": "_header-cart",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        }
+      },
+      "settings": {}
+    }
+  },
+  "order": ["header"]
+}
