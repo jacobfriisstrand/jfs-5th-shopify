@@ -27,7 +27,6 @@ assets/
 # Local development files
 .env.*
 
-# Editor-managed section group data — sourced from the live store via
-# `bin/dev.sh` (`shopify theme pull --live`), never committed.
-sections/header-group.json
-sections/footer-group.json
+# NOTE: sections/header-group.json + sections/footer-group.json are NOT ignored
+# anymore — they are committed because the production deploy runs without
+# `--nodelete` and would delete them from the live theme otherwise.
