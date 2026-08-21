@@ -32,6 +32,9 @@
 # * The push runs WITHOUT `--nodelete`: remote files absent from the repo are
 #   deleted on deploy. Keep any file that must survive on the live theme
 #   (editor-managed templates, merchant-uploaded assets) committed here.
+# * `config/settings_data.json` is `--ignore`d (and in `.shopifyignore`): it
+#   holds merchant theme-editor values on the live theme, so the repo copy is
+#   never deployed and the remote copy is never deleted or overwritten.
 # * Compiled assets (`assets/app.css`, `assets/*.js`) are gitignored, so
 #   `npm run build` MUST run before `shopify theme push` or every
 #   `{{ '…' | asset_url }}` reference will 404.
@@ -79,6 +82,7 @@ jobs:
           OUTPUT="$(npx shopify theme push \
             --theme "Production" \
             --allow-live \
+            --ignore=config/settings_data.json \
             --json)"
           echo "$OUTPUT"
           PREVIEW_URL="$(echo "$OUTPUT" | jq -r '.theme.preview_url // .preview_url // empty')"

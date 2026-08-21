@@ -60,15 +60,26 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# 3. Pull the PUBLISHED theme's data/config into local so the preview reflects
-#    the live store, not a blank dev theme. `shopify theme dev` builds its
+# 3. Pull the PUBLISHED theme's data into local so the preview reflects the
+#    live store, not a blank dev theme. `shopify theme dev` builds its
 #    development theme from local files, so unless local carries the live
-#    theme's data-bearing config files (settings, header/footer groups) the
-#    preview renders with no header menu, logo, or announcement.
+#    theme's data-bearing files the preview renders with no header menu,
+#    logo, announcement, or page content.
 #
-#    Only the config/data files are pulled — local source code (sections,
-#    blocks, templates, assets) is left untouched for active development on
-#    the current branch.
+#    Pulled (content/data edited via the theme editor):
+#      - config/settings_data.json       global settings (colors, fonts, ...)
+#      - sections/header-group.json      header content + menus
+#      - sections/footer-group.json      footer content + menus
+#      - templates/*.json                per-page section content (homepage,
+#        cart, collection, article, blog, page, ... incl. customers/*.json)
+#
+#    NOT pulled (source code owned by this repo):
+#      sections/*.liquid, blocks/*.liquid, snippets/, assets/, locales/,
+#      config/settings_schema.json, templates/gift_card.liquid
+#
+#    This is a startup snapshot — live-theme edits made while the script is
+#    running only reach local after a restart. Local uncommitted changes to
+#    the pulled files are overwritten by the live version.
 #
 #    --live   pull from the remote LIVE (published) theme
 #    --only   restrict the pull to the data-bearing files
@@ -76,6 +87,8 @@ LIVE_CONFIG_FILES=(
   "--only" "config/settings_data.json"
   "--only" "sections/header-group.json"
   "--only" "sections/footer-group.json"
+  "--only" "templates/*.json"
+  "--only" "templates/customers/*.json"
 )
 echo "[dev] Pulling live theme data from the published store..."
 shopify theme pull "${STORE_FLAG[@]}" \

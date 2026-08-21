@@ -79,6 +79,7 @@ jobs:
           set -euo pipefail
           OUTPUT="$(npx shopify theme push \
             --unpublished \
+            --ignore=config/settings_data.json \
             --json \
             --theme "${{ steps.name.outputs.theme_name }}")"
           echo "$OUTPUT"

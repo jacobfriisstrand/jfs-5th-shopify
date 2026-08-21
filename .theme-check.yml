@@ -1,1 +1,10 @@
 extends: theme-check:recommended
+
+# App extension blocks (e.g. `shopify://apps/square-instagram-feed/...`)
+# live on the store, not in this repo, so theme check cannot resolve them.
+# Only `templates/page.json` currently uses one; keep the check error-level
+# everywhere else.
+JSONMissingBlock:
+  severity: 0
+  ignore:
+    - "templates/page.json"
