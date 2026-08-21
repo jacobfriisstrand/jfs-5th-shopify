@@ -1,0 +1,79 @@
+{% liquid
+  assign title = section.settings.title
+  assign subtitle = section.settings.subtitle
+  assign image = section.settings.image
+  assign video = section.settings.video
+%}
+
+{%- if title != blank or subtitle != blank or image != blank or video != blank -%}
+<section class="grid-12">
+  <div class="col-content">
+    <div class="grid items-center gap-6 lg:grid-cols-2">
+      <div>
+        {%- if video != blank -%}
+          {% render 'video',
+            video: video,
+            muted: true,
+            loop: true,
+            autoplay: true,
+            class: 'relative block aspect-[3/4] w-full',
+            video_class: 'h-full w-full object-cover'
+          %}
+        {%- elsif image != blank -%}
+          {% render 'image',
+            image: image,
+            class: 'aspect-[3/4] w-full object-cover',
+            alt_fallback: title,
+            width_max: 2400,
+            widths: '480, 768, 1024, 1440, 1920, 2400',
+            sizes: '100vw'
+          %}
+        {%- endif -%}
+      </div>
+
+      <div class="space-y-2">
+        {%- if title != blank -%}
+          {% render 'heading', text: title, level: 2, class: 'text-xl' %}
+        {%- endif -%}
+        {%- if subtitle != blank -%}
+          <p class="text-xl lg:text-3xl">{{ subtitle | escape }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.media_column",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:settings.title"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "t:settings.subtitle"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:settings.image"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:settings.video"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.media_column",
+      "category": "t:categories.basic"
+    }
+  ]
+}
+{% endschema %}

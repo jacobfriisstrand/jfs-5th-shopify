@@ -88,9 +88,9 @@
 
 {%- if video != blank and video.sources != blank -%}
   <video-toggle
-    {%- if resolved_autoplay %} data-autoplay {% endif -%}
     class="group bg-black {{ class }}"
     style="background-color: #000"
+    {%- if resolved_autoplay %} data-autoplay{% endif -%}
   >
     {%- if resolved_poster != blank -%}
       {{

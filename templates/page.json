@@ -9,13 +9,14 @@
  */
 {
   "sections": {
-    "page_hero": {
-      "type": "page-hero",
-      "settings": {
-        "heading": "About us",
-        "image": "shopify://shop_images/jorgen-hendriksen-BomU_atAAKQ-unsplash.jpg"
-      }
+    "media_column": {
+      "type": "media-column",
+      "settings": {}
+    },
+    "video_module": {
+      "type": "video-module",
+      "settings": {}
     }
   },
-  "order": ["page_hero"]
+  "order": ["media_column", "video_module"]
 }

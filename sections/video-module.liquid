@@ -1,0 +1,31 @@
+{% liquid
+  assign video = section.settings.video
+%}
+
+<section class="grid-12">
+  {% render 'video',
+    video: video,
+    muted: false,
+    class: 'full-bleed relative aspect-video',
+    video_class: 'h-full w-full object-cover'
+  %}
+</section>
+
+{% schema %}
+{
+  "name": "t:names.video_module",
+  "settings": [
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:settings.video"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.video_module",
+      "category": "t:categories.basic"
+    }
+  ]
+}
+{% endschema %}
