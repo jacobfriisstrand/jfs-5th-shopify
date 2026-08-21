@@ -14,6 +14,11 @@ tsconfig.json
 package.json
 package-lock.json
 
+# Merchant-edited settings — the repo copy is defaults only; the live theme
+# keeps the values saved by the theme editor. Never deploy or pull this file,
+# otherwise pushes overwrite merchant customisation.
+config/settings_data.json
+
 # Documentation / repo files
 *.md
 

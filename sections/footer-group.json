@@ -17,7 +17,8 @@
         "menu-company": {
           "type": "menu",
           "settings": {
-            "menu": "footer"
+            "menu": "footer",
+            "show_legal_links": false
           },
           "blocks": {}
         },
@@ -32,18 +33,32 @@
         "menu-shop": {
           "type": "menu",
           "settings": {
-            "menu": "main-menu"
+            "menu": "main-menu",
+            "show_legal_links": false
           },
           "blocks": {}
         },
-        "footer-copyright": {
-          "type": "footer-copyright",
-          "static": true,
-          "settings": {},
+        "newsletter_signup_cKKNUg": {
+          "type": "newsletter-signup",
+          "name": "t:names.newsletter_signup",
+          "settings": {
+            "heading": "Newsletter",
+            "klaviyo_public_key": "Asf",
+            "klaviyo_list_id": "asdf",
+            "email_placeholder": "Email address",
+            "submit_label": "Subscribe",
+            "consent_label": "I agree to receive marketing emails",
+            "success_message": "Thanks for subscribing!"
+          },
           "blocks": {}
         }
       },
-      "block_order": ["menu-company", "menu-support", "menu-shop"],
+      "block_order": [
+        "menu-company",
+        "menu-support",
+        "menu-shop",
+        "newsletter_signup_cKKNUg"
+      ],
       "settings": {}
     }
   },

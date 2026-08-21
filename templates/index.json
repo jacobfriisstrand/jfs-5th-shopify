@@ -62,7 +62,7 @@
       "type": "next-event-teaser",
       "name": "t:names.next_event_teaser",
       "settings": {
-        "event_product": "copenhagen-midnight-cycle",
+        "event_product": "100km-track-run",
         "teaser_title": "Our next event",
         "body": "Eight runners. One team. 8,849 meters of elevation tackled lap by lap until we've climbed a mountain together. Bring your legs, your lungs, and someone who'll cheer when you can't talk anymore. Spots are limited — sign up while they last.",
         "cta_text": "Read more and sign up here"
@@ -73,11 +73,11 @@
       "name": "t:names.carousel",
       "settings": {
         "card_type": "event",
-        "heading": "Previous Events",
-        "subheading": "We've previously done a lot of other cool stuff",
+        "heading": "Upcoming events",
+        "subheading": "",
         "cta_text": "Go to all events",
         "cta_url": "shopify://collections/all-events",
-        "collection": "previous-events"
+        "collection": "all-events"
       }
     },
     "product_teaser_EGVdzd": {

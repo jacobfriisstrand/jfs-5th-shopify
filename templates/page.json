@@ -11,16 +11,67 @@
   "sections": {
     "main": {
       "type": "generic-header",
-      "settings": {}
+      "settings": {
+        "image": "shopify://shop_images/6U6A8834_1_3.png",
+        "heading": "Built on the will to improve",
+        "subheading": ""
+      }
     },
-    "media_column": {
+    "media_column_m8xecD": {
       "type": "media-column",
-      "settings": {}
+      "name": "t:names.media_column",
+      "settings": {
+        "title": "Where it started",
+        "subtitle": "Traditionally, there are four elements — water, fire, air, and earth. We believe in a fifth. Not a force of nature, but a force within you: the will to push further, improve harder, and show up when it would be easier not to. That's what 5th Element is built on — and it's what brings this community together.",
+        "image": "shopify://shop_images/6U6A8834_1_3-1.png"
+      }
     },
-    "video_module": {
+    "video_module_WK8G9k": {
       "type": "video-module",
+      "name": "t:names.video_module",
+      "settings": {
+        "video": "shopify://files/videos/Forside video - Matty .MOV"
+      }
+    },
+    "1787319660739fcd74": {
+      "type": "apps",
+      "blocks": {
+        "instagram_heading_AbV8Na": {
+          "type": "instagram-heading",
+          "name": "t:names.heading",
+          "settings": {
+            "text": "Become a part of the journey"
+          },
+          "blocks": {}
+        },
+        "instagram_button_wUxTWa": {
+          "type": "instagram-button",
+          "name": "t:names.button",
+          "settings": {
+            "text": "Follow along on Instagram",
+            "url": "https://www.instagram.com/5thelementco/"
+          },
+          "blocks": {}
+        },
+        "square_instagram_feed_insta_feed_mAmfhy": {
+          "type": "shopify://apps/square-instagram-feed/blocks/insta-feed/8c9f3786-8bb5-488d-a397-b1285ed978df",
+          "settings": {
+            "hide_mock_data": false
+          }
+        }
+      },
+      "block_order": [
+        "instagram_heading_AbV8Na",
+        "instagram_button_wUxTWa",
+        "square_instagram_feed_insta_feed_mAmfhy"
+      ],
       "settings": {}
     }
   },
-  "order": ["main", "media_column", "video_module"]
+  "order": [
+    "main",
+    "media_column_m8xecD",
+    "video_module_WK8G9k",
+    "1787319660739fcd74"
+  ]
 }

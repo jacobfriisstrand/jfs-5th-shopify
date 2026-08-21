@@ -1,12 +1,27 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero": {
       "type": "generic-header",
-      "settings": {}
+      "settings": {
+        "image": "shopify://shop_images/Media.png",
+        "heading": "EVENTS worth showing up for.",
+        "subheading": "Our events are built to push you past where you thought you'd stop. Some are fast, some are long, all of them are harder with a crew at your back. Sign up, show up, and find out what you're made of."
+      }
     },
     "events": {
       "type": "events-collection",
-      "settings": {}
+      "settings": {
+        "cta_text": "View event"
+      }
     }
   },
   "order": ["hero", "events"]
