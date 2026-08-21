@@ -65,7 +65,7 @@
 
   assign gallery_list_class = 'flex flex-col gap-4'
   if use_carousel
-    assign gallery_list_class = gallery_list_class | append: ' md:h-[70dvh] md:overflow-hidden [&>li:not(:first-child)]:hidden md:[&>li]:flex-1 md:[&>li]:min-h-0'
+    assign gallery_list_class = gallery_list_class | append: ' md:h-[70dvh] md:overflow-hidden md:[&>li]:flex-1 md:[&>li]:min-h-0'
   endif
 %}
 
@@ -75,7 +75,8 @@
       data-bundle-url="{{ 'swiper-element-bundle.js' | asset_url }}"
       data-slides-per-view="1"
       data-breakpoints='{"640":{"slidesPerView":1,"spaceBetween":0},"1024":{"slidesPerView":1,"spaceBetween":0},"1280":{"slidesPerView":1,"spaceBetween":0}}'
-      class="relative block w-full h-auto md:h-[70dvh]"
+      data-auto-height="false"
+      class="relative block w-full aspect-[3/4] md:h-[70dvh]"
       style="visibility:hidden"
       aria-roledescription="carousel"
       aria-label="{{ 'accessibility.product_images' | t | escape }}"
@@ -88,7 +89,7 @@
         {% render 'image',
           image: primary,
           priority: 'lcp',
-          class: 'h-full w-full object-cover',
+          class: 'h-full w-full object-contain',
           style: 'max-height:70dvh',
           width_max: 1200,
           widths: '400, 600, 800, 1000, 1200',
@@ -107,7 +108,7 @@
         <li>
           {% render 'image',
             image: media,
-            class: 'h-full w-full object-cover',
+            class: 'h-full w-full object-contain',
             style: 'max-height:70dvh',
             width_max: 1200,
             widths: '400, 600, 800, 1000, 1200',

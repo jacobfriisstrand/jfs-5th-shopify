@@ -2,7 +2,7 @@
   Renders a badge/pill.
 
   @param {string} text - The badge text. Required.
-  @param {string} [variant] - 'light', 'dark', or 'brand'. Default: 'dark'.
+  @param {string} [variant] - 'light', 'dark', or 'brand'. Default: 'light'.
   @param {string} [class] - Extra classes appended to the badge.
 
   @example
@@ -12,11 +12,9 @@
 {% enddoc %}
 
 {% liquid
-  assign variant_classes = 'bg-foreground text-background'
-
   case variant
-    when 'light'
-      assign variant_classes = 'bg-background text-foreground border border-foreground/20'
+    when 'dark'
+      assign variant_classes = 'bg-background/90 text-foreground border border-foreground/20'
     when 'brand'
       assign variant_classes = 'text-white'
       assign brand_style = 'background: var(--color-brand)'

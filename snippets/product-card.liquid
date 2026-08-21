@@ -1,8 +1,9 @@
 {% doc %}
   Renders a single product card: featured image (or placeholder), title,
-  price. Designed to be rendered inside a `for` loop over a collection's
-  products (or over unique colour variants per product — see `variant`).
-  The entire card is one `<a>` linking to the product page.
+  price (with optional compare-at sale price). Designed to be rendered
+  inside a `for` loop over a collection's products (or over unique colour
+  variants per product — see `variant`). The entire card is one `<a>`
+  linking to the product page.
 
   Wrap with whatever list semantics the caller needs (e.g. a `<li>` in a
   `<ul role="list">` grid, or a `<swiper-slide>` inside `<carousel>`).
@@ -37,6 +38,7 @@
 
   assign card_image = product.featured_image
   assign card_price = product.price
+  assign card_compare_price = product.compare_at_price
   assign card_url = product.url
   assign card_title = product.title
 
@@ -45,31 +47,42 @@
       assign card_image = variant.featured_image
     endif
     assign card_price = variant.price
+    assign card_compare_price = variant.compare_at_price
     assign card_url = product.url | append: '?variant=' | append: variant.id
     if variant.option1 != blank and variant.option1 != 'Default Title'
       assign card_title = product.title | append: ' — ' | append: variant.option1
     endif
   endif
+
+  assign on_sale = false
+  if card_compare_price > card_price
+    assign on_sale = true
+  endif
+
+  assign title_classes = 'text-base font-medium'
+  if resolved_heading_level == 2
+    assign title_classes = 'text-lg sm:text-xl font-medium'
+  endif
 %}
 
 <a
   href="{{ card_url }}"
-  class="group flex flex-col gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+  class="group flex flex-col overflow-hidden rounded-input border border-foreground/10 bg-foreground/[0.03] transition-[scale,background-color,border-color] duration-150 ease-out hover:border-foreground/25 hover:bg-foreground/[0.06] active:scale-[0.99] motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
 >
   {%- if card_image != blank -%}
-    <div class="grid aspect-[3/4] w-full place-items-start overflow-hidden rounded-input">
+    <div class="grid aspect-[3/4] w-full place-items-start overflow-hidden">
       {% render 'image',
         image: card_image,
-        class: '[grid-area:1/1] h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]',
+        class: '[grid-area:1/1] h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02] motion-reduce:transition-none',
         alt_fallback: card_title,
         width_max: 800,
         widths: '200, 300, 400, 600, 800',
         sizes: '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw'
       %}
-      {% render '_bundle-offer-pill', product: product, class: '[grid-area:1/1] m-2' %}
+      {% render '_bundle-offer-pill', product: product, class: '[grid-area:1/1] z-10 m-2' %}
     </div>
   {%- elsif settings.product_fallback_image != blank -%}
-    <div class="grid aspect-[3/4] w-full place-items-start overflow-hidden rounded-input">
+    <div class="grid aspect-[3/4] w-full place-items-start overflow-hidden bg-foreground/[0.03]">
       {% render 'image',
         image: settings.product_fallback_image,
         class: '[grid-area:1/1] h-full w-full object-contain p-10',
@@ -78,14 +91,29 @@
         widths: '200, 300, 400, 600, 800',
         sizes: '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw'
       %}
-      {% render '_bundle-offer-pill', product: product, class: '[grid-area:1/1] m-2' %}
+      {% render '_bundle-offer-pill', product: product, class: '[grid-area:1/1] z-10 m-2' %}
     </div>
   {%- else -%}
-    <div class="grid aspect-[3/4] w-full place-items-start rounded-input bg-foreground/5" aria-hidden="true">
-      {% render '_bundle-offer-pill', product: product, class: '[grid-area:1/1] m-2' %}
+    <div class="grid aspect-[3/4] w-full place-items-start overflow-hidden bg-foreground/5" aria-hidden="true">
+      {% render '_bundle-offer-pill', product: product, class: '[grid-area:1/1] z-10 m-2' %}
     </div>
   {%- endif -%}
 
-  {% render 'heading', text: card_title, level: resolved_heading_level, class: 'text-base font-medium' %}
-  <p class="text-sm">{{ card_price | money_without_trailing_zeros }}</p>
+  <div class="flex flex-col gap-1 p-3">
+    {% render 'heading', text: card_title, level: resolved_heading_level, class: title_classes %}
+    {%- if on_sale -%}
+      <div class="flex items-baseline gap-2 text-sm">
+        <s class="text-foreground/60">
+          <span class="sr-only">{{ 'content.price_regular' | t }}: </span>
+          {{- card_compare_price | money_without_trailing_zeros -}}
+        </s>
+        <span class="text-brand font-medium">
+          <span class="sr-only">{{ 'content.price_sale' | t }}: </span>
+          {{- card_price | money_without_trailing_zeros -}}
+        </span>
+      </div>
+    {%- else -%}
+      <p class="text-sm">{{ card_price | money_without_trailing_zeros }}</p>
+    {%- endif -%}
+  </div>
 </a>

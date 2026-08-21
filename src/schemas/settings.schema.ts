@@ -10,9 +10,9 @@
  */
 
 import type {
-  CheckboxSetting,
+  CollectionSetting,
   ImagePickerSetting,
-  RangeSetting,
+  TextSetting,
   UrlSetting,
 } from "./types";
 
@@ -25,7 +25,11 @@ interface ThemeInfoGroup {
   theme_support_email?: string;
 }
 
-type Setting = ImagePickerSetting | RangeSetting | CheckboxSetting | UrlSetting;
+type Setting =
+  | ImagePickerSetting
+  | TextSetting
+  | UrlSetting
+  | CollectionSetting;
 
 interface SettingsGroup {
   name: string;
@@ -67,22 +71,6 @@ const groups: [ThemeInfoGroup, ...SettingsGroup[]] = [
   },
 
   {
-    name: "Layout",
-    settings: [
-      {
-        type: "range",
-        id: "page_width",
-        label: "Page width",
-        min: 1000,
-        max: 1600,
-        step: 50,
-        unit: "px",
-        default: 1400,
-      },
-    ],
-  },
-
-  {
     name: "Social",
     settings: [
       {
@@ -99,13 +87,19 @@ const groups: [ThemeInfoGroup, ...SettingsGroup[]] = [
   },
 
   {
-    name: "Cart",
+    name: "Events",
     settings: [
       {
-        type: "checkbox",
-        id: "show_add_discount_code",
-        label: "Show discount-code field in cart",
-        default: false,
+        type: "collection",
+        id: "registration_upsell_collection",
+        label: "Registration upsell collection",
+        info: "Products shown in the upsell carousel inside the event registration drawer. Falls back to the 'all-products' collection when empty.",
+      },
+      {
+        type: "text",
+        id: "registration_upsell_heading",
+        label: "Registration upsell heading",
+        default: "You can also check out our products here",
       },
     ],
   },
