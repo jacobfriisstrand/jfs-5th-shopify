@@ -4,17 +4,10 @@
 %}
 
 <section
-  class="grid-12 py-12 sm:py-16"
+  class="grid-12"
   aria-labelledby="{{ heading_id }}"
 >
-  <div class="col-content flex flex-col gap-8">
-    {% render 'heading',
-      text: collection.title,
-      level: 1,
-      id: heading_id,
-      class: 'text-2xl font-medium sm:text-3xl'
-    %}
-
+  <div class="col-content">
     {%- if products.size == 0 -%}
       <p>{{ 'content.no_products_found' | t }}</p>
     {%- else -%}
