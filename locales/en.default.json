@@ -153,6 +153,9 @@
     "instagram": "Instagram",
     "tiktok": "TikTok"
   },
+  "collections": {
+    "title": "All collections"
+  },
   "content": {
     "discount": "Discount",
     "discount_savings": "You save",
@@ -254,6 +257,13 @@
   },
   "fields": {
     "separator": "to"
+  },
+  "gift_card": {
+    "add_to_apple_wallet": "Add to Apple Wallet",
+    "card": "Gift card",
+    "expired": "Expired",
+    "expires_on": "Expires on {{ expires_on }}",
+    "use_at_checkout": "Use this gift card code to check out"
   },
   "gift_cards": {
     "issued": {

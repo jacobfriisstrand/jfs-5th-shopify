@@ -162,6 +162,13 @@
     "cta_url": "Call to action link",
     "image_link_url": "Image link"
   },
+  "general": {
+    "collections_grid": "Collection list: Grid"
+  },
+  "labels": {
+    "grid_gap": "Grid gap",
+    "grid_item_width": "Grid item width"
+  },
   "html_defaults": {
     "join_our_email_list": "<h2>Join our email list</h2>",
     "get_exclusive_deals_and_early_access_to_new_products": "<p>Get exclusive deals and early access to new products.</p>",
@@ -476,6 +483,10 @@
     "base": "Base",
     "balance": "Balance",
     "banana": "Banana",
+    "size": {
+      "large": "Large",
+      "small": "Small"
+    },
     "below_image": "Below image",
     "bento": "Bento",
     "black": "Black",

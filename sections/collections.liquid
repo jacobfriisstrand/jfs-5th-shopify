@@ -1,0 +1,85 @@
+{% comment %}
+  This section is used in the list-collections template to render a list of
+  collections.
+
+  https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
+{% endcomment %}
+
+<h1 class="text-3xl font-bold mb-8">{{ 'collections.title' | t }}</h1>
+
+{%- liquid
+  if section.settings.grid_item_width == 'collections--compact'
+    assign card_size = '160px'
+  else
+    assign card_size = '280px'
+  endif
+-%}
+
+<div
+  class="grid"
+  style="
+    grid-template-columns: repeat(auto-fill, minmax(min({{ card_size }}, 100%), 1fr));
+    gap: {{ section.settings.grid_gap }}px;
+  "
+>
+  {% for collection in collections %}
+    <a class="flex flex-col w-full no-underline text-fg" href="{{ collection.url }}">
+      {% if collection.featured_image %}
+        {% render 'image',
+          class: 'rounded-lg',
+          image: collection.featured_image,
+          width: 600,
+          height: 600,
+          crop: 'center'
+        %}
+      {% endif %}
+
+      <div class="mt-3">
+        <p class="font-semibold">{{ collection.title }}</p>
+
+        {% if collection.description %}
+          <p class="text-gray-600 text-sm mt-1">{{ collection.description | strip_html | truncatewords: 15 }}</p>
+        {% endif %}
+      </div>
+    </a>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "t:general.collections_grid",
+  "settings": [
+    {
+      "type": "select",
+      "id": "grid_item_width",
+      "label": "t:labels.grid_item_width",
+      "options": [
+        {
+          "value": "collections--compact",
+          "label": "t:options.size.small"
+        },
+        {
+          "value": "collections--full",
+          "label": "t:options.size.large"
+        }
+      ],
+      "default": "collections--full"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "label": "t:labels.grid_gap",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 10
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.collections_grid"
+    }
+  ]
+}
+{% endschema %}

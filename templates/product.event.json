@@ -1,0 +1,73 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ *
+ * Event product template. Uses the shared main-product section but
+ * omits product-specific blocks (bundle-offer-pill, accordion rows).
+ * GM Event Ticketing app blocks are added via the theme editor.
+ *
+ * Block IDs match the product template so main-product.liquid's
+ * content_for calls resolve correctly for both template types.
+ *
+ * Event-specific metafield content (about, who-for, participate,
+ * included, practical-info, partners, disclaimer) is rendered inline
+ * by main-product.liquid when _is-event-product detects an event.
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "product-media-gallery": {
+          "type": "_product-media-gallery",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "product-title": {
+          "type": "product-title",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "price": {
+          "type": "price",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "product-description": {
+          "type": "product-description",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "variant-picker": {
+          "type": "variant-picker",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "quantity": {
+          "type": "quantity",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        },
+        "add-to-cart": {
+          "type": "add-to-cart",
+          "static": true,
+          "settings": {},
+          "blocks": {}
+        }
+      },
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}
