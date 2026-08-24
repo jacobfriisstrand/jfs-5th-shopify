@@ -6,6 +6,11 @@
   assign heading_id = 'next-event-teaser-' | append: section.id
 
   if event_product != blank
+    capture event_status
+      render 'event-status', product: event_product
+    endcapture
+    assign event_status = event_status | strip
+
     assign event_title = event_product.title
     assign event_url = event_product.url
     assign event_image = event_product.featured_image
@@ -17,7 +22,7 @@
   endif
 %}
 
-{%- if event_product != blank -%}
+{%- if event_product != blank and event_status != 'previous' -%}
   <section
     class="grid-12"
     aria-labelledby="{{ heading_id }}"

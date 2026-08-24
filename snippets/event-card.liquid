@@ -3,9 +3,10 @@
   title, and event-status badge. Designed to be rendered inside a carousel
   `<li>`.
 
-  Reads custom.event_start_date metafield to determine the event's status
-  (upcoming / previous). Events that have started (start date reached) are
-  treated as previous; there is no ongoing state.
+  Resolves the status badge (upcoming / previous) via the event-status
+  snippet from the custom.event_start_date / custom.event_end_date
+  metafields. A started-but-not-ended event is treated as upcoming. An
+  event with no start date renders no badge.
 
   Mobile: description below image.
   Desktop: description slides up from bottom on hover.
@@ -24,24 +25,10 @@
 {% liquid
   assign resolved_heading_level = heading_level | default: 3
 
-  assign now_ts = 'now' | date: '%s' | plus: 0
-  assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0
-
-  assign event_status = ''
-  if start_ts != 0
-    if start_ts > now_ts
-      assign event_status = 'upcoming'
-    else
-      assign event_status = 'previous'
-    endif
-    assign event_status_key = 'sections.event.status.' | append: event_status
-    assign event_status_label = event_status_key | t
-    if event_status == 'upcoming'
-      assign badge_variant = 'brand'
-    else
-      assign badge_variant = 'dark'
-    endif
-  endif
+  capture event_status
+    render 'event-status', product: product
+  endcapture
+  assign event_status = event_status | strip
 
   assign event_description = product.description | strip_html | truncate: 120
 %}
@@ -111,9 +98,9 @@
     {%- endif -%}
 
     <!-- Status badge -->
-    {%- if event_status != '' -%}
+    {%- if event_status != 'none' -%}
       <div class="[grid-area:1/1] z-10 p-2">
-        {% render 'badge', text: event_status_label, variant: badge_variant, class: 'uppercase tracking-wide' %}
+        {% render 'event-status', product: product, output: 'badge', class: 'uppercase tracking-wide' %}
       </div>
     {%- endif -%}
 

@@ -1,0 +1,59 @@
+{% doc %}
+  Resolves the canonical display status of an event product from its
+  `custom.event_start_date` / `custom.event_end_date` metafields. Single
+  source of truth for event status across the PDP, event cards, and event
+  sorting.
+
+  Statuses:
+  - `upcoming`: the event starts in the future, OR has started but has not
+    yet ended (a live event stays purchasable and reads as "Upcoming").
+  - `previous`: the event has ended (end date in the past, or start date
+    in the past with no end date).
+  - `none`: no start date is set — cannot be classified. Renders no badge
+    and is excluded from the Upcoming/Previous sort buckets (it still
+    appears under "All events").
+
+  Renders the status string by default. With `output: 'badge'` renders the
+  canonical status badge (identical text and variant everywhere) instead.
+
+  @param {product} product - The event product. Required.
+  @param {string} [output] - 'badge' renders the badge; omitted renders the status string.
+  @param {string} [class] - Extra classes forwarded to the badge element.
+
+  @example
+  {% capture event_status %}{% render 'event-status', product: product %}{% endcapture %}
+  {% render 'event-status', product: product, output: 'badge' %}
+{% enddoc %}
+
+{%- liquid
+  assign now_ts = 'now' | date: '%s' | plus: 0
+  assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0
+  assign end_ts = product.metafields.custom.event_end_date | date: '%s' | plus: 0
+
+  assign event_status = 'none'
+  if start_ts != 0
+    if end_ts != 0 and end_ts < now_ts
+      assign event_status = 'previous'
+    elsif start_ts > now_ts
+      assign event_status = 'upcoming'
+    elsif end_ts != 0
+      assign event_status = 'upcoming'
+    else
+      assign event_status = 'previous'
+    endif
+  endif
+
+  assign upcoming_label = 'sections.event.status.upcoming' | t
+  assign previous_label = 'sections.event.status.previous' | t
+-%}
+
+{%- if output == 'badge' -%}
+  {%- case event_status -%}
+    {%- when 'upcoming' -%}
+      {% render 'badge', text: upcoming_label, variant: 'brand', class: class %}
+    {%- when 'previous' -%}
+      {% render 'badge', text: previous_label, variant: 'dark', class: class %}
+  {%- endcase -%}
+{%- else -%}
+  {{- event_status -}}
+{%- endif -%}

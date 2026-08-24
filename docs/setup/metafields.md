@@ -186,14 +186,14 @@ A single training session rendered by `sections/training.liquid` on the training
 ### `custom.event_start_date` — _required for event cards_
 
 - **Type:** Date
-- **Used by:** `sections/next-event-teaser.liquid` (formatted date in header), `snippets/event-card.liquid` and `snippets/event-card-plp.liquid` (event status badge: upcoming / previous)
-- **Notes:** Determines status on event cards: upcoming (`start > now`), previous (`start <= now`). There is no ongoing state. next-event-teaser formats this as e.g. "23rd of March 2026". Hidden if blank.
+- **Used by:** `snippets/event-status.liquid` (canonical status resolution), `snippets/event-card.liquid` and `snippets/event-card-plp.liquid` (status badge), `sections/events-collection.liquid` and `sections/generic-header.liquid` (sort buckets + counts), `sections/main-product.liquid` (buy-control visibility), `sections/next-event-teaser.liquid` (formatted date in header)
+- **Notes:** All status logic lives in `snippets/event-status.liquid`, which compares start + end dates against `'now'` once. An event is `upcoming` if it hasn't started yet, or has started but not yet ended (a live event stays purchasable and reads as "Upcoming"). An event is `previous` once it has ended. An event with NO start date is unclassified: no badge, excluded from the Upcoming/Previous sort buckets, still shown under "All events". next-event-teaser formats the date as e.g. "23rd of March 2026" and hides the section when the selected event is `previous`. Hidden if blank.
 
 ### `custom.event_end_date` — _optional (past-event detection)_
 
 - **Type:** Date
-- **Used by:** `sections/main-product.liquid` (hides the registration form / ATC once the event has ended)
-- **Notes:** Compared against `'now'` to mark an event as past so the PDP shows "This event has ended" instead of the form. No longer used for the card status badge. Hidden if blank.
+- **Used by:** `snippets/event-status.liquid` (canonical status resolution), `sections/main-product.liquid` (hides the registration form / ATC once the event has ended)
+- **Notes:** Compared against `'now'` inside `snippets/event-status.liquid` to mark an event as ended: an event whose end date is in the past is `previous` everywhere (card badge, sort buckets, PDP form visibility). When set and still in the future, a started event stays `upcoming` — a live event keeps its buy controls. When blank, the start date alone decides (`start < now` → `previous`). Hidden if blank.
 
 ### `custom.participant_fields` — _optional (enables participant registration)_
 
