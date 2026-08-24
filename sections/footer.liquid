@@ -17,7 +17,7 @@
 %}
 
 <div class="grid-12 mt-20 lg:mt-40">
-  <div class="col-content flex flex-col gap-8">
+  <div class="col-content flex flex-col gap-8 pb-6">
     {%- if section.blocks.size > 0 -%}
       <div data-footer-menus class="flex max-lg:flex-col justify-between gap-10">
         <div class="grid gap-10 lg:grid-cols-[repeat(3,minmax(0,280px))]">
@@ -84,10 +84,10 @@
       </div>
     {%- endif -%}
 
-    <p class="font-heading text-[10vw] flex justify-between trim-cap leading-0">
-      <span class="trim-cap leading-0">{{ 'footer.improve' | t }}</span>
-      <span class="trim-cap leading-0">{{ 'footer.and' | t }}</span>
-      <span class="trim-cap leading-0">{{ 'footer.empower' | t }}</span>
+    <p class="font-heading text-[10vw] flex justify-between trim-cap">
+      <span class="trim-cap">{{ 'footer.improve' | t }}</span>
+      <span class="trim-cap">{{ 'footer.and' | t }}</span>
+      <span class="trim-cap">{{ 'footer.empower' | t }}</span>
     </p>
   </div>
 </div>
@@ -97,9 +97,7 @@
   "name": "t:names.footer",
   "max_blocks": 4,
   "enabled_on": {
-    "groups": [
-      "footer"
-    ]
+    "groups": ["footer"]
   },
   "blocks": [
     {
