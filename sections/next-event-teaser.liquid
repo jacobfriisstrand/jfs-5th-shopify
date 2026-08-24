@@ -34,7 +34,7 @@
             text: teaser_title,
             level: 2,
             id: heading_id,
-            class: 'text-xl lg:text-4xl'
+            class: 'text-xl lg:text-4xl text-foreground/50 max-lg:mb-1'
           %}
         {% endif %}
 
@@ -56,14 +56,10 @@
           </div>
         {% endif %}
 
-        {% render 'button',
-          text: cta_text,
-          href: event_url
-          class: 'lg:col-start-3 lg:w-fit lg:mt-auto lg:ml-auto'
-        %}
+        {% render 'button', text: cta_text, href: event_url, class: 'lg:col-start-3 lg:w-fit lg:mt-auto lg:ml-auto' %}
       </div>
 
-       <div class="aspect-video my-8 lg:my-13 max-h-120 m-auto w-full">
+      <div class="aspect-video my-8 lg:my-13 max-h-120 m-auto w-full">
         {% if event_image != blank %}
           {% render 'image',
             image: event_image,
@@ -90,9 +86,7 @@
 {
   "name": "t:names.next_event_teaser",
   "enabled_on": {
-    "templates": [
-      "index"
-    ]
+    "templates": ["index"]
   },
   "settings": [
     {
