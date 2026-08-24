@@ -32,16 +32,14 @@
   assign event_label_partners = 'sections.event.partners' | t
   assign event_label_disclaimer = 'sections.event.disclaimer' | t
 
-  assign now_ts = 'now' | date: '%s' | plus: 0
-  assign event_end_ts = product.metafields.custom.event_end_date | date: '%s' | plus: 0
-  assign event_start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0
-  assign event_is_past = false
-  if event_end_ts != 0
-    if event_end_ts < now_ts
-      assign event_is_past = true
-    endif
-  elsif event_start_ts != 0 and event_start_ts < now_ts
+  capture event_status
+    render 'event-status', product: product
+  endcapture
+  assign event_status = event_status | strip
+  if event_status == 'previous'
     assign event_is_past = true
+  else
+    assign event_is_past = false
   endif
 %}
 <script src="{{ 'product-form.js'  | asset_url }}" type="module" fetchpriority="low"></script>

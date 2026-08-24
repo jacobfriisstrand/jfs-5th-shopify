@@ -1,13 +1,38 @@
 {%- comment -%}
   events-collection: renders all events from a collection in a single grid.
   Sort controlled by html[data-event-sort] set by generic-header toggle.
-  Each card carries its own status badge (rendered by event-card snippet).
+  Default order ("All"): soonest upcoming first, then most-recent previous,
+  then events with no start date. Status per product resolved by the
+  event-status snippet; each card carries its own status badge.
 {%- endcomment -%}
 
 {%- liquid
   assign cta_text = section.settings.cta_text | default: 'View event'
-  assign now_ts = 'now' | date: '%s' | plus: 0
   assign section_id = section.id
+
+  assign upcoming_csv = ''
+  assign previous_csv = ''
+  for product in collection.products
+    capture event_status
+      render 'event-status', product: product
+    endcapture
+    assign event_status = event_status | strip
+    assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0
+    if start_ts != 0
+      assign padded_ts = start_ts | prepend: '000000000000000' | slice: -15, 15
+      if event_status == 'upcoming'
+        unless upcoming_csv contains padded_ts
+          assign upcoming_csv = upcoming_csv | append: ',' | append: padded_ts
+        endunless
+      elsif event_status == 'previous'
+        unless previous_csv contains padded_ts
+          assign previous_csv = previous_csv | append: ',' | append: padded_ts
+        endunless
+      endif
+    endif
+  endfor
+  assign upcoming_dates = upcoming_csv | remove_first: ',' | split: ',' | sort
+  assign previous_dates = previous_csv | remove_first: ',' | split: ',' | sort
 -%}
 
 <style>
@@ -24,52 +49,41 @@
 >
   <div class="col-content flex flex-col gap-8">
     {%- if collection.products.size > 0 -%}
-      {%- comment -%} All events (upcoming-first order) {%- endcomment -%}
+      {%- comment -%} All events: soonest upcoming first, then most-recent previous, then undated {%- endcomment -%}
       <div class="events-sort-all-{{ section_id }} hidden">
         <ul role="list" class="grid gap-20 lg:gap-40">
+          {%- for ts in upcoming_dates -%}
+            {%- render 'event-date-group', products: collection.products, ts: ts, status: 'upcoming', heading_level: 3, cta_text: cta_text -%}
+          {%- endfor -%}
+          {%- for ts in previous_dates reversed -%}
+            {%- render 'event-date-group', products: collection.products, ts: ts, status: 'previous', heading_level: 3, cta_text: cta_text -%}
+          {%- endfor -%}
           {%- for product in collection.products -%}
-            {%- assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0 -%}
-            {%- if start_ts > now_ts -%}
+            {%- capture event_status -%}{%- render 'event-status', product: product -%}{%- endcapture -%}
+            {%- assign event_status = event_status | strip -%}
+            {%- if event_status == 'none' -%}
               <li>
                 {%- render 'event-card-plp', product: product, heading_level: 3, cta_text: cta_text -%}
               </li>
             {%- endif -%}
           {%- endfor -%}
-          {%- for product in collection.products -%}
-            {%- assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0 -%}
-            {%- unless start_ts > now_ts -%}
-              <li>
-                {%- render 'event-card-plp', product: product, heading_level: 3, cta_text: cta_text -%}
-              </li>
-            {%- endunless -%}
-          {%- endfor -%}
         </ul>
       </div>
 
-      {%- comment -%} Upcoming only {%- endcomment -%}
+      {%- comment -%} Upcoming only (soonest first) {%- endcomment -%}
       <div class="events-sort-upcoming-{{ section_id }} hidden">
         <ul role="list" class="grid gap-40">
-          {%- for product in collection.products -%}
-            {%- assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0 -%}
-            {%- if start_ts > now_ts -%}
-              <li>
-                {%- render 'event-card-plp', product: product, heading_level: 3, cta_text: cta_text -%}
-              </li>
-            {%- endif -%}
+          {%- for ts in upcoming_dates -%}
+            {%- render 'event-date-group', products: collection.products, ts: ts, status: 'upcoming', heading_level: 3, cta_text: cta_text -%}
           {%- endfor -%}
         </ul>
       </div>
 
-      {%- comment -%} Previous only {%- endcomment -%}
+      {%- comment -%} Previous only (most recent first) {%- endcomment -%}
       <div class="events-sort-previous-{{ section_id }} hidden">
         <ul role="list" class="grid gap-40">
-          {%- for product in collection.products -%}
-            {%- assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0 -%}
-            {%- unless start_ts > now_ts -%}
-              <li>
-                {%- render 'event-card-plp', product: product, heading_level: 3, cta_text: cta_text -%}
-              </li>
-            {%- endunless -%}
+          {%- for ts in previous_dates reversed -%}
+            {%- render 'event-date-group', products: collection.products, ts: ts, status: 'previous', heading_level: 3, cta_text: cta_text -%}
           {%- endfor -%}
         </ul>
       </div>

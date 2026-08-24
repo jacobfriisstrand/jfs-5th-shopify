@@ -6,6 +6,11 @@
   assign heading_id = 'next-event-teaser-' | append: section.id
 
   if event_product != blank
+    capture event_status
+      render 'event-status', product: event_product
+    endcapture
+    assign event_status = event_status | strip
+
     assign event_title = event_product.title
     assign event_url = event_product.url
     assign event_image = event_product.featured_image
@@ -17,7 +22,7 @@
   endif
 %}
 
-{%- if event_product != blank -%}
+{%- if event_product != blank and event_status != 'previous' -%}
   <section
     class="grid-12"
     aria-labelledby="{{ heading_id }}"
@@ -29,7 +34,7 @@
             text: teaser_title,
             level: 2,
             id: heading_id,
-            class: 'text-xl lg:text-4xl'
+            class: 'text-xl lg:text-4xl text-foreground/50 max-lg:mb-1'
           %}
         {% endif %}
 
@@ -51,14 +56,10 @@
           </div>
         {% endif %}
 
-        {% render 'button',
-          text: cta_text,
-          href: event_url
-          class: 'lg:col-start-3 lg:w-fit lg:mt-auto lg:ml-auto'
-        %}
+        {% render 'button', text: cta_text, href: event_url, class: 'lg:col-start-3 lg:w-fit lg:mt-auto lg:ml-auto' %}
       </div>
 
-       <div class="aspect-video my-8 lg:my-13 max-h-120 m-auto w-full">
+      <div class="aspect-video my-8 lg:my-13 max-h-120 m-auto w-full">
         {% if event_image != blank %}
           {% render 'image',
             image: event_image,

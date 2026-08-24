@@ -3,19 +3,18 @@
   title, and event-status badge. Designed to be rendered inside a carousel
   `<li>`.
 
-  Reads custom.event_start_date metafield to determine the event's status
-  (upcoming / previous). Events that have started (start date reached) are
-  treated as previous; there is no ongoing state.
+  Resolves the status badge (upcoming / previous) via the event-status
+  snippet from the custom.event_start_date / custom.event_end_date
+  metafields. A started-but-not-ended event is treated as upcoming. An
+  event with no start date renders no badge.
 
   Mobile: description below image.
   Desktop: description slides up from bottom on hover.
 
   @param {product} product - The product to render. Required.
-  @param {number} [heading_level] - Heading level for the product title.
-    Defaults to 3.
-  @param {string} [cta_text] - Optional CTA button label. When provided,
-    a styled button appears at the bottom of the card. The entire card
-    already links to the product URL.
+  @param {number} [heading_level] - Heading level for the product title. Defaults to 3.
+  @param {string} [cta_text] - Optional CTA button label. When provided, a styled button appears at the bottom of the card. The entire card already links to the product URL.
+  @param {boolean} [equal_height] - When true (carousel usage), the mobile description below the image is clamped to a fixed two-line slot so every card has the same total height and the carousel container does not jump between slides with shorter or longer descriptions.
 
   @example
   {% render 'event-card', product: item, heading_level: 3, cta_text: 'View event' %}
@@ -24,36 +23,22 @@
 {% liquid
   assign resolved_heading_level = heading_level | default: 3
 
-  assign now_ts = 'now' | date: '%s' | plus: 0
-  assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0
-
-  assign event_status = ''
-  if start_ts != 0
-    if start_ts > now_ts
-      assign event_status = 'upcoming'
-    else
-      assign event_status = 'previous'
-    endif
-    assign event_status_key = 'sections.event.status.' | append: event_status
-    assign event_status_label = event_status_key | t
-    if event_status == 'upcoming'
-      assign badge_variant = 'brand'
-    else
-      assign badge_variant = 'dark'
-    endif
-  endif
+  capture event_status
+    render 'event-status', product: product
+  endcapture
+  assign event_status = event_status | strip
 
   assign event_description = product.description | strip_html | truncate: 120
 %}
 
 <a
   href="{{ product.url }}"
-  class="group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+  class="group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
 >
   <div class="grid relative">
     <!-- Image -->
     {%- if product.featured_image != blank -%}
-      <div class="[grid-area:1/1] aspect-[3/4]">
+      <div class="[grid-area:1/1] aspect-3/4">
         {% render 'image',
           image: product.featured_image,
           alt_fallback: product.title,
@@ -61,7 +46,7 @@
         %}
       </div>
     {%- elsif settings.product_fallback_image != blank -%}
-      <div class="[grid-area:1/1] aspect-[3/4]">
+      <div class="[grid-area:1/1] aspect-3/4">
         {% render 'image',
           image: settings.product_fallback_image,
           alt_fallback: product.title,
@@ -71,57 +56,38 @@
     {%- endif -%}
 
     <!-- Overlay -->
-    {% render 'image-overlay',
-      class: '[grid-area:1/1] z-0'
-      opacity: '100%'
-    %}
+    {% render 'image-overlay', class: '[grid-area:1/1] z-0', opacity: '100%' %}
 
     <!-- Heading + description over image -->
-    {%- if event_description != blank -%}
-      <div class="[grid-area:1/1] hidden md:grid place-content-end grid-rows-[auto_0fr] group-hover:grid-rows-[auto_1fr] transition-[grid-template-rows] duration-200 z-10 h-fit mt-auto">
-
-        <div class="py-1 px-4">
-          {% render 'heading',
-            text: product.title,
-            level: resolved_heading_level,
-            class: 'text-xl text-balance'
-          %}
+    <div class="[grid-area:1/1] hidden md:flex flex-col justify-end z-10 h-full">
+      <div class="py-1 px-4">
+        {% render 'heading', text: product.title, level: resolved_heading_level, class: 'text-xl text-balance' %}
+      </div>
+      {%- if event_description != blank -%}
+        <div class="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-200">
+          <div class="overflow-hidden">
+            <p class="px-4 pb-4 text-sm text-balance">{{ event_description }}</p>
+          </div>
         </div>
-        <div class="overflow-hidden">
-          <p class="px-4 pb-4 text-sm text-balance">{{ event_description }}</p>
-        </div>
-      </div>
+      {%- endif -%}
+    </div>
 
-      <!-- Mobile heading (no animation) -->
-      <div class="[grid-area:1/1] flex items-end md:hidden z-10 p-4">
-        {% render 'heading',
-          text: product.title,
-          level: resolved_heading_level,
-          class: 'text-xl text-balance'
-        %}
-      </div>
-    {%- else -%}
-      <div class="[grid-area:1/1] flex items-end z-10 p-4">
-        {% render 'heading',
-          text: product.title,
-          level: resolved_heading_level,
-          class: 'text-xl text-balance'
-        %}
-      </div>
-    {%- endif -%}
+    <!-- Mobile heading (no animation) -->
+    <div class="[grid-area:1/1] flex items-end md:hidden z-10 p-4">
+      {% render 'heading', text: product.title, level: resolved_heading_level, class: 'text-xl text-balance' %}
+    </div>
 
     <!-- Status badge -->
-    {%- if event_status != '' -%}
+    {%- if event_status != 'none' -%}
       <div class="[grid-area:1/1] z-10 p-2">
-        {% render 'badge', text: event_status_label, variant: badge_variant, class: 'uppercase tracking-wide' %}
+        {% render 'event-status', product: product, output: 'badge', class: 'uppercase tracking-wide' %}
       </div>
     {%- endif -%}
-
   </div>
 
   <!-- Mobile: description below image -->
-  {%- if event_description != blank -%}
-    <p class="md:hidden text-sm px-4">{{ event_description }}</p>
+  {%- if event_description != blank or equal_height -%}
+    <p class="md:hidden text-sm px-4 {% if equal_height %}min-h-15 line-clamp-3{% endif %}">{{ event_description }}</p>
   {%- endif -%}
 
   <!-- CTA button affordance -->

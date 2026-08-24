@@ -1,0 +1,30 @@
+{% doc %}
+  Renders the event cards that share one start date, inside an event sort
+  bucket. One `<li>` per matching product.
+
+  Used by `sections/events-collection.liquid` to order events by start date
+  (soonest upcoming first) without changing the collection's own order.
+
+  @param {object} products - All products of the collection (required).
+  @param {string} ts - Zero-padded start-date timestamp (15 chars) to match.
+  @param {string} status - Which status to render: 'upcoming' or 'previous'.
+  @param {number} [heading_level] - Heading level for the card (default 3).
+  @param {string} [cta_text] - CTA label for the card.
+
+  @example
+  {% render 'event-date-group', products: collection.products, ts: ts, status: 'upcoming' %}
+{% enddoc %}
+
+{%- for product in products -%}
+  {%- capture event_status -%}{%- render 'event-status', product: product -%}{%- endcapture -%}
+  {%- assign event_status = event_status | strip -%}
+  {%- if event_status == status -%}
+    {%- assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0 -%}
+    {%- assign padded = start_ts | prepend: '000000000000000' | slice: -15, 15 -%}
+    {%- if padded == ts -%}
+      <li>
+        {%- render 'event-card-plp', product: product, heading_level: heading_level, cta_text: cta_text -%}
+      </li>
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}

@@ -20,18 +20,20 @@
   assign sort_id = 'event-sort-' | append: section.id
 
   if template.name == 'collection' and template.suffix == 'events' and collection != blank
-    assign now_ts = 'now' | date: '%s' | plus: 0
     assign upcoming_count = 0
     assign previous_count = 0
     for product in collection.products
-      assign start_ts = product.metafields.custom.event_start_date | date: '%s' | plus: 0
-      if start_ts > now_ts
+      capture event_status
+        render 'event-status', product: product
+      endcapture
+      assign event_status = event_status | strip
+      if event_status == 'upcoming'
         assign upcoming_count = upcoming_count | plus: 1
-      else
+      elsif event_status == 'previous'
         assign previous_count = previous_count | plus: 1
       endif
     endfor
-    assign all_count = upcoming_count | plus: previous_count
+    assign all_count = collection.products.size
     assign sort_all_label = 'sections.events.sort_all' | t | append: ' (' | append: all_count | append: ')'
     assign sort_upcoming_label = 'sections.events.sort_upcoming' | t | append: ' (' | append: upcoming_count | append: ')'
     assign sort_previous_label = 'sections.events.sort_previous' | t | append: ' (' | append: previous_count | append: ')'

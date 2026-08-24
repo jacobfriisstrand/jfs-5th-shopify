@@ -67,14 +67,14 @@
       data-bundle-url="{{ 'swiper-element-bundle.js' | asset_url }}"
       data-slides-per-view="{{ slides_per_view }}"
       {%- if breakpoints != blank -%}
-        data-breakpoints='{{ breakpoints }}'
+        data-breakpoints="{{ breakpoints }}"
       {%- endif -%}
       class="block"
     >
   {%- endif -%}
 
   {%- if has_header -%}
-    <header class="mb-6 flex flex-wrap items-end justify-between gap-4 sm:mb-8">
+    <header class="mb-6 flex flex-wrap items-center lg:items-end justify-between gap-4 sm:mb-8">
       {%- if heading != blank or subheading != blank -%}
         <div class="flex flex-col gap-1">
           {%- if heading != blank -%}
@@ -93,7 +93,7 @@
 
       <div class="flex items-center gap-4">
         {%- if link_url != blank -%}
-          {% render 'button', text: link_text, href: link_url, variant: 'primary' %}
+          {% render 'button', text: link_text, href: link_url, variant: 'link' %}
         {%- endif -%}
       </div>
     </header>
@@ -106,7 +106,7 @@
           {%- when 'product' -%}
             {% render 'product-card', product: item, heading_level: card_heading_level %}
           {%- when 'event' -%}
-            {% render 'event-card', product: item, heading_level: card_heading_level %}
+            {% render 'event-card', product: item, heading_level: card_heading_level, equal_height: true %}
           {%- else -%}
             {{ 'Unknown carousel card type: ' | append: type }}
         {%- endcase -%}
