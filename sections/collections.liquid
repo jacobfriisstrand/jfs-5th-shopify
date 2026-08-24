@@ -5,77 +5,53 @@
   https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
 {% endcomment %}
 
-<h1 class="text-3xl font-bold mb-8">{{ 'collections.title' | t }}</h1>
+{% liquid
+  assign heading_id = 'collections-' | append: section.id
+  assign page_title = 'collections.title' | t
+%}
 
-{%- liquid
-  if section.settings.grid_item_width == 'collections--compact'
-    assign card_size = '160px'
-  else
-    assign card_size = '280px'
-  endif
--%}
+<section class="grid-12 py-12 sm:py-16" aria-labelledby="{{ heading_id }}">
+  <div class="col-content flex flex-col gap-8">
+    {% render 'heading', text: page_title, level: 1, id: heading_id, class: 'text-3xl lg:text-5xl' %}
 
-<div
-  class="grid"
-  style="
-    grid-template-columns: repeat(auto-fill, minmax(min({{ card_size }}, 100%), 1fr));
-    gap: {{ section.settings.grid_gap }}px;
-  "
->
-  {% for collection in collections %}
-    <a class="flex flex-col w-full no-underline text-fg" href="{{ collection.url }}">
-      {% if collection.featured_image %}
-        {% render 'image',
-          class: 'rounded-lg',
-          image: collection.featured_image,
-          width: 600,
-          height: 600,
-          crop: 'center'
-        %}
-      {% endif %}
-
-      <div class="mt-3">
-        <p class="font-semibold">{{ collection.title }}</p>
-
-        {% if collection.description %}
-          <p class="text-gray-600 text-sm mt-1">{{ collection.description | strip_html | truncatewords: 15 }}</p>
-        {% endif %}
-      </div>
-    </a>
-  {% endfor %}
-</div>
+    <ul
+      role="list"
+      class="grid gap-10 lg:grid-cols-2"
+    >
+      {%- for collection in collections -%}
+        <li>
+          <a
+            href="{{ collection.url }}"
+            class="group grid lg:grid-cols-2 overflow-hidden rounded-input border border-foreground/10 bg-foreground/[0.03] transition-[scale,background-color,border-color] duration-150 ease-out hover:border-foreground/25 hover:bg-foreground/[0.06] active:scale-[0.99] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+          >
+            {%- if collection.featured_image != blank -%}
+              <div class="aspect-3/4">
+                {% render 'image',
+                  image: collection.featured_image,
+                  class: 'object-cover w-full h-full',
+                  alt_fallback: collection.title,
+                  width_max: 800,
+                  widths: '200, 300, 400, 600, 800',
+                  sizes: '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw'
+                %}
+              </div>
+            {%- endif -%}
+            <div class="flex flex-col gap-1 p-4">
+              {% render 'heading', text: collection.title, class: 'text-base lg:text-4xl' %}
+              {%- if collection.description != blank -%}
+                <p class="text-sm text-foreground/60">{{ collection.description | strip_html | truncatewords: 15 }}</p>
+              {%- endif -%}
+            </div>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
 
 {% schema %}
 {
   "name": "t:general.collections_grid",
-  "settings": [
-    {
-      "type": "select",
-      "id": "grid_item_width",
-      "label": "t:labels.grid_item_width",
-      "options": [
-        {
-          "value": "collections--compact",
-          "label": "t:options.size.small"
-        },
-        {
-          "value": "collections--full",
-          "label": "t:options.size.large"
-        }
-      ],
-      "default": "collections--full"
-    },
-    {
-      "type": "range",
-      "id": "grid_gap",
-      "label": "t:labels.grid_gap",
-      "min": 0,
-      "max": 50,
-      "step": 5,
-      "unit": "px",
-      "default": 10
-    }
-  ],
   "presets": [
     {
       "name": "t:general.collections_grid"
