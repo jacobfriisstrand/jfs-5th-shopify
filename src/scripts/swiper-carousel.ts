@@ -143,7 +143,7 @@ class SwiperCarousel extends HTMLElement {
       spaceBetween: 16,
       autoHeight: isMobile && autoHeight,
       breakpoints,
-      keyboard: true,
+      keyboard: this.getAttribute("data-keyboard") !== "false",
       a11y: true,
       navigation: hasExternalNav ? { prevEl, nextEl } : false,
     });

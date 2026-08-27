@@ -345,6 +345,15 @@
         "submit_team": "Register team"
       }
     },
+    "model_size_guide": {
+      "label": "Model size guide",
+      "carousel_label": "Model photos",
+      "filter_label": "Filter by size",
+      "all_sizes": "All sizes",
+      "model_count_one": "1 model",
+      "model_count_other": "{{ count }} models",
+      "no_results": "No models found in this size."
+    },
     "training": {
       "label": "Training",
       "next_session": "Next session",
