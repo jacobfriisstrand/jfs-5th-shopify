@@ -135,6 +135,26 @@ A single training session rendered by `sections/training.liquid` on the training
 2. Enable **Storefront access** on the definition — otherwise `shop.metaobjects.training_session.values` is empty and nothing renders.
 3. Add one entry per session. Entries with a blank `date_time` are skipped by the next/previous split.
 
+### `model_size_guide`
+
+A single model photo with the worn size and a caption line, rendered by `sections/model-size-guide.liquid`. The section is added to any page via the theme editor (it is enabled on page templates). Every published entry shows up automatically — no per-entry wiring — and the storefront size filter is built from the distinct `size` values across entries. One entry per (model, product, size) combo; entries appear in admin sort order.
+
+| Field         | Type                    | Required | Purpose                                                                                          |
+| ------------- | ----------------------- | -------- | ------------------------------------------------------------------------------------------------ |
+| `name`        | Single line text        | Yes      | Editor-only identifier (set as the display name). Not rendered on the storefront.                |
+| `size`        | Single line text        | Yes      | Worn size, drives the filter. Single line text **limited to preset choices** (see admin setup) so editors cannot enter values the filter won't match. A list of single line text also works — the first value is used. |
+| `description` | Single line text        | No       | Caption line, e.g. `Jacob is 186 cm, 86 kg and wears a size L`.                                  |
+| `images`      | File reference list (images) | Yes      | One or more model photos; more than one renders a Swiper carousel on the card.                    |
+| `product`     | Product reference          | No       | Product this entry belongs to; its title renders as a link to the product page.                   |
+
+**Admin setup:**
+
+1. Create the `model_size_guide` metaobject definition (field type for `images`: **File**, list enabled, media type **Image**).
+2. On the `size` field, enable **Validation → Limit to preset choices** and enter the size options (e.g. `XS`, `S`, `M`, `L`, `XL`, `XXL`). Editors then pick from a dropdown instead of typing. Don't rename options after entries exist — entries keep the stored value and would drop out of the filter.
+3. Enable **Storefront access** on the definition (type + fields) — otherwise `shop.metaobjects.model_size_guide.values` is empty and nothing renders.
+4. Open **Display** and set **Display name** to the `name` field.
+5. Create a page (Online Store → Pages) and add the **Model size guide** section in the theme editor (Online Store → Themes → Customize → page → Add section). Then add entries; no per-product metafield is involved — the page shows every published entry.
+
 ---
 
 ## Event metafields (scope: event tickets)

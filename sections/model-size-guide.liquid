@@ -1,0 +1,259 @@
+{%- comment -%}
+  model-size-guide: surfaces model photos from the `model_size_guide`
+  metaobject definition — the section is added to any page via the theme editor.
+  Every published entry renders as a card (photo + caption); a
+  single-select size filter (radio chips) shows only the entries wearing the
+  chosen size. Filtering is done client-side by <model-size-guide> (see
+  src/scripts/model-size-guide.ts); without JS every card stays visible.
+
+  Expected metaobject shape (`model_size_guide`):
+
+  - `name`: single-line text (editor-only identifier; set as the admin display
+    name — not rendered on the storefront)
+  - `size`: single-line text (worn size, drives the filter; limit it to
+    preset choices in the metaobject definition so editors pick from a fixed
+    set instead of typing). A list of single-line text also works — the
+    first value is used.
+  - `description`: single-line text (caption, e.g.
+    "Jacob is 186 cm, 86 kg and wears a size L")
+  - `images`: list of file references, images only (model photos; a single
+    image renders as one photo, more than one renders as a Swiper carousel
+    on the card)
+  - `product`: product reference (optional; the product this entry's garment
+    belongs to — its title renders as a link to the product page)
+
+  Requires Storefront access on the definition (type + fields) or the
+  enumeration is empty and the section renders nothing.
+{%- endcomment -%}
+
+{%- liquid
+  assign entries = shop.metaobjects.model_size_guide.values
+  assign label = 'sections.model_size_guide.label' | t
+  assign filter_label = 'sections.model_size_guide.filter_label' | t
+  assign all_sizes_label = 'sections.model_size_guide.all_sizes' | t
+  assign no_results = 'sections.model_size_guide.no_results' | t
+  assign count_one = 'sections.model_size_guide.model_count_one' | t
+  assign count_other = 'sections.model_size_guide.model_count_other' | t: count: '__COUNT__'
+  assign radio_name = 'model-size-' | append: section.id
+
+  assign size_list = ''
+  assign size_keys = ''
+  for entry in entries
+    assign size_value = entry.size.value
+    if size_value == blank
+      assign size_value = entry.size
+    endif
+    if size_value == blank
+      assign size_value = entry.sizes.value
+    endif
+    if size_value == blank
+      assign size_value = entry.sizes
+    endif
+    if size_value.first != blank
+      assign entry_size = size_value.first | strip
+    else
+      assign entry_size = size_value | strip
+    endif
+    if entry_size != blank
+      assign size_key = '|' | append: entry_size | append: '|'
+      unless size_keys contains size_key
+        assign size_keys = size_keys | append: size_key
+        if size_list == ''
+          assign size_list = entry_size
+        else
+          assign size_list = size_list | append: ',' | append: entry_size
+        endif
+      endunless
+    endif
+  endfor
+  assign sizes = size_list | split: ','
+  assign any_carousel = false
+  for entry in entries
+    if entry.images.value.size > 1
+      assign any_carousel = true
+    endif
+  endfor
+
+  if entries.size == 1
+    assign initial_count = 'sections.model_size_guide.model_count_one' | t
+  else
+    assign initial_count = 'sections.model_size_guide.model_count_other' | t: count: entries.size
+  endif
+-%}
+
+{%- if entries != blank -%}
+  <script src="{{ 'model-size-guide.js' | asset_url }}" type="module" fetchpriority="low"></script>
+  {%- if any_carousel -%}
+    <script src="{{ 'swiper-carousel.js' | asset_url }}" type="module" fetchpriority="low"></script>
+  {%- endif -%}
+
+  <model-size-guide class="block">
+    <section class="grid-12 py-12 sm:py-16" aria-label="{{ label }}">
+      <div class="col-content flex flex-col gap-8">
+        <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+          <fieldset class="flex gap-2" role="radiogroup" aria-label="{{ filter_label }}">
+            <legend class="sr-only">{{ filter_label }}</legend>
+
+            {%- assign all_size_id = radio_name | append: '-all' -%}
+            {% render 'sort-button',
+              id: all_size_id,
+              name: radio_name,
+              value: '',
+              text: all_sizes_label,
+              checked: true
+            %}
+
+            {%- for size in sizes -%}
+              {%- if size != blank -%}
+                {%- assign size_chip_id = radio_name | append: '-' | append: forloop.index -%}
+                {%- assign size_label = size | escape -%}
+                {% render 'sort-button',
+                  id: size_chip_id,
+                  name: radio_name,
+                  value: size,
+                  text: size_label
+                %}
+              {%- endif -%}
+            {%- endfor -%}
+          </fieldset>
+
+          <style>
+            input[name="{{ radio_name }}"]:checked + label {
+              background: var(--color-foreground);
+              color: var(--color-background);
+              border-color: var(--color-foreground);
+            }
+          </style>
+
+          <p
+            role="status"
+            data-model-size-count
+            data-count-one="{{ count_one }}"
+            data-count-other="{{ count_other }}"
+            class="text-sm text-foreground/60"
+          >
+            {{- initial_count -}}
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-12">
+          {%- for entry in entries -%}
+            {%- assign entry_images = entry.images.value -%}
+            {%- assign entry_product = entry.product.value -%}
+            {%- assign size_value = entry.size.value -%}
+            {%- if size_value == blank -%}
+              {%- assign size_value = entry.size -%}
+            {%- endif -%}
+            {%- if size_value == blank -%}
+              {%- assign size_value = entry.sizes.value -%}
+            {%- endif -%}
+            {%- if size_value == blank -%}
+              {%- assign size_value = entry.sizes -%}
+            {%- endif -%}
+            {%- if size_value.first != blank -%}
+              {%- assign entry_size = size_value.first | strip -%}
+            {%- else -%}
+              {%- assign entry_size = size_value | strip -%}
+            {%- endif -%}
+            <article class="flex flex-col gap-3" data-model-size="{{ entry_size | escape }}">
+              <figure class="flex flex-col gap-4 md:flex-row md:items-start">
+                <div class="md:w-2/5">
+                {%- if entry_images.size > 1 -%}
+                  <swiper-carousel
+                    data-bundle-url="{{ 'swiper-element-bundle.js' | asset_url }}"
+                    data-slides-per-view="1"
+                    data-breakpoints='{"640":{"slidesPerView":1,"spaceBetween":0},"1024":{"slidesPerView":1,"spaceBetween":0},"1280":{"slidesPerView":1,"spaceBetween":0}}'
+                    data-auto-height="false"
+                    data-keyboard="false"
+                    class="relative block w-full aspect-[3/4]"
+                    style="visibility:hidden"
+                    aria-roledescription="carousel"
+                    aria-label="{{ 'sections.model_size_guide.carousel_label' | t | escape }}"
+                  >
+                    <ul role="list" class="h-full w-full">
+                      {%- for image in entry_images -%}
+                        <li class="h-full w-full">
+                          {% render 'image',
+                            image: image,
+                            class: 'aspect-[3/4] w-full object-cover',
+                            alt_fallback: entry.name.value,
+                            width_max: 1000,
+                            widths: '480, 768, 1024',
+                            sizes: '(min-width: 768px) 40vw, 100vw'
+                          %}
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                    <div
+                      class="mt-4 flex justify-end gap-2"
+                      role="group"
+                      aria-label="{{ 'content.pagination.nav_label' | t | escape }}"
+                    >
+                      <button
+                        type="button"
+                        data-carousel-prev
+                        aria-label="{{ 'content.pagination.previous' | t | escape }}"
+                        class="border-foreground/20 text-foreground flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+                      >
+                        <span aria-hidden="true">{% render 'icon', icon: 'arrow-left', size: 16 %}</span>
+                      </button>
+                      <button
+                        type="button"
+                        data-carousel-next
+                        aria-label="{{ 'content.pagination.next' | t | escape }}"
+                        class="border-foreground/20 text-foreground flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+                      >
+                        <span aria-hidden="true">{% render 'icon', icon: 'arrow-right', size: 16 %}</span>
+                      </button>
+                    </div>
+                  </swiper-carousel>
+                {%- elsif entry_images.size == 1 -%}
+                  {% render 'image',
+                    image: entry_images.first,
+                    class: 'aspect-[3/4] w-full object-cover',
+                    alt_fallback: entry.name.value,
+                    width_max: 1000,
+                    widths: '480, 768, 1024',
+                    sizes: '(min-width: 768px) 40vw, 100vw'
+                  %}
+                {%- endif -%}
+                </div>
+                <figcaption class="flex flex-col gap-1 md:flex-1">
+                  {%- if entry_product != blank -%}
+                    <a
+                      href="{{ entry_product.url }}"
+                      class="font-heading text-2xl text-foreground self-start transition-colors hover:text-foreground/70"
+                    >
+                      {{- entry_product.title | escape -}}
+                    </a>
+                  {%- endif -%}
+                  {%- if entry.description.value != blank -%}
+                    <p class="text-lg text-foreground/60">{{ entry.description.value }}</p>
+                  {%- endif -%}
+                </figcaption>
+              </figure>
+            </article>
+          {%- endfor -%}
+        </div>
+
+        <p data-model-size-empty hidden class="text-sm text-foreground/60">{{ no_results }}</p>
+      </div>
+    </section>
+  </model-size-guide>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.model_size_guide",
+  "enabled_on": {
+    "templates": [
+      "page"
+    ]
+  },
+  "presets": [
+    {
+      "name": "t:names.model_size_guide"
+    }
+  ]
+}
+{% endschema %}
