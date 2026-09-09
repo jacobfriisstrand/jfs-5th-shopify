@@ -17,7 +17,7 @@
         "menu-company": {
           "type": "menu",
           "settings": {
-            "menu": "footer",
+            "menu": "main-menu",
             "show_legal_links": false
           },
           "blocks": {}
@@ -43,8 +43,8 @@
           "name": "t:names.newsletter_signup",
           "settings": {
             "heading": "Newsletter",
-            "klaviyo_public_key": "Asf",
-            "klaviyo_list_id": "asdf",
+            "klaviyo_public_key": "T7R5CX",
+            "klaviyo_list_id": "",
             "email_placeholder": "Email address",
             "submit_label": "Subscribe",
             "consent_label": "I agree to receive marketing emails",

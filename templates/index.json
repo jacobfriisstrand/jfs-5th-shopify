@@ -22,22 +22,6 @@
     "vertical_image_block_eGXkcA": {
       "type": "vertical-image-block",
       "blocks": {
-        "image_Yqw3Gg": {
-          "type": "image",
-          "name": "t:names.image",
-          "settings": {
-            "image": "shopify://shop_images/6U6A8834_1_3-2.png"
-          },
-          "blocks": {}
-        },
-        "image_qtVFRY": {
-          "type": "image",
-          "name": "t:names.image",
-          "settings": {
-            "image": "shopify://shop_images/6U6A8834_1_3.png"
-          },
-          "blocks": {}
-        },
         "image_zJmQMA": {
           "type": "image",
           "name": "t:names.image",
@@ -47,7 +31,7 @@
           "blocks": {}
         }
       },
-      "block_order": ["image_Yqw3Gg", "image_qtVFRY", "image_zJmQMA"],
+      "block_order": ["image_zJmQMA"],
       "name": "t:names.vertical_image_block",
       "settings": {
         "heading": "Who we are",
@@ -62,10 +46,10 @@
       "type": "next-event-teaser",
       "name": "t:names.next_event_teaser",
       "settings": {
-        "event_product": "100km-track-run",
+        "event_product": "skagen-speedrun-team-relay",
         "teaser_title": "Our next event",
         "body": "Eight runners. One team. 8,849 meters of elevation tackled lap by lap until we've climbed a mountain together. Bring your legs, your lungs, and someone who'll cheer when you can't talk anymore. Spots are limited — sign up while they last.",
-        "cta_text": "Read more and sign up here"
+        "cta_text": "Read more and"
       }
     },
     "carousel_nTUUGb": {
@@ -73,7 +57,7 @@
       "name": "t:names.carousel",
       "settings": {
         "card_type": "event",
-        "heading": "Upcoming events",
+        "heading": "All events",
         "subheading": "",
         "cta_text": "Go to all events",
         "cta_url": "shopify://collections/all-events",
@@ -90,6 +74,10 @@
         "image": "shopify://shop_images/P1010835.jpg",
         "link_text": "View all colorways"
       }
+    },
+    "1788800416825a8181": {
+      "type": "apps",
+      "settings": {}
     }
   },
   "order": [
@@ -97,6 +85,7 @@
     "vertical_image_block_eGXkcA",
     "next_event_teaser_gkzeqL",
     "carousel_nTUUGb",
-    "product_teaser_EGVdzd"
+    "product_teaser_EGVdzd",
+    "1788800416825a8181"
   ]
 }
