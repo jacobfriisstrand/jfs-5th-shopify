@@ -9,7 +9,8 @@
   @param {string} text - The heading text. Required. Output is HTML-escaped.
   @param {number} [level] - Heading level, 1–6. Defaults to 2.
   @param {string} [id] - Optional `id` attribute (e.g. for `aria-labelledby`).
-  @param {string} [class] - Optional CSS classes.
+  @param {string} [class] - Optional CSS classes. A font utility passed here
+  (font-body, font-heading, font-[...]) overrides the default heading font.
 
   @example
   {% render 'heading', text: collection.title, level: 1, id: heading_id, class: 'text-2xl font-medium sm:text-3xl' %}
@@ -19,7 +20,7 @@
 
 {% liquid
   assign resolved_level = level | default: 2
-  assign heading_class = 'font-heading leading-[1em] trim-cap'
+  assign heading_class = 'leading-[1em] trim-cap'
   if class != blank
     assign heading_class = heading_class | append: ' ' | append: class
   endif
@@ -28,6 +29,7 @@
 {%- case resolved_level -%}
   {%- when 1 -%}
     <h1
+      data-heading
       {% if id != blank %}
         id="{{ id }}"
       {% endif %}
@@ -37,6 +39,7 @@
     </h1>
   {%- when 2 -%}
     <h2
+      data-heading
       {% if id != blank %}
         id="{{ id }}"
       {% endif %}
@@ -46,6 +49,7 @@
     </h2>
   {%- when 3 -%}
     <h3
+      data-heading
       {% if id != blank %}
         id="{{ id }}"
       {% endif %}
@@ -55,6 +59,7 @@
     </h3>
   {%- when 4 -%}
     <h4
+      data-heading
       {% if id != blank %}
         id="{{ id }}"
       {% endif %}
@@ -64,6 +69,7 @@
     </h4>
   {%- when 5 -%}
     <h5
+      data-heading
       {% if id != blank %}
         id="{{ id }}"
       {% endif %}
@@ -73,6 +79,7 @@
     </h5>
   {%- when 6 -%}
     <h6
+      data-heading
       {% if id != blank %}
         id="{{ id }}"
       {% endif %}
@@ -82,6 +89,7 @@
     </h6>
   {%- else -%}
     <h2
+      data-heading
       {% if id != blank %}
         id="{{ id }}"
       {% endif %}
