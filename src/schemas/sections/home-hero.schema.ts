@@ -12,19 +12,29 @@ export default defineSection({
       label: "t:settings.eyebrow_text",
     },
     {
-      type: "text",
-      id: "heading",
-      label: "t:settings.heading",
+      type: "select",
+      id: "eyebrow_heading_level",
+      label: "t:settings.eyebrow_heading_level",
+      default: "2",
+      options: [
+        { value: "1", label: "H1" },
+        { value: "2", label: "H2" },
+      ],
     },
     {
       type: "select",
-      id: "h1_source",
-      label: "t:settings.h1_source",
-      default: "heading",
+      id: "heading_heading_level",
+      label: "t:settings.heading_heading_level",
+      default: "1",
       options: [
-        { value: "heading", label: "t:options.large_heading" },
-        { value: "eyebrow", label: "t:options.eyebrow" },
+        { value: "1", label: "H1" },
+        { value: "2", label: "H2" },
       ],
+    },
+    {
+      type: "text",
+      id: "heading",
+      label: "t:settings.heading",
     },
     {
       type: "textarea",
