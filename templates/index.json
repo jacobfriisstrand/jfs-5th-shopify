@@ -12,8 +12,10 @@
     "home_hero": {
       "type": "home-hero",
       "settings": {
+        "h1_source": "eyebrow",
+        "eyebrow_text": "Train. Together. Copenhagen.",
         "heading": "Show up. Get better. Repeat.",
-        "subheading": "5th Element is a training crew built on showing up, pushing each other, and walking away a little stronger than we came in. Open to all levels, every week of the year. Find us on the track, the trails, and everywhere in between.",
+        "subheading": "5th Element is a Copenhagen based training community for men, built around one simple thing: showing up. Every Thursday, we meet on the track to train with purpose, push each other and leave a little better than we came. It is not about being the fastest. It is about consistency, shared effort and doing the work — week after week. Open to all running levels.",
         "video": "shopify://files/videos/Forside video - Matty .MOV",
         "button_label": "Shop now",
         "button_link": "shopify://collections"
@@ -34,7 +36,7 @@
       "block_order": ["image_zJmQMA"],
       "name": "t:names.vertical_image_block",
       "settings": {
-        "heading": "Who we are",
+        "heading": "Who is 5th Element",
         "body": "We started with a few friends, a stopwatch, and a stretch of asphalt. Now we're one of Copenhagen's fastest-growing training communities — runners, lifters, climbers, and first-timers, all training side by side. No egos, no gatekeeping, no pressure to be anything other than someone who wants to get better. Show up once and you'll see what we mean.",
         "button_label": "Read more about us",
         "button_link": "shopify://collections",
