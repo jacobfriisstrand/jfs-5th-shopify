@@ -52,7 +52,7 @@
 
         {% if body != blank %}
           <div class="max-lg:my-4 lg:col-start-2 lg:row-start-2">
-            {{ body }}
+            {{ body | escape | newline_to_br }}
           </div>
         {% endif %}
 

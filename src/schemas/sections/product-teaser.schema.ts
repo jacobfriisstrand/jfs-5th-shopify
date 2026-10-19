@@ -14,7 +14,7 @@ export default defineSection({
       label: "t:settings.heading",
     },
     {
-      type: "text",
+      type: "textarea",
       id: "subtitle",
       label: "t:settings.subheading",
     },

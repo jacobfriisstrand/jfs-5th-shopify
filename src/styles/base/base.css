@@ -123,7 +123,9 @@ video-toggle video {
 
 :root {
   /* Header measurements are set dynamically by header-component via
-     ResizeObserver + scroll. These are close-enough first-paint defaults. */
-  --header-height: 68px;
+     ResizeObserver + scroll, and measured before first paint by the inline
+     script in layout/theme.liquid. Keep these defaults in sync with the
+     real rendered heights so no-JS first paint matches too. */
+  --header-height: 64px;
   --announcement-bar-height: 36px;
 }

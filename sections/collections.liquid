@@ -10,7 +10,7 @@
   assign page_title = 'collections.title' | t
 %}
 
-<section class="grid-12 py-12 sm:py-16" aria-labelledby="{{ heading_id }}">
+<section class="grid-12" aria-labelledby="{{ heading_id }}">
   <div class="col-content flex flex-col gap-8">
     {% render 'heading', text: page_title, level: 1, id: heading_id, class: 'text-3xl lg:text-5xl' %}
 

@@ -17,3 +17,16 @@
   --font-body: var(--font-body--family);
   --font-heading: var(--font-heading--family);
 }
+
+/*
+ * Default heading font for snippet output, scoped via a neutral
+ * data-heading attribute so raw heading elements elsewhere are untouched.
+ * Zero-specificity :where() in the base layer; any font utility
+ * (font-body, font-heading, font-[...]) passed via a `class` prop
+ * overrides it from the utilities layer — no !important needed.
+ */
+@layer base {
+  :where([data-heading]) {
+    font-family: var(--font-heading);
+  }
+}

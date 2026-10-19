@@ -40,7 +40,7 @@
           {% endif %}
           {% if subtitle != blank %}
             <p>
-              {{ subtitle }}
+              {{ subtitle | escape | newline_to_br }}
             </p>
           {% endif %}
         </div>
@@ -68,7 +68,7 @@
       "label": "t:settings.heading"
     },
     {
-      "type": "text",
+      "type": "textarea",
       "id": "subtitle",
       "label": "t:settings.subheading"
     },

@@ -51,12 +51,24 @@
     {%- if collection.products.size > 0 -%}
       {%- comment -%} All events: soonest upcoming first, then most-recent previous, then undated {%- endcomment -%}
       <div class="events-sort-all-{{ section_id }} hidden">
-        <ul role="list" class="grid gap-20 lg:gap-40">
+        <ul role="list" class="grid gap-20 lg:gap-30">
           {%- for ts in upcoming_dates -%}
-            {%- render 'event-date-group', products: collection.products, ts: ts, status: 'upcoming', heading_level: 3, cta_text: cta_text -%}
+            {%- render 'event-date-group',
+              products: collection.products,
+              ts: ts,
+              status: 'upcoming',
+              heading_level: 3,
+              cta_text: cta_text
+            -%}
           {%- endfor -%}
           {%- for ts in previous_dates reversed -%}
-            {%- render 'event-date-group', products: collection.products, ts: ts, status: 'previous', heading_level: 3, cta_text: cta_text -%}
+            {%- render 'event-date-group',
+              products: collection.products,
+              ts: ts,
+              status: 'previous',
+              heading_level: 3,
+              cta_text: cta_text
+            -%}
           {%- endfor -%}
           {%- for product in collection.products -%}
             {%- capture event_status -%}{%- render 'event-status', product: product -%}{%- endcapture -%}
@@ -74,7 +86,13 @@
       <div class="events-sort-upcoming-{{ section_id }} hidden">
         <ul role="list" class="grid gap-40">
           {%- for ts in upcoming_dates -%}
-            {%- render 'event-date-group', products: collection.products, ts: ts, status: 'upcoming', heading_level: 3, cta_text: cta_text -%}
+            {%- render 'event-date-group',
+              products: collection.products,
+              ts: ts,
+              status: 'upcoming',
+              heading_level: 3,
+              cta_text: cta_text
+            -%}
           {%- endfor -%}
         </ul>
       </div>
@@ -83,7 +101,13 @@
       <div class="events-sort-previous-{{ section_id }} hidden">
         <ul role="list" class="grid gap-40">
           {%- for ts in previous_dates reversed -%}
-            {%- render 'event-date-group', products: collection.products, ts: ts, status: 'previous', heading_level: 3, cta_text: cta_text -%}
+            {%- render 'event-date-group',
+              products: collection.products,
+              ts: ts,
+              status: 'previous',
+              heading_level: 3,
+              cta_text: cta_text
+            -%}
           {%- endfor -%}
         </ul>
       </div>

@@ -22,7 +22,7 @@ export default defineSection({
       label: "t:settings.heading",
     },
     {
-      type: "text",
+      type: "textarea",
       id: "subheading",
       label: "t:settings.subheading",
     },

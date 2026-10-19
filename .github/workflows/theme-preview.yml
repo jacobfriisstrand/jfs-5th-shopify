@@ -63,6 +63,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Fresh preview themes start empty, and editor-managed data (page
+      # templates, section groups) no longer lives in the repo. Pull the
+      # current data from the shared Develop theme first. --nodelete stops the
+      # pull from pruning local files the Develop theme does not have yet
+      # (e.g. sections added in this PR). Best-effort: a missing Develop theme
+      # must not fail the preview.
+      - name: Pull editor-managed theme data
+        run: |
+          npx shopify theme pull \
+            --theme "Develop" \
+            --nodelete \
+            --only "templates/*.json" \
+            --only "templates/customers/*.json" \
+            --only "sections/*.json" \
+            || echo "No Develop theme found — preview ships without editor data"
+
       - name: Build theme
         run: npm run build
 

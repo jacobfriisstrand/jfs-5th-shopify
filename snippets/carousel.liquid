@@ -86,7 +86,7 @@
             %}
           {%- endif -%}
           {%- if subheading != blank -%}
-            <p class="text-foreground/70 text-sm sm:text-base">{{ subheading | escape }}</p>
+            <p class="text-foreground/70 text-sm sm:text-base">{{ subheading | escape | newline_to_br }}</p>
           {%- endif -%}
         </div>
       {%- endif -%}

@@ -8,6 +8,31 @@ export default defineSection({
   settings: [
     {
       type: "text",
+      id: "eyebrow_text",
+      label: "t:settings.eyebrow_text",
+    },
+    {
+      type: "select",
+      id: "eyebrow_heading_level",
+      label: "t:settings.eyebrow_heading_level",
+      default: "2",
+      options: [
+        { value: "1", label: "H1" },
+        { value: "2", label: "H2" },
+      ],
+    },
+    {
+      type: "select",
+      id: "heading_heading_level",
+      label: "t:settings.heading_heading_level",
+      default: "1",
+      options: [
+        { value: "1", label: "H1" },
+        { value: "2", label: "H2" },
+      ],
+    },
+    {
+      type: "text",
       id: "heading",
       label: "t:settings.heading",
     },

@@ -31,12 +31,12 @@
           {%- endif -%}
         </div>
 
-        <div class="space-y-2">
+        <div class="space-y-3">
           {%- if title != blank -%}
             {% render 'heading', text: title, level: 2, class: 'text-2xl' %}
           {%- endif -%}
           {%- if subtitle != blank -%}
-            <p class="text-xl lg:text-3xl">{{ subtitle | escape }}</p>
+            <p class="">{{ subtitle | escape | newline_to_br }}</p>
           {%- endif -%}
         </div>
       </div>

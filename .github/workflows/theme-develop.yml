@@ -67,9 +67,15 @@ jobs:
         id: push
         run: |
           set -euo pipefail
+          # The checkout carries no editor-managed data (JSON templates,
+          # section groups). This push does not use --nodelete, so --ignore
+          # keeps the copies already on the Develop theme from being deleted.
           OUTPUT="$(npx shopify theme push \
             --unpublished \
             --ignore=config/settings_data.json \
+            --ignore="templates/*.json" \
+            --ignore="templates/customers/*.json" \
+            --ignore="sections/*.json" \
             --json \
             --theme "${{ steps.resolve.outputs.theme_ref }}")"
           echo "$OUTPUT"
