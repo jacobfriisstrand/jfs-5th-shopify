@@ -1,0 +1,96 @@
+{% doc %}
+  Renders one model size guide card: the entry's photo media (Swiper
+  carousel for multiple images, a single photo otherwise) plus its caption
+  with the optional product link.
+
+  @param {metaobject} entry - A `model_size_guide` entry.
+  @example
+    {% render 'model-size-guide-card', entry: entry %}
+{% enddoc %}
+
+{%- liquid
+  assign entry_images = entry.images.value
+  assign entry_product = entry.product.value
+-%}
+{%- capture entry_size -%}{%- render 'model-size-guide-entry-size', entry: entry -%}{%- endcapture -%}
+{%- assign entry_size = entry_size | strip -%}
+<article class="flex flex-col gap-3" data-model-size="{{ entry_size | escape }}">
+  <figure class="flex flex-col gap-4 md:flex-row md:items-start">
+    <div class="md:w-2/5">
+      {%- if entry_images.size > 1 -%}
+        <swiper-carousel
+          data-bundle-url="{{ 'swiper-element-bundle.js' | asset_url }}"
+          data-slides-per-view="1"
+          data-breakpoints='{"640":{"slidesPerView":1,"spaceBetween":0},"1024":{"slidesPerView":1,"spaceBetween":0},"1280":{"slidesPerView":1,"spaceBetween":0}}'
+          data-auto-height="false"
+          data-keyboard="false"
+          class="relative block w-full aspect-[3/4]"
+          style="visibility:hidden"
+          aria-roledescription="carousel"
+          aria-label="{{ 'sections.model_size_guide.carousel_label' | t | escape }}"
+        >
+          <ul role="list" class="h-full w-full">
+            {%- for image in entry_images -%}
+              <li class="h-full w-full">
+                {% render 'image',
+                  image: image,
+                  class: 'aspect-[3/4] w-full object-cover',
+                  alt_fallback: entry.name.value,
+                  width_max: 1000,
+                  widths: '480, 768, 1024',
+                  sizes: '(min-width: 768px) 40vw, 100vw'
+                %}
+              </li>
+            {%- endfor -%}
+          </ul>
+          <div
+            class="mt-4 flex justify-end gap-2"
+            role="group"
+            aria-label="{{ 'content.pagination.nav_label' | t | escape }}"
+          >
+            <button
+              type="button"
+              data-carousel-prev
+              aria-label="{{ 'content.pagination.previous' | t | escape }}"
+              class="border-foreground/20 text-foreground flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+            >
+              <span aria-hidden="true">{% render 'icon', icon: 'arrow-left', size: 16 %}</span>
+            </button>
+            <button
+              type="button"
+              data-carousel-next
+              aria-label="{{ 'content.pagination.next' | t | escape }}"
+              class="border-foreground/20 text-foreground flex h-10 w-10 items-center justify-center rounded-full border transition aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
+            >
+              <span aria-hidden="true">{% render 'icon', icon: 'arrow-right', size: 16 %}</span>
+            </button>
+          </div>
+        </swiper-carousel>
+      {%- elsif entry_images.size == 1 -%}
+        {%- for image in entry_images -%}
+          {% render 'image',
+            image: image,
+            class: 'aspect-[3/4] w-full object-cover',
+            alt_fallback: entry.name.value,
+            width_max: 1000,
+            widths: '480, 768, 1024',
+            sizes: '(min-width: 768px) 40vw, 100vw'
+          %}
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+    <figcaption class="flex flex-col gap-1 md:flex-1">
+      {%- if entry_product != blank -%}
+        <a
+          href="{{ entry_product.url }}"
+          class="font-heading text-2xl text-foreground self-start transition-colors hover:text-foreground/70"
+        >
+          {{- entry_product.title | escape -}}
+        </a>
+      {%- endif -%}
+      {%- if entry.description.value != blank -%}
+        <p class="text-lg text-foreground/60">{{ entry.description.value }}</p>
+      {%- endif -%}
+    </figcaption>
+  </figure>
+</article>

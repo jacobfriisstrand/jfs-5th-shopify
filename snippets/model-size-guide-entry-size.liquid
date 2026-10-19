@@ -1,0 +1,39 @@
+{% doc %}
+  Renders the normalized size label for a `model_size_guide` metaobject
+  entry: the entry's `size` field when set, otherwise the first non-blank
+  value of its `sizes` list field.
+
+  Metaobject list values return nil for `.first` while strings return their
+  first character, so the value is extracted by iteration — never `.first`.
+  Kept in one snippet because the section needs the size in four places
+  (chip collection, card ordering, card attribute) and they must never
+  drift apart.
+
+  @param {metaobject} entry - A `model_size_guide` entry.
+  @example
+    {% capture entry_size %}{% render 'model-size-guide-entry-size', entry: entry %}{% endcapture %}
+{% enddoc %}
+
+{%- liquid
+  assign size_value = entry.size.value
+  if size_value == blank
+    assign size_value = entry.size
+  endif
+  if size_value == blank
+    assign size_value = entry.sizes.value
+  endif
+  if size_value == blank
+    assign size_value = entry.sizes
+  endif
+  if size_value.first != blank
+    assign entry_size = size_value | strip
+  else
+    assign entry_size = ''
+    for size_item in size_value
+      if entry_size == blank
+        assign entry_size = size_item | strip
+      endif
+    endfor
+  endif
+-%}
+{{- entry_size -}}
