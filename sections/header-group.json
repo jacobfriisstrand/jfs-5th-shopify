@@ -19,6 +19,15 @@
           "static": true,
           "settings": {},
           "blocks": {
+            "header_menu_link_j9gt9y": {
+              "type": "_header-menu-link",
+              "name": "t:names.header_menu_link",
+              "settings": {
+                "label": "Sizing",
+                "url": "shopify://pages/size-guides"
+              },
+              "blocks": {}
+            },
             "header_menu_link_BBRL9R": {
               "type": "_header-menu-link",
               "name": "t:names.header_menu_link",
@@ -57,6 +66,7 @@
             }
           },
           "block_order": [
+            "header_menu_link_j9gt9y",
             "header_menu_link_BBRL9R",
             "header_menu_link_NrxgP3",
             "header_menu_link_LgXELR",
