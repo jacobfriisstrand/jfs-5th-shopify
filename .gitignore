@@ -12,6 +12,13 @@ node_modules/
 # Shopify CLI files
 .shopify/
 
+# Editor-managed theme data (page templates, section groups) is merchant-
+# owned: pulled from the live theme by bin/dev.sh, never committed. CI theme
+# pushes `--ignore` the same paths (mirroring config/settings_data.json) so
+# deploys can neither overwrite nor delete the live copies.
+templates/**/*.json
+sections/**/*.json
+
 ## Release files
 release
 *.zip
@@ -26,7 +33,3 @@ assets/
 
 # Local development files
 .env.*
-
-# NOTE: sections/header-group.json + sections/footer-group.json are NOT ignored
-# anymore — they are committed because the production deploy runs without
-# `--nodelete` and would delete them from the live theme otherwise.

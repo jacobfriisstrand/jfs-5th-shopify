@@ -30,11 +30,17 @@
 # -----
 # * `--allow-live` is required because the theme is the live one.
 # * The push runs WITHOUT `--nodelete`: remote files absent from the repo are
-#   deleted on deploy. Keep any file that must survive on the live theme
-#   (editor-managed templates, merchant-uploaded assets) committed here.
-# * `config/settings_data.json` is `--ignore`d (and in `.shopifyignore`): it
-#   holds merchant theme-editor values on the live theme, so the repo copy is
-#   never deployed and the remote copy is never deleted or overwritten.
+#   deleted on deploy. Editor-managed data (JSON page templates, section
+#   groups, settings_data.json) is therefore `--ignore`d in the push step:
+#   those files intentionally have no repo copy, and their live copies are
+#   neither overwritten nor deleted. bin/dev.sh pulls them locally for
+#   development.
+# * Locales are merchant-editable too ("Edit default theme content"), but
+#   they must still ship repo keys. Before the push, the live locale files
+#   are pulled and deep-merged into the repo copies with the live side
+#   winning — a deploy never overwrites locale content.
+# * `templates/gift_card.liquid` stays committed — it is repo source, not
+#   editor data, and must ship to the live theme.
 # * Compiled assets (`assets/app.css`, `assets/*.js`) are gitignored, so
 #   `npm run build` MUST run before `shopify theme push` or every
 #   `{{ '…' | asset_url }}` reference will 404.
@@ -75,6 +81,85 @@ jobs:
       - name: Build theme
         run: npm run build
 
+      # Nothing-overwrite guard: pull the live theme's locale files and
+      # deep-merge them into the repo copies with the LIVE side winning
+      # conflicts. Merchant edits made via "Edit default theme content"
+      # therefore survive every deploy, while new keys added in the repo
+      # still ship. Keys removed from the repo linger on the live theme
+      # (accepted: removing them would be an overwrite).
+      - name: Merge live locale content (never overwrite)
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/live-locales
+          npx shopify theme pull \
+            --path /tmp/live-locales \
+            --theme "Production" \
+            --nodelete \
+            --only "locales/*.json"
+          # Locale files are JSONC: a leading /* */ header plus, in
+          # en.default.schema.json, // line comments between keys (Shopify
+          # tolerates them; strict parsers don't). The merge strips comments
+          # with a string-aware scanner (so "https://" inside values
+          # survives), deep-merges with the LIVE side winning conflicts, and
+          # re-attaches the header. Merchant edits made via "Edit default
+          # theme content" therefore survive every deploy, while new keys
+          # added in the repo still ship.
+          python3 - <<'PY'
+          import glob, json, os, re, shutil
+
+          def strip_jsonc(text):
+              out, i, n, in_str = [], 0, len(text), False
+              while i < n:
+                  ch = text[i]
+                  if in_str:
+                      out.append(ch)
+                      if ch == "\\" and i + 1 < n:
+                          out.append(text[i + 1]); i += 2; continue
+                      if ch == '"':
+                          in_str = False
+                      i += 1; continue
+                  if ch == '"':
+                      in_str = True; out.append(ch); i += 1; continue
+                  if ch == "/" and i + 1 < n and text[i + 1] == "/":
+                      while i < n and text[i] != "\n":
+                          i += 1
+                      continue
+                  if ch == "/" and i + 1 < n and text[i + 1] == "*":
+                      i += 2
+                      while i + 1 < n and not (text[i] == "*" and text[i + 1] == "/"):
+                          i += 1
+                      i += 2; continue
+                  out.append(ch); i += 1
+              return "".join(out)
+
+          def merge(repo, live):
+              if isinstance(repo, dict) and isinstance(live, dict):
+                  out = dict(repo)
+                  for key, value in live.items():
+                      out[key] = merge(repo[key], value) if key in repo else value
+                  return out
+              return live
+
+          for live_path in sorted(glob.glob("/tmp/live-locales/locales/*.json")):
+              name = os.path.basename(live_path)
+              repo_path = os.path.join("locales", name)
+              with open(live_path, encoding="utf-8-sig") as handle:
+                  live = json.loads(strip_jsonc(handle.read()))
+              if not os.path.exists(repo_path):
+                  shutil.copy(live_path, repo_path)
+                  continue
+              with open(repo_path, encoding="utf-8-sig") as handle:
+                  repo_text = handle.read()
+              repo = json.loads(strip_jsonc(repo_text))
+              header = re.match(r"\s*/\*.*?\*/", repo_text, flags=re.S)
+              merged = merge(repo, live)
+              with open(repo_path, "w", encoding="utf-8") as handle:
+                  if header:
+                      handle.write(header.group(0) + "\n")
+                  json.dump(merged, handle, ensure_ascii=False, indent=2)
+                  handle.write("\n")
+          PY
+
       - name: Push to live theme
         id: push
         run: |
@@ -83,6 +168,9 @@ jobs:
             --theme "Production" \
             --allow-live \
             --ignore=config/settings_data.json \
+            --ignore="templates/*.json" \
+            --ignore="templates/customers/*.json" \
+            --ignore="sections/*.json" \
             --json)"
           echo "$OUTPUT"
           PREVIEW_URL="$(echo "$OUTPUT" | jq -r '.theme.preview_url // .preview_url // empty')"
