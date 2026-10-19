@@ -26,6 +26,30 @@
     <div id="header-group">
       {% sections 'header-group' %}
     </div>
+    <script>
+      // Measure the header and announcement bar before first paint so the
+      // CSS vars are correct on the first frame. header.js runs as a low
+      // priority module after paint and would otherwise correct
+      // --header-height from the CSS default (68px) to the real height
+      // (64px), shifting every negative-margin hero and sticky offset by
+      // 4px on page transitions. header.ts keeps the vars updated after
+      // this via ResizeObserver + scroll.
+      (function () {
+        var group = document.getElementById("header-group");
+        if (!group) return;
+        var bar = document.querySelector(".shopify-section.announcement-bar");
+        var barH = bar ? bar.offsetHeight : 0;
+        var barInGroup = bar ? group.contains(bar) : false;
+        document.documentElement.style.setProperty(
+          "--header-height",
+          (barInGroup ? group.offsetHeight - barH : group.offsetHeight) + "px"
+        );
+        document.documentElement.style.setProperty(
+          "--announcement-bar-height",
+          barH + "px"
+        );
+      })();
+    </script>
 
     <template id="cart-drawer-template" hidden>
       {% section 'cart-drawer' %}
