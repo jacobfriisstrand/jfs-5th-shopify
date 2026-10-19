@@ -16,7 +16,7 @@
             {% render 'heading', text: heading, level: 2, class: 'text-2xl' %}
           {%- endif -%}
           {%- if body != blank -%}
-            <p>{{ body | escape }}</p>
+            <p>{{ body | escape | newline_to_br }}</p>
           {%- endif -%}
           {%- if button_label != blank and button_link != blank -%}
             {% render 'button',

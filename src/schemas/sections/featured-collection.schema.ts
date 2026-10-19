@@ -13,7 +13,7 @@ export default defineSection({
       default: "Featured products",
     },
     {
-      type: "text",
+      type: "textarea",
       id: "subheading",
       label: "t:settings.subheading",
     },

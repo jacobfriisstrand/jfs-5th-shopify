@@ -65,7 +65,7 @@
       {%- endif -%}
       {%- if subheading != blank -%}
         <p class="lg:mt-4 text-base max-w-sm">
-          {{- subheading | escape -}}
+          {{- subheading | escape | newline_to_br -}}
         </p>
       {%- endif -%}
     </div>
