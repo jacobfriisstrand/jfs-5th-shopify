@@ -64,7 +64,7 @@
         {% render 'heading', text: heading, level: 1, class: 'text-3xl lg:text-5xl' %}
       {%- endif -%}
       {%- if subheading != blank -%}
-        <p class="lg:mt-4 text-base max-w-sm">
+        <p class="lg:mt-4 text-base max-w-lg">
           {{- subheading | escape | newline_to_br -}}
         </p>
       {%- endif -%}

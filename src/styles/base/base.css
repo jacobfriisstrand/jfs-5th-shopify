@@ -45,6 +45,7 @@ body {
 @layer base {
   p {
     line-height: var(--leading-snug);
+    text-wrap: balance;
   }
 }
 
