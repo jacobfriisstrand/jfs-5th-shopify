@@ -2,6 +2,11 @@
   Renders the PDP media gallery using variant_gallery metaobjects and the shared
   `<swiper-carousel>` behavior used elsewhere in the theme.
 
+  When no gallery entry matches the active variant, falls back to `product.media`
+  with the variant/product featured image rendered as the first slide. That
+  image is excluded from the fallback list (compared in the media-id space, see
+  prologue) so it never renders twice.
+
   @param {product} product - Product object used to resolve variant-specific media.
 
   @example
@@ -40,18 +45,33 @@
     assign primary = product.featured_image
   endif
 
+  # Media-space counterpart of `primary`. `variant.featured_image` and
+  # `product.featured_image` expose IMAGE ids, while `product.media` items
+  # expose MEDIA ids — two different id spaces for the same photo — so the
+  # duplicate check must compare media id against media id.
+  assign primary_media_id = variant.featured_media.id
+  if primary_media_id == blank
+    assign primary_media_id = product.featured_media.id
+  endif
+
   assign is_product_media_fallback = false
   if matched_images == product.media
     assign is_product_media_fallback = true
   endif
 
+  # Count the slides the render loop will actually emit (skip videos and, in
+  # the product.media fallback, the primary image rendered above) so the
+  # carousel decision can never disagree with the rendered slide count.
   assign extras_count = 0
-  if matched_images != empty
-    assign extras_count = matched_images.size
-    if is_product_media_fallback and primary != blank
-      assign extras_count = extras_count | minus: 1
+  for media in matched_images
+    if media.media_type == 'video'
+      continue
     endif
-  endif
+    if is_product_media_fallback and primary != blank and media.id == primary_media_id
+      continue
+    endif
+    assign extras_count = extras_count | plus: 1
+  endfor
 
   assign total_count = extras_count
   if primary != blank
@@ -102,7 +122,7 @@
         {%- if media.media_type == 'video' -%}
           {%- continue -%}
         {%- endif -%}
-        {%- if is_product_media_fallback and primary != blank and media.id == primary.id -%}
+        {%- if is_product_media_fallback and primary != blank and media.id == primary_media_id -%}
           {%- continue -%}
         {%- endif -%}
         <li>
