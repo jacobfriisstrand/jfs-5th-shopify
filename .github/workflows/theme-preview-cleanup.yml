@@ -62,8 +62,10 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Pull all themes once. The CLI returns an array of
-          # `{ id, name, role, ... }`. Preview names follow the convention
+          # Pull all themes once. Depending on the CLI version this is
+          # either a top-level array (4.x) of `{ id, name, role, ... }` or
+          # that array wrapped in `{ "themes": [...] }` (5.x); `(.themes? // .)`
+          # normalises both. Preview names follow the convention
           # `PR #<number> — <branch>` from `theme-preview.yml`.
           THEMES_JSON="$(npx shopify theme list --json)"
 
@@ -72,7 +74,7 @@ jobs:
           # workflow, so this match is exact.
           mapfile -t ENTRIES < <(
             echo "$THEMES_JSON" \
-              | jq -r '.[] | select(.name | test("^PR #[0-9]+ — ")) | "\(.id)\t\(.name | capture("^PR #(?<n>[0-9]+) ").n)"'
+              | jq -r '(.themes? // .)[] | select(.name | test("^PR #[0-9]+ — ")) | "\(.id)\t\(.name | capture("^PR #(?<n>[0-9]+) ").n)"'
           )
 
           if [ "${#ENTRIES[@]}" -eq 0 ]; then

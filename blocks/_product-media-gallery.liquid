@@ -103,6 +103,7 @@
       <li>
         {% render 'image',
           image: primary,
+          alt_fallback: product.title,
           priority: 'lcp',
           class: 'h-auto w-full',
           width_max: 1200,
@@ -116,6 +117,7 @@
         <li>
           {% render 'image',
             image: media,
+            alt_fallback: product.title,
             class: 'h-auto w-full',
             width_max: 1200,
             widths: '400, 600, 800, 1000, 1200',

@@ -5,6 +5,7 @@
   assign teaser_image = section.settings.image
   assign link_text = section.settings.link_text | default: 'Shop now'
   assign heading_id = 'product-teaser-' | append: section.id
+  assign image_alt_fallback = teaser_product.title | default: title
 
   if teaser_product != blank
     assign product_url = teaser_product.url
@@ -24,6 +25,7 @@
         <div class="relative grid [grid-area:1/1]">
           {% render 'image',
             image: teaser_image,
+            alt_fallback: image_alt_fallback,
             class: 'h-full w-full object-cover aspect-3/4 lg:aspect-video',
             width_max: 1200,
             widths: '480, 768, 1024, 1200',

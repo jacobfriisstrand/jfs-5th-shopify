@@ -8,10 +8,10 @@
     `above-fold` → eager + decoding async,
     default (omitted) → lazy + decoding async.
   @param {string} [class] - Additional CSS classes on the `<img>` tag.
-  @param {string} [alt] - Explicit alt text. Takes precedence over
-    `alt_fallback` and `image.alt`.
-  @param {string} [alt_fallback] - Fallback alt text when `image.alt` is
-    blank and no explicit `alt` is supplied.
+  @param {string} [alt] - Explicit alt text. Wins over every other alt
+    source — use only for fixed alt text (e.g. decorative or icon images).
+  @param {string} [alt_fallback] - Contextual alt default (product name,
+    collection title, section heading, …).
   @param {string} [sizes] - Responsive `sizes` attribute (e.g. `100vw`).
   @param {string} [widths] - Comma-separated width breakpoints for
     responsive `srcset` (e.g. `'480, 768, 1024, 1440, 1920, 2400'`).
@@ -20,6 +20,15 @@
   @param {number} [width] - Fixed `width` attribute on the `<img>`.
   @param {number} [height] - Fixed `height` attribute on the `<img>`.
   @param {string} [style] - Inline `style` attribute on the `<img>`.
+
+  Alt text resolution chain (first non-blank source wins):
+  1. `alt` param — explicit, overrides everything.
+  2. `image.alt` — merchant-entered alt text (admin files or theme editor).
+  3. `alt_fallback` param — contextual default passed by the call site
+     (product name for product images, collection title, section heading, …).
+  4. Automatic: a readable label derived from the image filename. Guarantees
+     no image renders with an empty alt by accident, so editors only need to
+     override alt text when the automatic default is not descriptive enough.
 
   @example
   {% render 'image',
@@ -51,7 +60,7 @@
     widths: '100, 200, 400',
     sizes: '(min-width: 640px) 96px, 80px',
     class: 'rounded-input h-auto w-full object-cover',
-    alt: line.product.title
+    alt_fallback: line.product.title
   %}
 {% enddoc %}
 
@@ -72,6 +81,11 @@
     assign resolved_alt = alt
   elsif resolved_alt == blank and alt_fallback != blank
     assign resolved_alt = alt_fallback
+  endif
+
+  if resolved_alt == blank
+    assign alt_source = image.src | default: image.preview_image.src
+    assign resolved_alt = alt_source | split: '/' | last | split: '?' | first | split: '#' | first | split: '.' | first | replace: '%20', ' ' | replace: '-', ' ' | replace: '_', ' ' | capitalize
   endif
 
   assign resolved_width_max = width_max | default: image.width
