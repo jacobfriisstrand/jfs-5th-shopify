@@ -68,8 +68,8 @@
         {% content_for 'block', id: 'bundle-offer-pill', type: 'bundle-offer-pill' %}
       {%- endif -%}
       {% content_for 'block', id: 'product-description', type: 'product-description' %}
-      {% content_for 'block', id: 'price', type: 'price' %}
       {%- unless event_is_past -%}
+        {% content_for 'block', id: 'price', type: 'price' %}
         {% content_for 'block', id: 'variant-picker', type: 'variant-picker' %}
         {% render 'product-size-guide', product: product, section_id: section.id %}
         {%- if registration != blank -%}
