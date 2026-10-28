@@ -21,9 +21,7 @@
     {%- if section.blocks.size > 0 -%}
       <div data-footer-menus class="flex max-lg:flex-col justify-between gap-10">
         <div class="grid gap-10 lg:grid-cols-[repeat(3,minmax(0,280px))]">
-          {%- for block in section.blocks -%}
-            {% render block %}
-          {%- endfor -%}
+          {% content_for 'blocks' %}
         </div>
         <div class="flex flex-col justify-between lg:items-end gap-10 w-full">
           <a
@@ -84,7 +82,7 @@
       </div>
     {%- endif -%}
 
-    <p class="font-heading text-[10vw] flex justify-between trim-cap leading-0">
+    <p class="font-heading text-[10vw] flex justify-between trim-cap leading-none">
       <span class="trim-cap">{{ 'footer.improve' | t }}</span>
       <span class="trim-cap">{{ 'footer.and' | t }}</span>
       <span class="trim-cap">{{ 'footer.empower' | t }}</span>
