@@ -63,6 +63,7 @@
         {% if event_image != blank %}
           {% render 'image',
             image: event_image,
+            alt_fallback: event_title,
             class: 'h-full w-full object-cover',
             width_max: 1200,
             widths: '480, 768, 1024, 1200',
@@ -71,6 +72,7 @@
         {% elsif settings.product_fallback_image != blank %}
           {% render 'image',
             image: settings.product_fallback_image,
+            alt_fallback: event_title,
             class: 'h-full w-full object-contain',
             width_max: 1200,
             widths: '480, 768, 1024, 1200',

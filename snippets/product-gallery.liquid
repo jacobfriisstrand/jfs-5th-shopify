@@ -108,6 +108,7 @@
       <li>
         {% render 'image',
           image: primary,
+          alt_fallback: product.title,
           priority: 'lcp',
           class: 'h-full w-full object-contain',
           style: 'max-height:70dvh',
@@ -128,6 +129,7 @@
         <li>
           {% render 'image',
             image: media,
+            alt_fallback: product.title,
             class: 'h-full w-full object-contain',
             style: 'max-height:70dvh',
             width_max: 1200,
@@ -170,6 +172,7 @@
       <li>
         {% render 'image',
           image: settings.product_fallback_image,
+          alt_fallback: product.title,
           class: 'h-full w-full object-contain',
           style: 'max-height:70dvh',
           width_max: 1200,
