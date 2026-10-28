@@ -18,8 +18,8 @@
   assign no_upcoming = 'sections.training.no_upcoming' | t
 
   for session in shop.metaobjects.training_session.values
-    assign session_ts = session.date_time.value | date: '%s' | plus: 0
-    if session_ts != blank
+    if session.date_time.value != blank
+      assign session_ts = session.date_time.value | date: '%s' | plus: 0
       if session_ts >= today_ts
         if next_session == blank or session_ts < next_ts
           assign next_session = session
@@ -30,6 +30,8 @@
       endif
     endif
   endfor
+
+  assign last_position = previous_count | minus: 1
 -%}
 
 <section class="grid-12" aria-label="{{ label }}">
@@ -50,27 +52,37 @@
       <div class="space-y-5">
         {% render 'heading', text: previous_sessions_heading, level: 2, class: 'text-2xl lg:text-4xl' %}
         <ul class="divide-y divide-foreground/15 space-y-4" role="list">
-          {%- assign picked = '' -%}
-          {%- for i in (1..previous_count) -%}
-            {%- assign candidate = blank -%}
-            {%- assign candidate_ts = blank -%}
+          {%- comment -%}
+            Metaobject drops expose no stable identity on the storefront
+            (`session.id` renders nil here), so pick-and-dedup by id is
+            impossible. Instead render by position: a session's position is
+            the number of past sessions starting strictly later. Iterating
+            positions newest-first and rendering every session whose position
+            matches shows each past session exactly once, newest first;
+            sessions sharing a timestamp render adjacent at the same position.
+          {%- endcomment -%}
+          {%- for position in (0..last_position) -%}
             {%- for session in shop.metaobjects.training_session.values -%}
-              {%- assign session_ts = session.date_time.value | date: '%s' | plus: 0 -%}
-              {%- if session_ts != blank and session_ts < today_ts -%}
-                {%- unless picked contains session.id -%}
-                  {%- if candidate_ts == blank or session_ts > candidate_ts -%}
-                    {%- assign candidate = session -%}
-                    {%- assign candidate_ts = session_ts -%}
+              {%- if session.date_time.value != blank -%}
+                {%- assign session_ts = session.date_time.value | date: '%s' | plus: 0 -%}
+                {%- if session_ts < today_ts -%}
+                  {%- assign position_of_session = 0 -%}
+                  {%- for other in shop.metaobjects.training_session.values -%}
+                    {%- if other.date_time.value != blank -%}
+                      {%- assign other_ts = other.date_time.value | date: '%s' | plus: 0 -%}
+                      {%- if other_ts < today_ts and other_ts > session_ts -%}
+                        {%- assign position_of_session = position_of_session | plus: 1 -%}
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                  {%- if position_of_session == position -%}
+                    <li>
+                      {% render 'training-session-card', session: session, heading_level: 3 %}
+                    </li>
                   {%- endif -%}
-                {%- endunless -%}
+                {%- endif -%}
               {%- endif -%}
             {%- endfor -%}
-            {%- if candidate != blank -%}
-              {%- assign picked = picked | append: ',' | append: candidate.id -%}
-              <li>
-                {% render 'training-session-card', session: candidate, heading_level: 3 %}
-              </li>
-            {%- endif -%}
           {%- endfor -%}
         </ul>
       </div>
