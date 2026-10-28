@@ -51,8 +51,10 @@ jobs:
           # List all themes and find one named exactly "Develop" (not "PR #…"
           # preview themes). If found, push by ID to guarantee we update the
           # same record. If not found, push by name to create it.
+          # `(.themes? // .)` normalises both CLI output shapes: 4.x returns a
+          # top-level array, 5.x wraps it in `{ "themes": [...] }`.
           THEMES_JSON="$(npx shopify theme list --json)"
-          EXISTING_ID="$(echo "$THEMES_JSON" | jq -r '.[] | select(.name == "'"$THEME_NAME"'") | .id' | head -1)"
+          EXISTING_ID="$(echo "$THEMES_JSON" | jq -r '(.themes? // .)[] | select(.name == "'"$THEME_NAME"'") | .id' | head -1)"
           if [ -n "$EXISTING_ID" ] && [ "$EXISTING_ID" != "null" ]; then
             echo "Found existing theme \"$THEME_NAME\" (id $EXISTING_ID)"
             echo "theme_ref=$EXISTING_ID" >> "$GITHUB_OUTPUT"
@@ -96,7 +98,7 @@ jobs:
           THEMES_JSON="$(npx shopify theme list --json)"
           # Delete any unpublished theme named exactly "Develop" whose ID
           # differs from the one we just pushed to.
-          DUPLICATES="$(echo "$THEMES_JSON" | jq -r '.[] | select(.name == "'"$THEME_NAME"'" and .id != '"$TARGET_ID"' and .role == "unpublished") | .id')"
+          DUPLICATES="$(echo "$THEMES_JSON" | jq -r '(.themes? // .)[] | select(.name == "'"$THEME_NAME"'" and .id != '"$TARGET_ID"' and .role == "unpublished") | .id')"
           if [ -n "$DUPLICATES" ]; then
             for DUP_ID in $DUPLICATES; do
               echo "Deleting orphaned duplicate theme $DUP_ID"
