@@ -1,8 +1,13 @@
 {% comment %}
   menu: renders a Shopify navigation linklist (configured in admin under
-  Online Store → Navigation) as an inline list of links. The same block is
-  used for header and footer navigation; the merchant picks which linklist
-  via the `menu` setting in the theme editor.
+  Online Store → Navigation) as a footer column of links; the merchant
+  picks which linklist via the `menu` setting in the theme editor.
+
+  Legal links (privacy policy + cookie settings) are hardcoded into the
+  first `menu` block of the section — they always render there, even when
+  no linklist is attached to the block or it is empty. The cookie-settings
+  link uses Shopify's documented `#shopifyReshowConsentBanner` fragment to
+  reopen the native consent banner.
 
   The `<ul>` markup is owned by `snippets/menu-list.liquid` so header and
   footer navigations stay byte-identical at the link level.
@@ -11,7 +16,36 @@
 {% liquid
   assign linklist = linklists[block.settings.menu]
   assign nav_label = linklist.title
-  assign show_legal_links = block.settings.show_legal_links
+
+  # The first `menu` block in the parent section always renders the legal
+  # links, regardless of which linklist (if any) it has attached.
+  #
+  # Identifying theme blocks inside a section group is awkward: `block.type`
+  # reports the generic `@theme` (even though the group JSON stores the real
+  # type) and sibling blocks' settings are not exposed to Liquid. The only
+  # type signal Liquid can see is the block id, which embeds the type-prefixed
+  # key the block was created with (e.g. "…__menu_Dyg3XD"). Self-identification
+  # additionally uses the block's own `menu` setting, which IS readable here.
+  assign is_menu_block = false
+  if block.settings.menu != blank or block.id contains '__menu'
+    assign is_menu_block = true
+  endif
+
+  assign earlier_menu_block = false
+  for sibling in section.blocks
+    if sibling.id == block.id
+      break
+    endif
+    if sibling.id contains '__menu'
+      assign earlier_menu_block = true
+    endif
+  endfor
+
+  assign is_first_menu_block = false
+  if is_menu_block and earlier_menu_block == false
+    assign is_first_menu_block = true
+  endif
+
   assign privacy_policy = blank
   for policy in shop.policies
     if policy.url contains 'privacy-policy'
@@ -20,43 +54,41 @@
     endif
   endfor
 
-  assign cookie_policy = blank
-  for policy in shop.policies
-    if policy.url contains 'shopifyReshowConsentBanner'
-      assign cookie_policy = policy
-      break
-    endif
-  endfor
+  assign legal_nav_label = 'footer.legal' | t
+  assign cookie_settings_url = routes.root_url | append: 'policies#shopifyReshowConsentBanner'
+
+  # Render the nav when there is a menu to list, or when this block is the
+  # hardcoded legal-links host. Liquid mixes `and`/`or` right-to-left, so
+  # the decision is computed here instead of in one tag condition.
+  assign render_nav = false
+  if is_first_menu_block
+    assign render_nav = true
+  endif
+  if linklist != blank and linklist.links.size > 0
+    assign render_nav = true
+  endif
 %}
 
-{%- if linklist != blank and linklist.links.size > 0 -%}
-  <nav data-menu aria-label="{{ nav_label | escape }}" class="flex flex-col gap-2">
-    {%- render 'menu-list', linklist: linklist, list_classes: 'flex flex-col gap-2 text-sm', link_classes: 'link' -%}
-    {%- if show_legal_links -%}
-      {%- if privacy_policy != blank or cookie_policy != blank -%}
-        <ul role="list" class="flex flex-col gap-2 text-sm">
-          {%- if privacy_policy != blank -%}
-            <li>
-              <a
-                href="{{ privacy_policy.url }}"
-                class="link"
-              >
-                {{- privacy_policy.title -}}
-              </a>
-            </li>
-          {%- endif -%}
-          {%- if cookie_policy != blank -%}
-            <li>
-              <a
-                href="{{ cookie_policy.url }}"
-                class="link"
-              >
-                {{- cookie_policy.title -}}
-              </a>
-            </li>
-          {%- endif -%}
-        </ul>
-      {%- endif -%}
+{%- if render_nav -%}
+  <nav data-menu aria-label="{{ nav_label | default: legal_nav_label | escape }}" class="flex flex-col gap-2">
+    {%- if linklist != blank and linklist.links.size > 0 -%}
+      {%- render 'menu-list', linklist: linklist, list_classes: 'flex flex-col gap-2 text-sm', link_classes: 'link' -%}
+    {%- endif -%}
+    {%- if is_first_menu_block -%}
+      <ul role="list" class="flex flex-col gap-2 text-sm">
+        {%- if privacy_policy != blank -%}
+          <li>
+            <a href="{{ privacy_policy.url }}" class="link">
+              {{- privacy_policy.title -}}
+            </a>
+          </li>
+        {%- endif -%}
+        <li>
+          <a href="{{ cookie_settings_url }}" class="link">
+            {{- 'footer.cookie_settings' | t -}}
+          </a>
+        </li>
+      </ul>
     {%- endif -%}
   </nav>
 {%- endif -%}
@@ -71,12 +103,6 @@
       "id": "menu",
       "label": "t:content.menu",
       "default": "main-menu"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_legal_links",
-      "label": "t:content.show_legal_links",
-      "default": false
     }
   ],
   "presets": [

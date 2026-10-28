@@ -10,12 +10,6 @@ export default defineBlock({
       label: "t:content.menu",
       default: "main-menu",
     },
-    {
-      type: "checkbox",
-      id: "show_legal_links",
-      label: "t:content.show_legal_links",
-      default: false,
-    },
   ],
   presets: [{ name: "t:names.menu" }],
 });
