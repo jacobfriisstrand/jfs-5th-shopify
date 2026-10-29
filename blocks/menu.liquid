@@ -3,11 +3,14 @@
   Online Store → Navigation) as a footer column of links; the merchant
   picks which linklist via the `menu` setting in the theme editor.
 
-  Legal links (privacy policy + cookie settings) are hardcoded into the
-  first `menu` block of the section — they always render there, even when
-  no linklist is attached to the block or it is empty. The cookie-settings
-  link uses Shopify's documented `#shopifyReshowConsentBanner` fragment to
-  reopen the native consent banner.
+  Legal links (store policies + cookie settings) are hardcoded into the
+  second `menu` block of the section — they always render there, no matter
+  which linklist (if any) is attached to the block or whether it is empty.
+  Store policies come from Shopify's native policy pages (privacy, refund,
+  terms of service, shipping) and only render once the merchant has
+  configured them in admin. The cookie-settings link uses Shopify's
+  documented `#shopifyReshowConsentBanner` fragment to reopen the native
+  consent banner.
 
   The `<ul>` markup is owned by `snippets/menu-list.liquid` so header and
   footer navigations stay byte-identical at the link level.
@@ -17,7 +20,7 @@
   assign linklist = linklists[block.settings.menu]
   assign nav_label = linklist.title
 
-  # The first `menu` block in the parent section always renders the legal
+  # The second `menu` block in the parent section always renders the legal
   # links, regardless of which linklist (if any) it has attached.
   #
   # Identifying theme blocks inside a section group is awkward: `block.type`
@@ -31,28 +34,27 @@
     assign is_menu_block = true
   endif
 
-  assign earlier_menu_block = false
+  assign earlier_menu_block_count = 0
   for sibling in section.blocks
     if sibling.id == block.id
       break
     endif
     if sibling.id contains '__menu'
-      assign earlier_menu_block = true
+      assign earlier_menu_block_count = earlier_menu_block_count | plus: 1
     endif
   endfor
 
-  assign is_first_menu_block = false
-  if is_menu_block and earlier_menu_block == false
-    assign is_first_menu_block = true
+  assign is_second_menu_block = false
+  if is_menu_block and earlier_menu_block_count == 1
+    assign is_second_menu_block = true
   endif
 
-  assign privacy_policy = blank
-  for policy in shop.policies
-    if policy.url contains 'privacy-policy'
-      assign privacy_policy = policy
-      break
-    endif
-  endfor
+  # Store policies are nil until the merchant creates the corresponding
+  # page under admin → Settings → Policies.
+  assign privacy_policy = shop.privacy_policy
+  assign refund_policy = shop.refund_policy
+  assign terms_of_service = shop.terms_of_service
+  assign shipping_policy = shop.shipping_policy
 
   assign legal_nav_label = 'footer.legal' | t
   assign cookie_settings_url = routes.root_url | append: 'policies#shopifyReshowConsentBanner'
@@ -61,7 +63,7 @@
   # hardcoded legal-links host. Liquid mixes `and`/`or` right-to-left, so
   # the decision is computed here instead of in one tag condition.
   assign render_nav = false
-  if is_first_menu_block
+  if is_second_menu_block
     assign render_nav = true
   endif
   if linklist != blank and linklist.links.size > 0
@@ -74,12 +76,33 @@
     {%- if linklist != blank and linklist.links.size > 0 -%}
       {%- render 'menu-list', linklist: linklist, list_classes: 'flex flex-col gap-2 text-sm', link_classes: 'link' -%}
     {%- endif -%}
-    {%- if is_first_menu_block -%}
+    {%- if is_second_menu_block -%}
       <ul role="list" class="flex flex-col gap-2 text-sm">
         {%- if privacy_policy != blank -%}
           <li>
             <a href="{{ privacy_policy.url }}" class="link">
               {{- privacy_policy.title -}}
+            </a>
+          </li>
+        {%- endif -%}
+        {%- if refund_policy != blank -%}
+          <li>
+            <a href="{{ refund_policy.url }}" class="link">
+              {{- refund_policy.title -}}
+            </a>
+          </li>
+        {%- endif -%}
+        {%- if terms_of_service != blank -%}
+          <li>
+            <a href="{{ terms_of_service.url }}" class="link">
+              {{- terms_of_service.title -}}
+            </a>
+          </li>
+        {%- endif -%}
+        {%- if shipping_policy != blank -%}
+          <li>
+            <a href="{{ shipping_policy.url }}" class="link">
+              {{- shipping_policy.title -}}
             </a>
           </li>
         {%- endif -%}
