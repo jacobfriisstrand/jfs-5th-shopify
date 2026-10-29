@@ -26,7 +26,7 @@
   </div>
   <div>
     {%- if session.body.value != blank -%}
-      <div class="prose">{{ session.body | metafield_tag }}</div>
+      <div class="rich-text">{{ session.body | metafield_tag }}</div>
     {%- endif -%}
   </div>
 </article>

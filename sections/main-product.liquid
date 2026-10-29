@@ -96,7 +96,7 @@
               <summary>
                 {% render 'heading', text: event_label_about, level: 3, class: 'text-lg font-medium !leading-0' %}
               </summary>
-              <div class="prose">{{ event_about | metafield_tag }}</div>
+              <div class="rich-text">{{ event_about | metafield_tag }}</div>
             </details>
           {%- endif -%}
           {%- if event_who_for != blank -%}
@@ -104,7 +104,7 @@
               <summary>
                 {% render 'heading', text: event_label_who_for, level: 3, class: 'text-lg font-medium !leading-0' %}
               </summary>
-              <div class="prose">{{ event_who_for | metafield_tag }}</div>
+              <div class="rich-text">{{ event_who_for | metafield_tag }}</div>
             </details>
           {%- endif -%}
           {%- if event_participate != blank -%}
@@ -112,7 +112,7 @@
               <summary>
                 {% render 'heading', text: event_label_participate, level: 3, class: 'text-lg font-medium !leading-0' %}
               </summary>
-              <div class="prose">{{ event_participate | metafield_tag }}</div>
+              <div class="rich-text">{{ event_participate | metafield_tag }}</div>
             </details>
           {%- endif -%}
           {%- if event_included != blank -%}
@@ -120,7 +120,7 @@
               <summary>
                 {% render 'heading', text: event_label_included, level: 3, class: 'text-lg font-medium !leading-0' %}
               </summary>
-              <div class="prose">{{ event_included | metafield_tag }}</div>
+              <div class="rich-text">{{ event_included | metafield_tag }}</div>
             </details>
           {%- endif -%}
           {%- if accordion_details != blank -%}
@@ -128,7 +128,7 @@
               <summary>
                 {% render 'heading', text: accordion_label_details, level: 3, class: 'text-lg font-medium !leading-0' %}
               </summary>
-              <div class="prose">{{ accordion_details | metafield_tag }}</div>
+              <div class="rich-text">{{ accordion_details | metafield_tag }}</div>
             </details>
           {%- endif -%}
           {%- if accordion_product_specifications != blank -%}
@@ -140,7 +140,7 @@
                   class: 'text-lg font-medium !leading-0'
                 %}
               </summary>
-              <div class="prose">{{ accordion_product_specifications | metafield_tag }}</div>
+              <div class="rich-text">{{ accordion_product_specifications | metafield_tag }}</div>
             </details>
           {%- endif -%}
           {%- if accordion_care != blank -%}
@@ -148,7 +148,7 @@
               <summary>
                 {% render 'heading', text: accordion_label_care, level: 3, class: 'text-lg font-medium !leading-0' %}
               </summary>
-              <div class="prose">{{ accordion_care | metafield_tag }}</div>
+              <div class="rich-text">{{ accordion_care | metafield_tag }}</div>
             </details>
           {%- endif -%}
           {%- if accordion_shipping != blank -%}
@@ -156,7 +156,7 @@
               <summary>
                 {% render 'heading', text: accordion_label_shipping, level: 3, class: 'text-lg font-medium !leading-0' %}
               </summary>
-              <div class="prose">{{ accordion_shipping | metafield_tag }}</div>
+              <div class="rich-text">{{ accordion_shipping | metafield_tag }}</div>
             </details>
           {%- endif -%}
         </div>
@@ -165,7 +165,7 @@
       {%- if event_practical_info != blank -%}
         <div class="mt-8">
           {% render 'heading', text: event_label_practical_information, level: 2, class: 'text-2xl font-medium' %}
-          <div class="prose mt-4">{{ event_practical_info | metafield_tag }}</div>
+          <div class="rich-text mt-4">{{ event_practical_info | metafield_tag }}</div>
         </div>
       {%- endif -%}
 
@@ -185,7 +185,7 @@
       {%- if event_disclaimer != blank -%}
         <div class="mt-8">
           {% render 'heading', text: event_label_disclaimer, level: 2, class: 'text-2xl font-medium' %}
-          <div class="prose mt-4">{{ event_disclaimer | metafield_tag }}</div>
+          <div class="rich-text mt-4">{{ event_disclaimer | metafield_tag }}</div>
         </div>
       {%- endif -%}
     </div>

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @import "./base/base.css";
 @import "./tokens/colors.css";
 @import "./tokens/typography.css";
@@ -10,7 +11,8 @@
 @import "./components/accordion.css";
 @import "./components/header-menu.css";
 @import "./components/button.css";
-@import "./components/prose.css";
+@import "./components/rich-text.css";
+@import "./components/policy.css";
 @import "./components/swiper.css";
 @import "./components/drawer-responsive.css";
 
