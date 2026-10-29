@@ -57,7 +57,7 @@
 
     <main
       id="MainContent"
-      class="content-for-layout grid gap-20 lg:gap-30"
+      class="content-for-layout grid gap-20 lg:gap-30{% if request.page_type == 'policy' %} prose{% endif %}"
       role="main"
       data-template="{{ template }}"
     >

@@ -3,9 +3,13 @@
  * Apply to wrappers around merchant-authored richtext metafields / settings
  * to get sensible defaults for links, lists, paragraphs, and emphasis without
  * resorting to hand-named selectors elsewhere in the markup.
+ *
+ * Deliberately named `rich-text`, not `prose`: the Tailwind Typography
+ * plugin owns the `prose` name (see policy.css, which applies it to
+ * Shopify's hardcoded policy-page markup).
  */
 
-@utility prose {
+@utility rich-text {
   color: inherit;
   font-size: 0.9375rem;
   line-height: 1.6;

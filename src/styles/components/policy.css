@@ -1,0 +1,87 @@
+/*
+ * Policy pages (privacy policy, refund policy, terms of service, shipping
+ * policy).
+ *
+ * Shopify renders /policies/* with hardcoded markup that no theme section
+ * or template can wrap:
+ *
+ *   <div class="shopify-policy__container">
+ *     <div class="shopify-policy__title"><h1>…</h1></div>
+ *     <div class="shopify-policy__body"><div class="rte">…</div></div>
+ *   </div>
+ *
+ * The one theme-owned wrapper is <main> in layout/theme.liquid, which
+ * carries the Tailwind Typography plugin's `prose` class on policy pages.
+ * This file completes the treatment: palette mapped onto theme tokens,
+ * page rhythm, and the site's heading language.
+ *
+ * The bare selectors below target Shopify's server-rendered markup and the
+ * plugin's own class — a deliberate exception to the "no hand-named
+ * selectors" rule, since this markup is not authored by the theme.
+ */
+
+/* The plugin ships a light-theme palette; re-key it to the theme's tokens
+   so prose content follows the dark background/foreground everywhere. */
+.prose {
+  --tw-prose-body: var(--color-foreground);
+  --tw-prose-headings: var(--color-foreground);
+  --tw-prose-lead: color-mix(
+    in oklab,
+    var(--color-foreground) 70%,
+    transparent
+  );
+  --tw-prose-links: var(--color-foreground);
+  --tw-prose-bold: var(--color-foreground);
+  --tw-prose-counters: color-mix(
+    in oklab,
+    var(--color-foreground) 60%,
+    transparent
+  );
+  --tw-prose-bullets: color-mix(
+    in oklab,
+    var(--color-foreground) 60%,
+    transparent
+  );
+  --tw-prose-hr: color-mix(in oklab, var(--color-foreground) 20%, transparent);
+  --tw-prose-quotes: var(--color-foreground);
+  --tw-prose-quote-borders: var(--color-brand);
+  --tw-prose-captions: color-mix(
+    in oklab,
+    var(--color-foreground) 60%,
+    transparent
+  );
+  --tw-prose-code: var(--color-foreground);
+  --tw-prose-pre-code: var(--color-foreground);
+  --tw-prose-pre-bg: color-mix(
+    in oklab,
+    var(--color-foreground) 10%,
+    transparent
+  );
+  --tw-prose-th-borders: color-mix(
+    in oklab,
+    var(--color-foreground) 30%,
+    transparent
+  );
+  --tw-prose-td-borders: color-mix(
+    in oklab,
+    var(--color-foreground) 15%,
+    transparent
+  );
+}
+
+/* Page rhythm for the Shopify-rendered policy column. */
+main.prose {
+  @apply mx-auto px-[var(--layout-gutter)] py-16 lg:py-24;
+}
+
+/* Site heading language (heading font, tight leading). The plugin's
+   zero-specificity :where() rules yield to these. */
+.shopify-policy__title h1,
+.shopify-policy__body :is(h1, h2, h3, h4, h5, h6) {
+  @apply font-heading leading-[1em] font-normal;
+}
+
+/* Match the site's h1 scale (cf. generic-header) instead of the plugin's. */
+.shopify-policy__title h1 {
+  @apply text-3xl lg:text-5xl;
+}
