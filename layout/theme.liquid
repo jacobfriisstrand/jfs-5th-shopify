@@ -7,6 +7,75 @@
 >
   <head>
     {%- render 'meta-tags' -%}
+    <script>
+      // Announcement-bar reload-flash guard. On reload / back-forward the
+      // browser paints at scrollY 0 and only restores the previous offset
+      // after first paint, so flow content at the top of the document — the
+      // announcement bar — flashes on screen mid-scroll. When this history
+      // entry expects a restored offset > 0 (persisted in sessionStorage on
+      // pagehide), hide the bar before first paint and reveal it once the
+      // offset lands. Restoring to the top, fresh navigation, or a skipped
+      // restoration all end revealed: the fallback only fires while scrollY
+      // is 0, where showing the bar is always correct.
+      (function () {
+        var key = "annbar-scroll:" + location.href;
+        var saved = 0;
+        try {
+          saved = parseInt(sessionStorage.getItem(key), 10) || 0;
+        } catch (error) {}
+
+        var nav = performance.getEntriesByType("navigation")[0] || {};
+        var expectsRestore =
+          (nav.type === "reload" || nav.type === "back_forward") && saved > 0;
+
+        function reveal() {
+          document.documentElement.removeAttribute(
+            "data-hide-announcement-bar"
+          );
+          window.removeEventListener("scroll", reveal);
+        }
+
+        if (expectsRestore) {
+          document.documentElement.setAttribute(
+            "data-hide-announcement-bar",
+            ""
+          );
+          // Publish the expected offset for the pre-paint measurement script
+          // below: it must derive the bar's tucked state from this instead of
+          // assuming the page loads at the top, or the restored layout gets a
+          // post-paint correction (a visible shift near the top and at the
+          // page bottom).
+          document.documentElement.setAttribute(
+            "data-expected-scroll",
+            String(saved)
+          );
+          // Paint the sticky header in its scrolled (solid) state on the
+          // first frame: header.js only syncs `data-scrolled` after it loads,
+          // which would fade the solid background in over the content on
+          // every mid-scroll reload. header.js removes this attribute when
+          // it takes over the scroll state.
+          document.documentElement.setAttribute("data-header-restored", "");
+          // Restoration fires a scroll event; a restore that lands on the
+          // top (or is skipped entirely) fires none, hence the bounded poll.
+          window.addEventListener("scroll", reveal, {
+            passive: true,
+            once: true,
+          });
+          var polls = 0;
+          var poll = function () {
+            if (window.scrollY !== 0 || ++polls > 60) reveal();
+            else requestAnimationFrame(poll);
+          };
+          requestAnimationFrame(poll);
+        }
+
+        window.addEventListener("pagehide", function () {
+          try {
+            sessionStorage.setItem(key, String(window.scrollY));
+          } catch (error) {}
+        });
+      })();
+    </script>
     {%- render 'stylesheets' -%}
     {%- render 'fonts' -%}
     {%- render 'scripts' -%}
@@ -20,7 +89,14 @@
     {{ content_for_header }}
   </head>
 
-  <body class="grid grid-rows-[auto_1fr_auto] min-h-svh">
+  <!-- Four explicit rows: announcement bar, sticky header group, main (1fr so
+       short pages still pin the footer to the bottom), footer. The header group
+       must own an `auto` row — inside the old 3-row template it occupied the
+       `1fr` row early in parsing (before <main> exists), stretched to the
+       leftover viewport height, and the pre-paint measurement script then
+       published that stretched height as --header-height, shifting every
+       negative-margin hero by hundreds of pixels on first paint. -->
+  <body class="grid grid-rows-[auto_auto_1fr_auto] min-h-svh">
     {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
     {% section 'announcement-bar' %}
     <div id="header-group">
@@ -44,9 +120,22 @@
           "--header-height",
           (barInGroup ? group.offsetHeight - barH : group.offsetHeight) + "px"
         );
+        // The visible bar height is scroll-dependent (the bar tucks away as
+        // the page scrolls). On a reload/back-forward the restoration may land
+        // after this script runs, so derive the state from the expected
+        // restored offset published by the head guard instead of assuming
+        // scrollY 0 — header.js then recomputes the identical value and no
+        // post-paint layout correction occurs.
+        var expectedScroll = Math.max(
+          parseInt(
+            document.documentElement.getAttribute("data-expected-scroll"),
+            10
+          ) || 0,
+          window.scrollY || 0
+        );
         document.documentElement.style.setProperty(
           "--announcement-bar-height",
-          barH + "px"
+          Math.max(0, barH - expectedScroll) + "px"
         );
       })();
     </script>
