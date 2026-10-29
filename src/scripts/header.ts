@@ -210,6 +210,10 @@ class HeaderComponent extends Component {
   };
 
   #updateScrolledAttr() {
+    // The pre-paint restore hint (see layout/theme.liquid) is only valid
+    // until this component owns the scroll state; drop it atomically with
+    // the `data-scrolled` decision so both land in the same style recalc.
+    document.documentElement.removeAttribute("data-header-restored");
     const group = document.getElementById("header-group");
     if (!group) return;
     if (window.scrollY > 0) {

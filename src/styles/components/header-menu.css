@@ -357,6 +357,31 @@ dialog[data-drawer="top"].header-menu-megamenu.dialog-closing {
   background-color: var(--color-background);
 }
 
+/* Pre-paint restored-scroll state (set by the guard in layout/theme.liquid
+   when a reload/back-forward will restore a scrolled offset): paint the
+   solid background on the first frame instead of fading it in after
+   header.js syncs. header.js removes the attribute once it owns the scroll
+   state; `transition: none` snaps the skipped-restoration correction too. */
+html[data-header-restored] #header-group {
+  background-color: var(--color-background);
+  transition: none;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Announcement-bar reload-flash guard                                        */
+/*                                                                            */
+/* Reload / back-forward restore the scroll offset after first paint, which   */
+/* briefly paints top-of-document content — the announcement bar — mid-page.  */
+/* The inline script in layout/theme.liquid sets this attribute on <html>     */
+/* before first paint when the restored offset is known to be > 0, and        */
+/* removes it once the offset lands. visibility (not display) keeps the bar   */
+/* in layout, so revealing never shifts content.                              */
+/* -------------------------------------------------------------------------- */
+
+[data-hide-announcement-bar] .shopify-section.announcement-bar {
+  visibility: hidden;
+}
+
 #header-group[data-megamenu-open] {
   background-color: var(--color-background);
   transition: none;
