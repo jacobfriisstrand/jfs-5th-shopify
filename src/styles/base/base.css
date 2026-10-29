@@ -26,6 +26,16 @@ html {
   overflow-x: clip;
 }
 
+/* WebKit (all iOS browsers) does not propagate `clip` from the root element
+   to the viewport, so html { overflow-x: clip } alone still allows sideways
+   panning on iOS whenever any descendant pokes past the right edge. Clipping
+   the body as well empties the viewport's scrollable overflow region there.
+   `clip` (not `hidden`) keeps the body a non-scroll-container, so sticky and
+   fixed elements are unaffected. */
+body {
+  overflow-x: clip;
+}
+
 html[scroll-lock] {
   overflow: hidden;
 }
