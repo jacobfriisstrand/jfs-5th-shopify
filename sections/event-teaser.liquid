@@ -3,14 +3,9 @@
   assign teaser_title = section.settings.teaser_title
   assign body = section.settings.body
   assign cta_text = section.settings.cta_text | default: 'Learn more'
-  assign heading_id = 'next-event-teaser-' | append: section.id
+  assign heading_id = 'event-teaser-' | append: section.id
 
   if event_product != blank
-    capture event_status
-      render 'event-status', product: event_product
-    endcapture
-    assign event_status = event_status | strip
-
     assign event_title = event_product.title
     assign event_url = event_product.url
     assign event_image = event_product.featured_image
@@ -22,7 +17,7 @@
   endif
 %}
 
-{%- if event_product != blank and event_status != 'previous' -%}
+{%- if event_product != blank -%}
   <section
     class="grid-12"
     aria-labelledby="{{ heading_id }}"
@@ -86,7 +81,7 @@
 
 {% schema %}
 {
-  "name": "t:names.next_event_teaser",
+  "name": "t:names.event_teaser",
   "enabled_on": {
     "templates": [
       "index"
@@ -117,7 +112,7 @@
   ],
   "presets": [
     {
-      "name": "t:names.next_event_teaser",
+      "name": "t:names.event_teaser",
       "category": "t:categories.banners"
     }
   ]

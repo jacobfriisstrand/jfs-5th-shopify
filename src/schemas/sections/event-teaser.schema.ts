@@ -1,7 +1,7 @@
 import { defineSection } from "../types.ts";
 
 export default defineSection({
-  name: "t:names.next_event_teaser",
+  name: "t:names.event_teaser",
   enabled_on: {
     templates: ["index"],
   },
@@ -30,7 +30,7 @@ export default defineSection({
   ],
   presets: [
     {
-      name: "t:names.next_event_teaser",
+      name: "t:names.event_teaser",
       category: "t:categories.banners",
     },
   ],
