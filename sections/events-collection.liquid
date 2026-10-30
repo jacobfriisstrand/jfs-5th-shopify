@@ -51,7 +51,7 @@
     {%- if collection.products.size > 0 -%}
       {%- comment -%} All events: soonest upcoming first, then most-recent previous, then undated {%- endcomment -%}
       <div class="events-sort-all-{{ section_id }} hidden">
-        <ul role="list" class="grid gap-20 lg:gap-30">
+        <ul role="list" class="grid gap-10 lg:gap-30">
           {%- for ts in upcoming_dates -%}
             {%- render 'event-date-group',
               products: collection.products,
@@ -121,9 +121,7 @@
 {
   "name": "t:names.events_collection",
   "enabled_on": {
-    "templates": [
-      "collection"
-    ]
+    "templates": ["collection"]
   },
   "settings": [
     {
