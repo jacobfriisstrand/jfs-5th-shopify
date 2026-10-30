@@ -46,14 +46,7 @@
             {%- if contact_email != blank or instagram_url != blank or tiktok_url != blank -%}
               <ul class="flex items-center gap-4 text-sm justify-between w-full">
                 {%- if contact_email != blank -%}
-                  <li>
-                    <a
-                      href="mailto:{{ contact_email }}"
-                      class="link"
-                    >
-                      {{- contact_email -}}
-                    </a>
-                  </li>
+                  <li>{{ contact_email }}</li>
                 {%- endif -%}
                 {%- if instagram_url != blank -%}
                   <li>
@@ -82,10 +75,10 @@
       </div>
     {%- endif -%}
 
-    <p class="font-heading text-[10vw] flex justify-between trim-cap leading-none">
-      <span class="trim-cap">{{ 'footer.improve' | t }}</span>
-      <span class="trim-cap">{{ 'footer.and' | t }}</span>
-      <span class="trim-cap">{{ 'footer.empower' | t }}</span>
+    <p class="font-heading text-[10vw] flex justify-between leading-none">
+      <span>{{ 'footer.improve' | t }}</span>
+      <span>{{ 'footer.and' | t }}</span>
+      <span>{{ 'footer.empower' | t }}</span>
     </p>
   </div>
 </div>
