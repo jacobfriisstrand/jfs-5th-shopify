@@ -18,46 +18,37 @@
       // restoration all end revealed: the fallback only fires while scrollY
       // is 0, where showing the bar is always correct.
       (function () {
-        var key = "annbar-scroll:" + location.href;
+        var key = 'annbar-scroll:' + location.href;
         var saved = 0;
         try {
           saved = parseInt(sessionStorage.getItem(key), 10) || 0;
         } catch (error) {}
 
-        var nav = performance.getEntriesByType("navigation")[0] || {};
-        var expectsRestore =
-          (nav.type === "reload" || nav.type === "back_forward") && saved > 0;
+        var nav = performance.getEntriesByType('navigation')[0] || {};
+        var expectsRestore = (nav.type === 'reload' || nav.type === 'back_forward') && saved > 0;
 
         function reveal() {
-          document.documentElement.removeAttribute(
-            "data-hide-announcement-bar"
-          );
-          window.removeEventListener("scroll", reveal);
+          document.documentElement.removeAttribute('data-hide-announcement-bar');
+          window.removeEventListener('scroll', reveal);
         }
 
         if (expectsRestore) {
-          document.documentElement.setAttribute(
-            "data-hide-announcement-bar",
-            ""
-          );
+          document.documentElement.setAttribute('data-hide-announcement-bar', '');
           // Publish the expected offset for the pre-paint measurement script
           // below: it must derive the bar's tucked state from this instead of
           // assuming the page loads at the top, or the restored layout gets a
           // post-paint correction (a visible shift near the top and at the
           // page bottom).
-          document.documentElement.setAttribute(
-            "data-expected-scroll",
-            String(saved)
-          );
+          document.documentElement.setAttribute('data-expected-scroll', String(saved));
           // Paint the sticky header in its scrolled (solid) state on the
           // first frame: header.js only syncs `data-scrolled` after it loads,
           // which would fade the solid background in over the content on
           // every mid-scroll reload. header.js removes this attribute when
           // it takes over the scroll state.
-          document.documentElement.setAttribute("data-header-restored", "");
+          document.documentElement.setAttribute('data-header-restored', '');
           // Restoration fires a scroll event; a restore that lands on the
           // top (or is skipped entirely) fires none, hence the bounded poll.
-          window.addEventListener("scroll", reveal, {
+          window.addEventListener('scroll', reveal, {
             passive: true,
             once: true,
           });
@@ -69,7 +60,7 @@
           requestAnimationFrame(poll);
         }
 
-        window.addEventListener("pagehide", function () {
+        window.addEventListener('pagehide', function () {
           try {
             sessionStorage.setItem(key, String(window.scrollY));
           } catch (error) {}
@@ -89,18 +80,20 @@
     {{ content_for_header }}
   </head>
 
-  <!-- Four explicit rows: announcement bar, sticky header group, main (1fr so
-       short pages still pin the footer to the bottom), footer. The header group
-       must own an `auto` row — inside the old 3-row template it occupied the
-       `1fr` row early in parsing (before <main> exists), stretched to the
-       leftover viewport height, and the pre-paint measurement script then
-       published that stretched height as --header-height, shifting every
-       negative-margin hero by hundreds of pixels on first paint.
-       The single explicit column is clamped with minmax(0, 1fr): the implicit
-       `auto` track would otherwise grow to the widest section's min-content
-       width and stretch the whole page past the viewport (e.g. the
-       announcement bar's unbreakable nowrap line at ~436px on a 393px
-       iPhone viewport, scrolling every page sideways). -->
+  <!--
+    Four explicit rows: announcement bar, sticky header group, main (1fr so
+    short pages still pin the footer to the bottom), footer. The header group
+    must own an `auto` row — inside the old 3-row template it occupied the
+    `1fr` row early in parsing (before <main> exists), stretched to the
+    leftover viewport height, and the pre-paint measurement script then
+    published that stretched height as --header-height, shifting every
+    negative-margin hero by hundreds of pixels on first paint.
+    The single explicit column is clamped with minmax(0, 1fr): the implicit
+    `auto` track would otherwise grow to the widest section's min-content
+    width and stretch the whole page past the viewport (e.g. the
+    announcement bar's unbreakable nowrap line at ~436px on a 393px
+    iPhone viewport, scrolling every page sideways).
+  -->
   <body class="grid grid-rows-[auto_auto_1fr_auto] grid-cols-[minmax(0,1fr)] min-h-svh">
     {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
     {% section 'announcement-bar' %}
@@ -116,14 +109,14 @@
       // 4px on page transitions. header.ts keeps the vars updated after
       // this via ResizeObserver + scroll.
       (function () {
-        var group = document.getElementById("header-group");
+        var group = document.getElementById('header-group');
         if (!group) return;
-        var bar = document.querySelector(".shopify-section.announcement-bar");
+        var bar = document.querySelector('.shopify-section.announcement-bar');
         var barH = bar ? bar.offsetHeight : 0;
         var barInGroup = bar ? group.contains(bar) : false;
         document.documentElement.style.setProperty(
-          "--header-height",
-          (barInGroup ? group.offsetHeight - barH : group.offsetHeight) + "px"
+          '--header-height',
+          (barInGroup ? group.offsetHeight - barH : group.offsetHeight) + 'px'
         );
         // The visible bar height is scroll-dependent (the bar tucks away as
         // the page scrolls). On a reload/back-forward the restoration may land
@@ -132,15 +125,12 @@
         // scrollY 0 — header.js then recomputes the identical value and no
         // post-paint layout correction occurs.
         var expectedScroll = Math.max(
-          parseInt(
-            document.documentElement.getAttribute("data-expected-scroll"),
-            10
-          ) || 0,
+          parseInt(document.documentElement.getAttribute('data-expected-scroll'), 10) || 0,
           window.scrollY || 0
         );
         document.documentElement.style.setProperty(
-          "--announcement-bar-height",
-          Math.max(0, barH - expectedScroll) + "px"
+          '--announcement-bar-height',
+          Math.max(0, barH - expectedScroll) + 'px'
         );
       })();
     </script>
@@ -151,7 +141,7 @@
 
     <main
       id="MainContent"
-      class="content-for-layout grid gap-20 lg:gap-30{% if request.page_type == 'policy' %} prose{% endif %}"
+      class="content-for-layout grid gap-10 lg:gap-30{% if request.page_type == 'policy' %} prose{% endif %}"
       role="main"
       data-template="{{ template }}"
     >
