@@ -25,7 +25,7 @@
   endif
 
   if event_url != blank
-    assign body_placement = 'lg:col-start-2 lg:row-start-2'
+    assign body_placement = 'lg:col-start-2 lg:row-start-1'
   else
     assign body_placement = 'lg:col-start-2 lg:row-start-1'
   endif
@@ -47,18 +47,19 @@
 >
   <div class="col-content">
     <div class="grid lg:grid-cols-3 lg:gap-x-10">
-      {% render 'title-block',
-        eyebrow: eyebrow_text,
-        title: event_title,
-        heading_line: section.settings.heading_line,
-        id: heading_id
-      %}
-
-      {% if event_date != blank %}
-        <p class="font-heading text-xl lg:text-right">
-          {{ event_date }}
-        </p>
-      {% endif %}
+      <div>
+        {% render 'title-block',
+          eyebrow: eyebrow_text,
+          title: event_title,
+          heading_line: section.settings.heading_line,
+          id: heading_id
+        %}
+        {% if event_date != blank %}
+          <p class="font-heading text-xl">
+            {{ event_date }}
+          </p>
+        {% endif %}
+      </div>
 
       {% if body != blank %}
         <div class="max-lg:my-4 {{ body_placement }}">
@@ -67,7 +68,11 @@
       {% endif %}
 
       {% if event_url != blank %}
-        {% render 'button', text: cta_text, href: event_url, class: 'lg:col-start-3 lg:w-fit lg:mt-auto lg:ml-auto' %}
+        {% render 'button',
+          text: cta_text,
+          href: event_url,
+          class: 'lg:col-start-3 lg:row-start-1 lg:w-fit lg:ml-auto'
+        %}
       {% endif %}
     </div>
 
@@ -90,9 +95,7 @@
 {
   "name": "t:names.event_teaser",
   "enabled_on": {
-    "templates": [
-      "index"
-    ]
+    "templates": ["index"]
   },
   "settings": [
     {
