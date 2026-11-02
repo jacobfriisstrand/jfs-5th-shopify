@@ -62,14 +62,14 @@
 
   {%- comment -%} Date {%- endcomment -%}
   {%- if event_date_formatted != blank -%}
-    <p class="lg:col-start-1 lg:row-start-4 text-2xl lg:text-4xl font-heading mt-auto leading-1">
+    <p class="lg:col-start-1 lg:row-start-4 text-2xl lg:text-4xl w-fit lg:ml-auto font-heading mt-auto leading-none">
       {{ event_date_formatted }}
     </p>
   {%- endif -%}
 
   {%- comment -%} Title {%- endcomment -%}
   <div class="col-start-1 row-start-1">
-    {% render 'heading', text: product.title, level: resolved_heading_level, class: 'text-2xl' %}
+    {% render 'heading', text: product.title, level: resolved_heading_level, class: 'text-2xl lg:ml-auto w-fit' %}
   </div>
 
   {%- comment -%} Description {%- endcomment -%}
@@ -79,6 +79,6 @@
 
   {%- comment -%} CTA button {%- endcomment -%}
   <div class="lg:col-start-3 lg:row-start-4 mt-auto">
-    {% render 'button', text: resolved_cta_text, href: product.url, class: 'w-fit lg:ml-auto' %}
+    {% render 'button', text: resolved_cta_text, href: product.url, class: 'w-fit' %}
   </div>
 </div>
