@@ -15,45 +15,43 @@
   endif
 %}
 
-{%- if teaser_product != blank -%}
-  <section
-    class="grid-12"
-    aria-labelledby="{{ heading_id }}"
-  >
-    <div class="col-content grid place-items-start">
-      {% if teaser_image != blank %}
-        <div class="relative grid [grid-area:1/1]">
-          {% render 'image',
-            image: teaser_image,
-            alt_fallback: image_alt_fallback,
-            class: 'h-full w-full object-cover aspect-3/4 lg:aspect-video',
-            width_max: 1200,
-            widths: '480, 768, 1024, 1200',
-            sizes: '100vw'
-          %}
-          {% render 'image-overlay', opacity: '75%' %}
-        </div>
-      {% endif %}
+<section
+  class="grid-12"
+  {% if title != blank %}aria-labelledby="{{ heading_id }}"{% endif %}
+>
+  <div class="col-content grid place-items-start">
+    {% if teaser_image != blank %}
+      <div class="relative grid [grid-area:1/1]">
+        {% render 'image',
+          image: teaser_image,
+          alt_fallback: image_alt_fallback,
+          class: 'h-full w-full object-cover aspect-3/4 lg:aspect-video',
+          width_max: 1200,
+          widths: '480, 768, 1024, 1200',
+          sizes: '100vw'
+        %}
+        {% render 'image-overlay', opacity: '75%' %}
+      </div>
+    {% endif %}
 
-      <div class="[grid-area:1/1] mt-auto p-4 z-10 space-y-4">
-        <div class="space-y-2">
-          {% if title != blank %}
-            {% render 'heading', text: title, level: 2, id: heading_id, class: 'text-4xl lg:text-6xl' %}
-          {% endif %}
-          {% if subtitle != blank %}
-            <p>
-              {{ subtitle | escape | newline_to_br }}
-            </p>
-          {% endif %}
-        </div>
-
-        {% if link_text != blank %}
-          {% render 'button', text: link_text, variant: 'link', href: product_url, class: 'w-fit' %}
+    <div class="[grid-area:1/1] mt-auto p-4 z-10 space-y-4">
+      <div class="space-y-2">
+        {% if title != blank %}
+          {% render 'heading', text: title, id: heading_id, class: 'text-4xl lg:text-6xl' %}
+        {% endif %}
+        {% if subtitle != blank %}
+          <p>
+            {{ subtitle | escape | newline_to_br }}
+          </p>
         {% endif %}
       </div>
+
+      {% if product_url != blank and link_text != blank %}
+        {% render 'button', text: link_text, variant: 'link', href: product_url, class: 'w-fit' %}
+      {% endif %}
     </div>
-  </section>
-{%- endif -%}
+  </div>
+</section>
 
 {% schema %}
 {

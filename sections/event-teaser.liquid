@@ -1,102 +1,137 @@
 {% liquid
+  assign event_title = section.settings.heading
   assign event_product = section.settings.event_product
-  assign teaser_title = section.settings.teaser_title
+  assign event_image = section.settings.image
+  assign eyebrow_text = section.settings.eyebrow_text
   assign body = section.settings.body
   assign cta_text = section.settings.cta_text | default: 'Learn more'
   assign heading_id = 'event-teaser-' | append: section.id
 
+  assign event_image_fit = 'object-cover'
+
   if event_product != blank
-    assign event_title = event_product.title
+    if event_title == blank
+      assign event_title = event_product.title
+    endif
     assign event_url = event_product.url
-    assign event_image = event_product.featured_image
+    if event_image == blank
+      assign event_image = event_product.featured_image
+    endif
 
     assign event_start_date = event_product.metafields.custom.event_start_date
     if event_start_date != blank
       assign event_date = event_start_date | date: '%B %d, %Y'
     endif
   endif
+
+  if event_url != blank
+    assign body_placement = 'lg:col-start-2 lg:row-start-1'
+  else
+    assign body_placement = 'lg:col-start-2 lg:row-start-1'
+  endif
+
+  if event_image == blank and settings.product_fallback_image != blank
+    assign event_image = settings.product_fallback_image
+    assign event_image_fit = 'object-contain'
+  endif
+
+  assign event_image_alt = event_title | default: eyebrow_text
+  assign event_image_class = 'h-full w-full ' | append: event_image_fit
 %}
 
-{%- if event_product != blank -%}
-  <section
-    class="grid-12"
+<section
+  class="grid-12"
+  {% if eyebrow_text != blank or event_title != blank %}
     aria-labelledby="{{ heading_id }}"
-  >
-    <div class="col-content">
-      <div class="grid lg:grid-cols-3 lg:gap-x-10">
-        {% if teaser_title != blank %}
-          {% render 'heading',
-            text: teaser_title,
-            level: 2,
-            id: heading_id,
-            class: 'text-xl lg:text-4xl text-foreground/50 max-lg:mb-1'
-          %}
-        {% endif %}
-
-        {% if event_title != blank %}
-          <p class="font-heading text-4xl lg:text-2xl">
-            {{ event_title }}
-          </p>
-        {% endif %}
-
+  {% endif %}
+>
+  <div class="col-content">
+    <div class="grid lg:grid-cols-3 lg:gap-x-10">
+      <div>
+        {% render 'title-block',
+          eyebrow: eyebrow_text,
+          title: event_title,
+          heading_line: section.settings.heading_line,
+          id: heading_id
+        %}
         {% if event_date != blank %}
-          <p class="font-heading text-xl lg:text-right">
+          <p class="font-heading text-xl">
             {{ event_date }}
           </p>
         {% endif %}
-
-        {% if body != blank %}
-          <div class="max-lg:my-4 lg:col-start-2 lg:row-start-2">
-            {{ body | escape | newline_to_br }}
-          </div>
-        {% endif %}
-
-        {% render 'button', text: cta_text, href: event_url, class: 'lg:col-start-3 lg:w-fit lg:mt-auto lg:ml-auto' %}
       </div>
 
-      <div class="aspect-video my-8 lg:my-13 max-h-120 m-auto w-full">
-        {% if event_image != blank %}
-          {% render 'image',
-            image: event_image,
-            alt_fallback: event_title,
-            class: 'h-full w-full object-cover',
-            width_max: 1200,
-            widths: '480, 768, 1024, 1200',
-            sizes: '(max-width: 767px) 100vw, 50vw'
-          %}
-        {% elsif settings.product_fallback_image != blank %}
-          {% render 'image',
-            image: settings.product_fallback_image,
-            alt_fallback: event_title,
-            class: 'h-full w-full object-contain',
-            width_max: 1200,
-            widths: '480, 768, 1024, 1200',
-            sizes: '(max-width: 767px) 100vw, 50vw'
-          %}
-        {% endif %}
-      </div>
+      {% if body != blank %}
+        <div class="max-lg:my-4 {{ body_placement }}">
+          {{ body | escape | newline_to_br }}
+        </div>
+      {% endif %}
+
+      {% if event_url != blank %}
+        {% render 'button',
+          text: cta_text,
+          href: event_url,
+          class: 'lg:col-start-3 lg:row-start-1 lg:w-fit lg:ml-auto'
+        %}
+      {% endif %}
     </div>
-  </section>
-{%- endif -%}
+
+    {% if event_image != blank %}
+      <div class="aspect-video my-8 lg:my-13 max-h-120 m-auto w-full">
+        {% render 'image',
+          image: event_image,
+          alt_fallback: event_image_alt,
+          class: event_image_class,
+          width_max: 1200,
+          widths: '480, 768, 1024, 1200',
+          sizes: '(max-width: 767px) 100vw, 50vw'
+        %}
+      </div>
+    {% endif %}
+  </div>
+</section>
 
 {% schema %}
 {
   "name": "t:names.event_teaser",
   "enabled_on": {
-    "templates": [
-      "index"
-    ]
+    "templates": ["index"]
   },
   "settings": [
     {
-      "type": "product",
-      "id": "event_product",
-      "label": "t:settings.event_product"
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:settings.image"
     },
     {
       "type": "text",
-      "id": "teaser_title",
+      "id": "eyebrow_text",
+      "label": "t:settings.eyebrow_text"
+    },
+    {
+      "type": "text",
+      "id": "heading",
       "label": "t:settings.heading"
+    },
+    {
+      "type": "select",
+      "id": "heading_line",
+      "label": "t:settings.heading_line",
+      "default": "eyebrow_h2",
+      "options": [
+        {
+          "value": "title_h2",
+          "label": "t:options.title_as_h2"
+        },
+        {
+          "value": "eyebrow_h2",
+          "label": "t:options.eyebrow_as_h2"
+        },
+        {
+          "value": "none",
+          "label": "t:options.no_heading"
+        }
+      ]
     },
     {
       "type": "textarea",
@@ -108,6 +143,11 @@
       "id": "cta_text",
       "label": "t:settings.cta_text",
       "default": "Learn more"
+    },
+    {
+      "type": "product",
+      "id": "event_product",
+      "label": "t:settings.event_product"
     }
   ],
   "presets": [

@@ -1,4 +1,4 @@
-import { defineSection } from "../types.ts";
+import { defineSection, defineTitleBlockSettings } from "../types.ts";
 
 export default defineSection({
   name: "t:names.event_teaser",
@@ -7,15 +7,11 @@ export default defineSection({
   },
   settings: [
     {
-      type: "product",
-      id: "event_product",
-      label: "t:settings.event_product",
+      type: "image_picker",
+      id: "image",
+      label: "t:settings.image",
     },
-    {
-      type: "text",
-      id: "teaser_title",
-      label: "t:settings.heading",
-    },
+    ...defineTitleBlockSettings({ levels: ["h2"] }),
     {
       type: "textarea",
       id: "body",
@@ -26,6 +22,11 @@ export default defineSection({
       id: "cta_text",
       label: "t:settings.cta_text",
       default: "Learn more",
+    },
+    {
+      type: "product",
+      id: "event_product",
+      label: "t:settings.event_product",
     },
   ],
   presets: [
