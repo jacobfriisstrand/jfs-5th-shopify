@@ -154,6 +154,21 @@ Rules in brief (full reasoning in
   you touch a file for unrelated work, convert its headings in the same
   commit.
 
+### Eyebrow + title pairs: always via the `title-block` snippet
+
+Whenever a section renders a lead-in line above a title line (an eyebrow
+
+- title pair — e.g. the home hero, the event teaser), or the title-block
+  snippet is asked for by name, render it through
+  [`snippets/title-block.liquid`](./snippets/title-block.liquid) and declare
+  its settings with the shared `defineTitleBlockSettings()` helper
+  (`src/schemas/types.ts`). Which heading levels the pair may use is a
+  per-section decision (`levels`), driven by the section's place in the
+  document outline.
+
+Wiring steps, the `heading_line` values, and the one-heading guarantee:
+[`docs/agent-reference/title-block.md`](./docs/agent-reference/title-block.md).
+
 ### Skill canon for liquid, JS/TS, and CSS work
 
 The two skills below are **canonical** for any work in this repo that touches
