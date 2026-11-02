@@ -7,20 +7,24 @@
   a page `<h1>`).
 
   @param {string} text - The heading text. Required. Output is HTML-escaped.
-  @param {number} [level] - Heading level, 1–6. Defaults to 2.
+  @param {string} [level] - Heading level 1–6 (number or numeric string), or the string 'p' to render a plain `<p>`: text styled like a heading that stays outside the document outline. Defaults to 2.
   @param {string} [id] - Optional `id` attribute (e.g. for `aria-labelledby`).
-  @param {string} [class] - Optional CSS classes. A font utility passed here
-  (font-body, font-heading, font-[...]) overrides the default heading font.
+  @param {string} [class] - Optional CSS classes. A font utility passed here (font-body, font-heading, font-[...]) overrides the default heading font.
 
   @example
   {% render 'heading', text: collection.title, level: 1, id: heading_id, class: 'text-2xl font-medium sm:text-3xl' %}
   @example
   {% render 'heading', text: product.title, level: card_heading_level, class: 'text-base font-medium' %}
+  @example
+  {% render 'heading', text: 'Limited edition', level: 'p', class: 'text-base font-body' %}
 {% enddoc %}
 
 {% liquid
   assign resolved_level = level | default: 2
-  assign heading_class = 'leading-[1em] trim-cap'
+  unless resolved_level == 'p'
+    assign resolved_level = resolved_level | plus: 0
+  endunless
+  assign heading_class = 'leading-[1em]'
   if class != blank
     assign heading_class = heading_class | append: ' ' | append: class
   endif
@@ -87,6 +91,16 @@
     >
       {{ text | escape }}
     </h6>
+  {%- when 'p' -%}
+    <p
+      data-heading
+      {% if id != blank %}
+        id="{{ id }}"
+      {% endif %}
+      class="{{ heading_class }}"
+    >
+      {{ text | escape }}
+    </p>
   {%- else -%}
     <h2
       data-heading
