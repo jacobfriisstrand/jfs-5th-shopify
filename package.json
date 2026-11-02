@@ -18,7 +18,8 @@
     "prepare": "vp config"
   },
   "dependencies": {
-    "swiper": "^11.2.10"
+    "swiper": "^11.2.10",
+    "tw-shimmer": "^0.4.14"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.20",
