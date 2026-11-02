@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+@import "tw-shimmer";
 @import "./base/base.css";
 @import "./tokens/colors.css";
 @import "./tokens/typography.css";
@@ -7,7 +8,6 @@
 @import "./tokens/animations.css";
 @import "./utilities/layout.css";
 @import "./utilities/utility-link.css";
-@import "./utilities/text-box-trim.css";
 @import "./components/accordion.css";
 @import "./components/header-menu.css";
 @import "./components/button.css";
