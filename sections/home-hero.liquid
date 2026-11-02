@@ -6,8 +6,6 @@
   assign video = section.settings.video
   assign button_label = section.settings.button_label
   assign button_link = section.settings.button_link
-  assign heading_level = section.settings.heading_heading_level | default: 1 | plus: 0
-  assign eyebrow_level = section.settings.eyebrow_heading_level | default: 2 | plus: 0
 %}
 
 <section class="relative -mt-[calc(var(--header-height)+var(--announcement-bar-height,0))] isolate w-full overflow-hidden bg-background text-foreground min-h-[110dvh]">
@@ -43,14 +41,12 @@
   <div class="grid-12 h-dvh">
     <div class="col-content flex items-end pb-10">
       <div class="flex flex-col gap-4 lg:flex-row lg:w-full lg:justify-between lg:items-end rounded-2xl">
-        <div class="flex flex-col gap-5 lg:basis-1/3">
-          {%- if eyebrow_text != blank -%}
-            {% render 'heading', text: eyebrow_text, level: eyebrow_level, class: 'text-base md:text-lg font-body' %}
-          {%- endif -%}
-          {%- if heading != blank -%}
-            {% render 'heading', text: heading, level: heading_level, class: 'text-3xl lg:text-6xl' %}
-          {%- endif -%}
-        </div>
+        {% render 'title-block',
+          eyebrow: eyebrow_text,
+          title: heading,
+          heading_line: section.settings.heading_line,
+          class: 'lg:basis-1/3'
+        %}
         <div class="lg:basis-2/5 grid gap-4">
           {%- if subheading != blank -%}
             <p>{{ subheading | escape | newline_to_br }}</p>
@@ -79,41 +75,29 @@
       "label": "t:settings.eyebrow_text"
     },
     {
-      "type": "select",
-      "id": "eyebrow_heading_level",
-      "label": "t:settings.eyebrow_heading_level",
-      "default": "2",
-      "options": [
-        {
-          "value": "1",
-          "label": "H1"
-        },
-        {
-          "value": "2",
-          "label": "H2"
-        }
-      ]
-    },
-    {
-      "type": "select",
-      "id": "heading_heading_level",
-      "label": "t:settings.heading_heading_level",
-      "default": "1",
-      "options": [
-        {
-          "value": "1",
-          "label": "H1"
-        },
-        {
-          "value": "2",
-          "label": "H2"
-        }
-      ]
-    },
-    {
       "type": "text",
       "id": "heading",
       "label": "t:settings.heading"
+    },
+    {
+      "type": "select",
+      "id": "heading_line",
+      "label": "t:settings.heading_line",
+      "default": "title_h1",
+      "options": [
+        {
+          "value": "title_h1",
+          "label": "t:options.title_as_h1"
+        },
+        {
+          "value": "eyebrow_h1",
+          "label": "t:options.eyebrow_as_h1"
+        },
+        {
+          "value": "none",
+          "label": "t:options.no_heading"
+        }
+      ]
     },
     {
       "type": "textarea",

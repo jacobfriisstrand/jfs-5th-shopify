@@ -479,3 +479,76 @@ export function defineMediaSettings(options?: {
     },
   ];
 }
+
+/**
+ * Canonical settings for the eyebrow + title pair rendered through the
+ * `title-block` snippet.
+ *
+ * `eyebrow_text` is the editor-written lead-in line, `heading` the main
+ * line. Sections may derive the title from context instead (e.g. an event
+ * teaser falls back to the product title when `heading` is blank — the same
+ * manual-first precedence as the section's image). `heading_line` selects
+ * which of the two lines is the section's heading and at which level — the
+ * valid combinations are enumerated as the only choices, so the pair can
+ * never render two headings (e.g. both as H2).
+ *
+ * Sections spread this helper so every section using the pair shares one
+ * definition:
+ *
+ * ```ts
+ * settings: [
+ *   ...defineTitleBlockSettings(),
+ *   // section-specific settings
+ * ],
+ * ```
+ *
+ * Which heading levels the pair may use is a per-section decision, driven
+ * by the section's position in the document outline — not a global rule:
+ * page heroes pass `levels: ["h1"]` (the hero heading is the page H1),
+ * mid-page teasers pass `levels: ["h2"]` (the page H1 lives elsewhere).
+ * `defaultHeadingLine` must be selectable within `levels`.
+ */
+export type TitleBlockHeadingLine =
+  | "title_h1"
+  | "title_h2"
+  | "eyebrow_h1"
+  | "eyebrow_h2"
+  | "none";
+
+export function defineTitleBlockSettings(options?: {
+  defaultHeadingLine?: TitleBlockHeadingLine;
+  levels?: Array<"h1" | "h2">;
+}): [TextSetting, TextSetting, SelectSetting] {
+  const levels = options?.levels ?? ["h1", "h2"];
+  const headingOptions: SelectOption[] = [
+    { value: "title_h1", label: "t:options.title_as_h1" },
+    { value: "title_h2", label: "t:options.title_as_h2" },
+    { value: "eyebrow_h1", label: "t:options.eyebrow_as_h1" },
+    { value: "eyebrow_h2", label: "t:options.eyebrow_as_h2" },
+    { value: "none", label: "t:options.no_heading" },
+  ].filter(
+    (option) =>
+      option.value === "none" ||
+      levels.some((level) => option.value.endsWith(`_${level}`)),
+  );
+
+  return [
+    {
+      type: "text",
+      id: "eyebrow_text",
+      label: "t:settings.eyebrow_text",
+    },
+    {
+      type: "text",
+      id: "heading",
+      label: "t:settings.heading",
+    },
+    {
+      type: "select",
+      id: "heading_line",
+      label: "t:settings.heading_line",
+      default: options?.defaultHeadingLine ?? "eyebrow_h2",
+      options: headingOptions,
+    },
+  ];
+}

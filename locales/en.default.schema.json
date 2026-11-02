@@ -557,6 +557,8 @@
     // Icon option for decorative eye symbol
     "eye": "Eye",
     "eyebrow": "Eyebrow",
+    "eyebrow_as_h1": "Eyebrow as H1",
+    "eyebrow_as_h2": "Eyebrow as H2",
     "facebook": "Facebook",
     "featured_collections": "Featured collections",
     "featured_products": "Featured products",
@@ -613,6 +615,7 @@
     // Clothes iron appliance icon for care instructions
     "iron": "Iron",
     "landscape": "Landscape",
+    "no_heading": "No heading",
     "no_icon": "No icon",
     "large": "Large",
     "large_arrows": "Large arrows",
@@ -765,6 +768,8 @@
     // Typography spacing option for line height and letter spacing
     "tight": "Tight",
     "tiktok": "TikTok",
+    "title_as_h1": "Title as H1",
+    "title_as_h2": "Title as H2",
     "top": "Top",
     "top_left": "Top left",
     "top_right": "Top right",
@@ -922,7 +927,6 @@
     "extra_large": "Extra large",
     "extra_small": "Extra small",
     "eyebrow_text": "Eyebrow",
-    "eyebrow_heading_level": "Eyebrow heading level",
     "favicon": "Favicon",
     "filter_style": "Filter style",
     "first_row_media_position": "First row media position",
@@ -942,7 +946,7 @@
     "gift_card_form": "Gift card form",
     "gradient_direction": "Gradient direction",
     "heading": "Heading",
-    "heading_heading_level": "Heading level",
+    "heading_line": "Heading placement",
     "heading_preset": "Heading preset",
     "headings": "Headings",
     "height": "Height",

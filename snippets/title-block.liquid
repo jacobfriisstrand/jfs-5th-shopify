@@ -1,0 +1,103 @@
+{% doc %}
+  Renders the eyebrow + title pair as one element — a single wrapper with
+  the eyebrow above the heading — shared by sections (home hero, event
+  teaser). Sections declare the pair's settings via
+  `defineTitleBlockSettings()` in `src/schemas/types.ts` and pass the
+  stored `heading_line` value here; the snippet maps it to exactly one
+  heading and one paragraph, so the pair can never render two headings
+  (e.g. both as H2).
+
+  The wrapper makes the pair a single unit in flex and grid layouts, and
+  owns the standard spacing between the lines. Default styling mirrors the
+  home hero: `flex flex-col gap-2` wrapper, `text-base md:text-lg
+  font-body` eyebrow, `text-3xl lg:text-6xl` title (the heading family
+  comes from the `[data-heading]` tokens). Pass `eyebrow_class`,
+  `title_class`, or `class` only to deviate.
+
+  Renders nothing when both lines are blank.
+
+  @param {string} [eyebrow] - Lead-in line above the title.
+  @param {string} [title] - The main line.
+  @param {string} [heading_line] - Which line is the heading and at which level: 'title_h1', 'title_h2', 'eyebrow_h1', 'eyebrow_h2' or 'none' — the shared `heading_line` select value. Falls back to the eyebrow as H2.
+  @param {string} [class] - Classes for the wrapper element, appended to the standard `flex flex-col gap-2`.
+  @param {string} [eyebrow_class] - Classes for the eyebrow element; defaults to the standard typography.
+  @param {string} [title_class] - Classes for the title element; defaults to the standard typography.
+  @param {string} [id] - id for aria-labelledby: lands on the eyebrow when present, otherwise on the title.
+
+  @example
+  {% render 'title-block',
+    eyebrow: section.settings.eyebrow_text,
+    title: product.title,
+    heading_line: section.settings.heading_line,
+    id: heading_id
+  %}
+  @example
+  {% render 'title-block',
+    eyebrow: section.settings.eyebrow_text,
+    title: section.settings.heading,
+    heading_line: section.settings.heading_line,
+    class: 'lg:basis-1/3'
+  %}
+{% enddoc %}
+
+{% liquid
+  assign title_block_eyebrow_class = eyebrow_class | default: 'text-base md:text-lg font-body'
+  assign title_block_title_class = title_class | default: 'text-3xl lg:text-6xl'
+  assign title_block_class = 'flex flex-col gap-2'
+
+  if class != blank
+    assign title_block_class = title_block_class | append: ' ' | append: class
+  endif
+
+  case heading_line
+    when 'title_h1'
+      assign title_block_title_level = 1
+      assign title_block_eyebrow_level = 'p'
+    when 'title_h2'
+      assign title_block_title_level = 2
+      assign title_block_eyebrow_level = 'p'
+    when 'eyebrow_h1'
+      assign title_block_eyebrow_level = 1
+      assign title_block_title_level = 'p'
+    when 'eyebrow_h2'
+      assign title_block_eyebrow_level = 2
+      assign title_block_title_level = 'p'
+    when 'none'
+      assign title_block_eyebrow_level = 'p'
+      assign title_block_title_level = 'p'
+    else
+      assign title_block_eyebrow_level = 2
+      assign title_block_title_level = 'p'
+  endcase
+
+  assign title_block_eyebrow_id = blank
+  assign title_block_title_id = blank
+  if id != blank
+    if eyebrow != blank
+      assign title_block_eyebrow_id = id
+    else
+      assign title_block_title_id = id
+    endif
+  endif
+%}
+
+{%- if eyebrow != blank or title != blank -%}
+  <div class="{{ title_block_class }}">
+    {%- if eyebrow != blank -%}
+      {% render 'heading',
+        text: eyebrow,
+        level: title_block_eyebrow_level,
+        id: title_block_eyebrow_id,
+        class: title_block_eyebrow_class
+      %}
+    {%- endif -%}
+    {%- if title != blank -%}
+      {% render 'heading',
+        text: title,
+        level: title_block_title_level,
+        id: title_block_title_id,
+        class: title_block_title_class
+      %}
+    {%- endif -%}
+  </div>
+{%- endif -%}

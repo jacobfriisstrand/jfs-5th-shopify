@@ -1,4 +1,8 @@
-import { defineSection, defineMediaSettings } from "../types.ts";
+import {
+  defineSection,
+  defineMediaSettings,
+  defineTitleBlockSettings,
+} from "../types.ts";
 
 export default defineSection({
   name: "t:names.home_hero",
@@ -6,36 +10,10 @@ export default defineSection({
     templates: ["index"],
   },
   settings: [
-    {
-      type: "text",
-      id: "eyebrow_text",
-      label: "t:settings.eyebrow_text",
-    },
-    {
-      type: "select",
-      id: "eyebrow_heading_level",
-      label: "t:settings.eyebrow_heading_level",
-      default: "2",
-      options: [
-        { value: "1", label: "H1" },
-        { value: "2", label: "H2" },
-      ],
-    },
-    {
-      type: "select",
-      id: "heading_heading_level",
-      label: "t:settings.heading_heading_level",
-      default: "1",
-      options: [
-        { value: "1", label: "H1" },
-        { value: "2", label: "H2" },
-      ],
-    },
-    {
-      type: "text",
-      id: "heading",
-      label: "t:settings.heading",
-    },
+    ...defineTitleBlockSettings({
+      defaultHeadingLine: "title_h1",
+      levels: ["h1"],
+    }),
     {
       type: "textarea",
       id: "subheading",
