@@ -81,8 +81,10 @@ jobs:
             --json \
             --theme "${{ steps.resolve.outputs.theme_ref }}")"
           echo "$OUTPUT"
-          PREVIEW_URL="$(echo "$OUTPUT" | jq -r '.theme.preview_url // .preview_url')"
-          EDITOR_URL="$(echo "$OUTPUT" | jq -r '.theme.editor_url // .editor_url')"
+          # Shopify CLI 5.0 renamed the URL fields to camelCase (4.x used
+          # snake_case), so try both shapes.
+          PREVIEW_URL="$(echo "$OUTPUT" | jq -r '.theme.previewUrl // .theme.preview_url // .previewUrl // .preview_url')"
+          EDITOR_URL="$(echo "$OUTPUT" | jq -r '.theme.editorUrl // .theme.editor_url // .editorUrl // .editor_url')"
           THEME_ID="$(echo "$OUTPUT" | jq -r '.theme.id // .id')"
           {
             echo "preview_url=$PREVIEW_URL"

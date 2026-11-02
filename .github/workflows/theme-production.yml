@@ -173,8 +173,8 @@ jobs:
             --ignore="sections/*.json" \
             --json)"
           echo "$OUTPUT"
-          PREVIEW_URL="$(echo "$OUTPUT" | jq -r '.theme.preview_url // .preview_url // empty')"
-          EDITOR_URL="$(echo "$OUTPUT" | jq -r '.theme.editor_url // .editor_url // empty')"
+          PREVIEW_URL="$(echo "$OUTPUT" | jq -r '.theme.previewUrl // .theme.preview_url // .previewUrl // .preview_url // empty')"
+          EDITOR_URL="$(echo "$OUTPUT" | jq -r '.theme.editorUrl // .theme.editor_url // .editorUrl // .editor_url // empty')"
           THEME_ID="$(echo "$OUTPUT" | jq -r '.theme.id // .id // empty')"
           {
             echo "preview_url=$PREVIEW_URL"
