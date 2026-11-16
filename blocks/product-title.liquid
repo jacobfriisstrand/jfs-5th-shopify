@@ -1,16 +1,31 @@
 {% doc %}
-  Renders the product title as the PDP <h1>.
+  Renders the product title as the PDP <h1> via the shared title-block
+  snippet. Event products (identified by a `custom.event_start_date`
+  metafield) show the event date(s) as the eyebrow line; normal products
+  render no eyebrow.
 
   Used by `sections/main-product.liquid` via `{% content_for 'block', type: 'product-title' %}`.
   The element id is derived from `section.id` so the parent section can reference
-  it via `aria-labelledby`.
+  it via `aria-labelledby` — the snippet places it on whichever line renders
+  first (the eyebrow when present, else the title).
 {% enddoc %}
 
 {% liquid
   assign heading_id = 'main-product-' | append: section.id | append: '-title'
+
+  capture event_dates
+    render 'event-dates', product: product
+  endcapture
+  assign event_dates = event_dates | strip
 %}
 
-{% render 'heading', text: product.title, level: 1, id: heading_id, class: 'text-4xl lg:text-6xl' %}
+{% render 'title-block',
+  eyebrow: event_dates,
+  title: product.title,
+  heading_line: 'title_h1',
+  id: heading_id,
+  title_class: 'text-4xl lg:text-6xl'
+%}
 
 {% schema %}
 {
