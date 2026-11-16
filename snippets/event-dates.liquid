@@ -1,0 +1,50 @@
+{% doc %}
+  Renders the display date(s) of an event product from the
+  `custom.event_start_date` / `custom.event_end_date` metafields — the
+  single source of truth for event date display, like `event-status`
+  is for event status.
+
+  Formats:
+  - No start date: renders nothing.
+  - Start only, or end on the same day: "June 12, 2025".
+  - Start and end in the same month and year: "June 12 – 14, 2025".
+  - Same year, different month: "June 12 – July 2, 2025".
+  - Different years: "June 12, 2025 – July 2, 2026".
+
+  @param {product} product - The event product. Required.
+
+  @example
+  {% capture event_dates %}{% render 'event-dates', product: product %}{% endcapture %}
+{% enddoc %}
+
+{%- liquid
+  assign event_start_date = product.metafields.custom.event_start_date
+  assign event_end_date = product.metafields.custom.event_end_date
+
+  assign start_ts = event_start_date | date: '%s' | plus: 0
+  assign end_ts = event_end_date | date: '%s' | plus: 0
+
+  assign event_dates = ''
+  if start_ts != 0
+    assign start_formatted = event_start_date | date: '%B %d, %Y'
+    if end_ts > start_ts
+      assign start_year = event_start_date | date: '%Y'
+      assign end_year = event_end_date | date: '%Y'
+      if start_year == end_year
+        assign start_month = event_start_date | date: '%m'
+        assign end_month = event_end_date | date: '%m'
+        if start_month == end_month
+          assign end_formatted = event_end_date | date: '%d, %Y'
+        else
+          assign end_formatted = event_end_date | date: '%B %d, %Y'
+        endif
+      else
+        assign end_formatted = event_end_date | date: '%B %d, %Y'
+      endif
+      assign event_dates = start_formatted | append: ' – ' | append: end_formatted
+    else
+      assign event_dates = start_formatted
+    endif
+  endif
+-%}
+{{- event_dates -}}
