@@ -60,16 +60,86 @@ fi
 STORE="${SHOPIFY_FLAG_STORE_LIVE:-5th-element-dev.myshopify.com}"
 STORE_FLAG=(--store "$STORE")
 
+# Helper: open a URL in the default browser (macOS `open`, Linux `xdg-open`).
+open_url() {
+  local url="$1"
+  if command -v open >/dev/null 2>&1; then
+    open "$url" 2>/dev/null || true
+  elif command -v xdg-open >/dev/null 2>&1; then
+    xdg-open "$url" 2>/dev/null || true
+  else
+    echo "[dev] Open this link manually: $url" >&2
+  fi
+}
+
+# Helper: extract the user-verification URL from a Shopify CLI error payload
+# and open it in the default browser. Returns 1 when the payload contains no
+# verification challenge (i.e. a different failure).
+open_verification_url() {
+  local output="$1"
+  local url
+  url=$(printf '%s\n' "$output" | grep -oE 'https://admin\.shopify\.com/challenges/user_verification\?token=[^"[:space:]]+' | head -1 || true)
+  if [[ -z "$url" ]]; then
+    return 1
+  fi
+  echo "[dev] Shopify needs to verify your identity — opening the verification link."
+  open_url "$url"
+  return 0
+}
+
+# Helper: run a Shopify CLI command (streaming its output through `tee $log`)
+# and retry the "Shopify needs to verify your identity" abort. That challenge
+# can only be completed in a browser, so the first occurrence opens the
+# verification link once and the command is retried every few seconds (up to
+# VERIFY_TIMEOUT seconds, override with SHOPIFY_VERIFY_TIMEOUT) — once
+# verification completes a retry succeeds and the script continues
+# unattended. Returns 1 for any other failure or on timeout.
+VERIFY_TIMEOUT="${SHOPIFY_VERIFY_TIMEOUT:-300}"
+run_shopify_verified() {
+  local log="$1"
+  shift
+  local opened=false
+  local wait_start=0
+  while true; do
+    if "$@" 2>&1 | tee "$log"; then
+      return 0
+    fi
+    if grep -q "user_verification" "$log" 2>/dev/null; then
+      if [[ "$opened" == false ]]; then
+        opened=true
+        wait_start=$(date +%s)
+        if ! open_verification_url "$(cat "$log")"; then
+          echo "[dev] ERROR: verification challenge detected but no link found in its output." >&2
+          return 1
+        fi
+      fi
+      if (( $(date +%s) - wait_start > VERIFY_TIMEOUT )); then
+        echo "[dev] Timed out waiting for identity verification (${VERIFY_TIMEOUT}s)." >&2
+        echo "[dev] Complete the verification in the opened browser tab, then re-run bin/dev.sh." >&2
+        return 1
+      fi
+      echo "[dev] Waiting for identity verification to complete (retrying in 5s)..."
+      sleep 5
+      continue
+    fi
+    return 1
+  done
+}
+
 # 2. Cleanup trap (PIDs filled in below as watchers are launched).
 VP_PID=""
 ESBUILD_PID=""
 SHOPIFY_PID=""
 SHOPIFY_LOG=""
+PULL_LOG=""
+PUSH_LOG=""
 cleanup() {
   [[ -n "$VP_PID"      ]] && kill "$VP_PID"      2>/dev/null || true
   [[ -n "$ESBUILD_PID" ]] && kill "$ESBUILD_PID" 2>/dev/null || true
   [[ -n "$SHOPIFY_PID" ]] && kill "$SHOPIFY_PID" 2>/dev/null || true
   [[ -n "$SHOPIFY_LOG" ]] && rm -f "$SHOPIFY_LOG" 2>/dev/null || true
+  [[ -n "$PULL_LOG"    ]] && rm -f "$PULL_LOG"   2>/dev/null || true
+  [[ -n "$PUSH_LOG"    ]] && rm -f "$PUSH_LOG"   2>/dev/null || true
 }
 trap cleanup EXIT
 
@@ -111,10 +181,16 @@ if [[ "$PULL_LIVE" == false && -f sections/header-group.json && -f templates/ind
   echo "[dev] Live theme data already pulled — skipping (pass --pull-live to re-pull from the published theme)."
 else
   echo "[dev] Pulling live theme data from the published store..."
-  shopify theme pull "${STORE_FLAG[@]}" \
+  PULL_LOG=$(mktemp -t shopify-pull.XXXXXX)
+  if ! run_shopify_verified "$PULL_LOG" shopify theme pull "${STORE_FLAG[@]}" \
     --live \
     --nodelete \
-    "${LIVE_CONFIG_FILES[@]}"
+    "${LIVE_CONFIG_FILES[@]}"; then
+    echo "[dev] ERROR: shopify theme pull failed. Run it manually to diagnose:" >&2
+    echo "  shopify theme pull --live --nodelete ${LIVE_CONFIG_FILES[*]}" >&2
+    echo "[dev] Then re-run bin/dev.sh." >&2
+    exit 1
+  fi
 fi
 
 # 3b. Push local files (now including the live theme's data) to the remote dev
@@ -131,8 +207,14 @@ fi
 #     --nodelete      don't delete remote-only files (some are managed by
 #                     Shopify, not us)
 #     --json          machine-readable, suppresses interactive prompts
+#
+#     The CLI occasionally aborts with a "Shopify needs to verify your
+#     identity" challenge. run_shopify_verified opens the challenge link in
+#     the browser and retries the same command until verification completes
+#     (or VERIFY_TIMEOUT elapses).
 echo "[dev] Aligning remote dev theme with local files..."
-if ! shopify theme push \
+PUSH_LOG=$(mktemp -t shopify-push.XXXXXX)
+if ! run_shopify_verified "$PUSH_LOG" shopify theme push \
   "${STORE_FLAG[@]}" \
   --development \
   --nodelete \
@@ -186,16 +268,17 @@ while true; do
     EDITOR_URL=$(grep -oE 'https://[^[:space:]]+/admin/themes/[0-9]+/editor[^[:space:]]*' "$SHOPIFY_LOG" | head -1)
     if [[ -n "$EDITOR_URL" ]]; then
       echo "[dev] Opening theme editor: $EDITOR_URL"
-      if command -v open >/dev/null 2>&1; then
-        open "$EDITOR_URL" 2>/dev/null || true
-      elif command -v xdg-open >/dev/null 2>&1; then
-        xdg-open "$EDITOR_URL" 2>/dev/null || true
-      fi
+      open_url "$EDITOR_URL"
     fi
     break
   fi
   if ! kill -0 "$SHOPIFY_PID" 2>/dev/null; then
-    echo "[dev] shopify theme dev exited before becoming ready." >&2
+    if grep -q "user_verification" "$SHOPIFY_LOG" 2>/dev/null; then
+      open_verification_url "$(cat "$SHOPIFY_LOG")" || true
+      echo "[dev] Complete the verification in the opened browser tab, then re-run bin/dev.sh." >&2
+    else
+      echo "[dev] shopify theme dev exited before becoming ready." >&2
+    fi
     exit 1
   fi
   if (( $(date +%s) - WAIT_START > WAIT_TIMEOUT )); then
