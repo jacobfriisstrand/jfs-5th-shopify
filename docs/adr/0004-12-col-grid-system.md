@@ -49,7 +49,7 @@ elements anywhere on the inner 12-col band with flat markup.
 | **`cs-N` validity**                                 | `cs-N` only makes sense up to the active track count. Pair with responsive prefixes (`lg:cs-3`) to avoid landing in implicit territory at smaller breakpoints.                                                                                                                                                                                                                                                                  |
 | **Content max-width**                               | `1920px` (`--layout-content-width`)                                                                                                                                                                                                                                                                                                                                                                                             |
 | **Column gap**                                      | `clamp(12px, 2vw, 20px)` (`--layout-gap`)                                                                                                                                                                                                                                                                                                                                                                                       |
-| **Horizontal-scroll fix**                           | `scrollbar-gutter: stable both-edges` on `<html>` (in [`src/styles/base.css`](../../src/styles/base.css)) — kept as a defensive measure although the named-lines pattern no longer triggers `100vw`-style scrollbar issues.                                                                                                                                                                                                     |
+| **Horizontal-scroll fix**                           | `scrollbar-gutter: stable` on `<html>` (in [`src/styles/base/base.css`](../../src/styles/base/base.css)) — inline-end gutter only, so content width never changes between pages that scroll and pages that don't (classic scrollbars). Not `both-edges`: the mirrored left gutter shows as a visible gap shifting the page right whenever the OS uses space-taking scrollbars (macOS "Show scroll bars: Always", Windows).                                                                                                                                                                                                     |
 
 ### Tokens
 
@@ -186,7 +186,7 @@ for the heading. It is intentionally minimal — restyle and extend per client.
 - [Josh Comeau — Full-bleed layout using CSS Grid](https://www.joshwcomeau.com/css/full-bleed/)
 - [AGENTS.md — Minimal scaffolding & least privilege](../../AGENTS.md)
 - [src/styles/app.css](../../src/styles/app.css) — Tailwind v4 entry; pulls in `layout.css`.
-- [src/styles/layout.css](../../src/styles/layout.css) — `@theme` tokens and `@utility` definitions.
-- [src/styles/base.css](../../src/styles/base.css) — `html { scrollbar-gutter }`.
+- [src/styles/utilities/layout.css](../../src/styles/utilities/layout.css) — `@theme` tokens and `@utility` definitions.
+- [src/styles/base/base.css](../../src/styles/base/base.css) — `html { scrollbar-gutter: stable }`.
 - [sections/page-hero.liquid](../../sections/page-hero.liquid) — proof-of-concept.
 - [Tailwind v4 `@utility` docs](https://tailwindcss.com/docs/adding-custom-styles#adding-custom-utilities)

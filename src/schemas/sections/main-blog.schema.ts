@@ -5,4 +5,5 @@ export default defineSection({
   disabled_on: {
     groups: ["header"],
   },
+  blocks: [{ type: "@theme" }],
 });

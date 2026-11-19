@@ -7,7 +7,7 @@
   a page `<h1>`).
 
   @param {string} text - The heading text. Required. Output is HTML-escaped.
-  @param {string} [level] - Heading level 1–6 (number or numeric string), or the string 'p' to render a plain `<p>`: text styled like a heading that stays outside the document outline. Defaults to 2.
+  @param {number} [level] - Heading level 1–6, or the string 'p' to render a plain `<p>`: text styled like a heading that stays outside the document outline. Defaults to 2. Note: the 'p' variant must be passed via a variable (e.g. `{% assign lvl = 'p' %}`) since static type checking expects a number.
   @param {string} [id] - Optional `id` attribute (e.g. for `aria-labelledby`).
   @param {string} [class] - Optional CSS classes. A font utility passed here (font-body, font-heading, font-[...]) overrides the default heading font.
 
