@@ -22,7 +22,14 @@
 
 html {
   scroll-behavior: smooth;
-  scrollbar-gutter: stable both-edges;
+  /* Reserve the vertical-scrollbar gutter on the inline-end edge only, so page
+     content width never changes between pages that scroll and pages that don't
+     (classic scrollbars). `both-edges` would mirror the gutter on the left
+     edge, which shows as a visible gap shifting the page right whenever the OS
+     uses space-taking scrollbars (macOS "Show scroll bars: Always", Windows).
+     With overlay scrollbars (macOS default) the gutter is 0px and this is a
+     no-op. */
+  scrollbar-gutter: stable;
   overflow-x: clip;
 }
 
