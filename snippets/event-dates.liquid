@@ -1,15 +1,26 @@
 {% doc %}
-  Renders the display date(s) of an event product from the
+  Renders the display date(s) and time(s) of an event product from the
   `custom.event_start_date` / `custom.event_end_date` metafields — the
   single source of truth for event date display, like `event-status`
   is for event status.
 
+  Both metafields are date-and-time values. A `00:00` time is treated as
+  "no time set" because the admin date picker stores midnight when the
+  merchant picks a date without a time.
+
   Formats:
   - No start date: renders nothing.
-  - Start only, or end on the same day: "June 12, 2025".
-  - Start and end in the same month and year: "June 12 – 14, 2025".
-  - Same year, different month: "June 12 – July 2, 2025".
-  - Different years: "June 12, 2025 – July 2, 2026".
+  - Start only: "June 12, 2025" or "June 12, 2025, 18:00".
+  - Start and end on the same calendar day, both with times:
+    "June 12, 2025, 18:00–21:00". A one-sided same-day time renders the
+    date only.
+  - Start and end on different days without times:
+    - Same month and year: "June 12 – 14, 2025".
+    - Same year, different month: "June 12 – July 2, 2025".
+    - Different years: "June 12, 2025 – July 2, 2026".
+  - Start and end on different days with at least one time: full dates on
+    both sides so each time stays attached to its day —
+    "June 12, 2025, 18:00 – June 14, 2025, 20:00".
 
   @param {product} product - The event product. Required.
 
@@ -24,24 +35,55 @@
   assign start_ts = event_start_date | date: '%s' | plus: 0
   assign end_ts = event_end_date | date: '%s' | plus: 0
 
+  assign start_time = event_start_date | date: '%H:%M'
+  assign end_time = event_end_date | date: '%H:%M'
+  if start_time == '00:00'
+    assign start_time = ''
+  endif
+  if end_time == '00:00'
+    assign end_time = ''
+  endif
+
+  assign start_day = event_start_date | date: '%Y-%m-%d'
+  assign end_day = event_end_date | date: '%Y-%m-%d'
+
   assign event_dates = ''
   if start_ts != 0
-    assign start_formatted = event_start_date | date: '%B %d, %Y'
+    assign start_date_only = event_start_date | date: '%B %d, %Y'
+    assign start_formatted = start_date_only
+    if start_time != blank
+      assign start_formatted = start_formatted | append: ', ' | append: start_time
+    endif
+
     if end_ts > start_ts
-      assign start_year = event_start_date | date: '%Y'
-      assign end_year = event_end_date | date: '%Y'
-      if start_year == end_year
-        assign start_month = event_start_date | date: '%m'
-        assign end_month = event_end_date | date: '%m'
-        if start_month == end_month
-          assign end_formatted = event_end_date | date: '%d, %Y'
+      if start_day == end_day
+        if start_time != blank and end_time != blank
+          assign event_dates = start_formatted | append: '–' | append: end_time
+        else
+          assign event_dates = start_formatted
+        endif
+      elsif start_time != blank or end_time != blank
+        assign end_formatted = event_end_date | date: '%B %d, %Y'
+        if end_time != blank
+          assign end_formatted = end_formatted | append: ', ' | append: end_time
+        endif
+        assign event_dates = start_formatted | append: ' – ' | append: end_formatted
+      else
+        assign start_year = event_start_date | date: '%Y'
+        assign end_year = event_end_date | date: '%Y'
+        if start_year == end_year
+          assign start_month = event_start_date | date: '%m'
+          assign end_month = event_end_date | date: '%m'
+          if start_month == end_month
+            assign end_formatted = event_end_date | date: '%d, %Y'
+          else
+            assign end_formatted = event_end_date | date: '%B %d, %Y'
+          endif
         else
           assign end_formatted = event_end_date | date: '%B %d, %Y'
         endif
-      else
-        assign end_formatted = event_end_date | date: '%B %d, %Y'
+        assign event_dates = start_date_only | append: ' – ' | append: end_formatted
       endif
-      assign event_dates = start_formatted | append: ' – ' | append: end_formatted
     else
       assign event_dates = start_formatted
     endif

@@ -1,0 +1,36 @@
+{% doc %}
+  Renders the location lines of an event product from the
+  `custom.event_location_address` / `custom.event_location_additional_info`
+  metafields — the single source of truth for event location display,
+  like `event-dates` is for event dates and `event-status` is for event
+  status.
+
+  Renders one muted line per set field (address first, then additional
+  info). Renders nothing when both are blank.
+
+  `blocks/product-title.liquid` composes the same two fields into the
+  title-block `subline` array for the PDP eyebrow group, where raw
+  strings (not markup) are required.
+
+  @param {product} product - The event product. Required.
+  @param {string} [class] - Extra classes forwarded to each line.
+
+  @example
+  {% render 'event-location', product: product %}
+  {% render 'event-location', product: product, class: 'w-fit lg:ml-auto lg:text-right' %}
+{% enddoc %}
+
+{% liquid
+  assign event_location_address = product.metafields.custom.event_location_address | escape
+  assign event_location_info = product.metafields.custom.event_location_additional_info | escape
+  assign location_class = 'text-sm text-foreground/70'
+  if class != blank
+    assign location_class = location_class | append: ' ' | append: class
+  endif
+%}
+{%- if event_location_address != blank -%}
+  <p class="{{ location_class }}">{{ event_location_address }}</p>
+{%- endif -%}
+{%- if event_location_info != blank -%}
+  <p class="{{ location_class }}">{{ event_location_info }}</p>
+{%- endif -%}

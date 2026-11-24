@@ -8,6 +8,11 @@
   metafields. A started-but-not-ended event is treated as upcoming. An
   event with no start date renders no badge.
 
+  Under the title renders the event date + time (via the event-dates
+  snippet, single source of truth for event date display) and, when set,
+  muted location lines below it (via the event-location snippet, single
+  source of truth for event location display).
+
   Mobile: description below image.
   Desktop: description slides up from bottom on hover.
 
@@ -27,6 +32,11 @@
     render 'event-status', product: product
   endcapture
   assign event_status = event_status | strip
+
+  capture event_dates
+    render 'event-dates', product: product
+  endcapture
+  assign event_dates = event_dates | strip
 
   assign event_description = product.description | strip_html | truncate: 120
 %}
@@ -58,10 +68,14 @@
     <!-- Overlay -->
     {% render 'image-overlay', class: '[grid-area:1/1] z-0', opacity: '100%' %}
 
-    <!-- Heading + description over image -->
+    <!-- Heading + date + location + description over image -->
     <div class="[grid-area:1/1] hidden md:flex flex-col justify-end z-10 h-full">
       <div class="py-1 px-4">
         {% render 'heading', text: product.title, level: resolved_heading_level, class: 'text-xl text-balance' %}
+        {%- if event_dates != blank -%}
+          <p class="text-sm">{{ event_dates }}</p>
+        {%- endif -%}
+        {% render 'event-location', product: product %}
       </div>
       {%- if event_description != blank -%}
         <div class="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-200">
@@ -72,9 +86,15 @@
       {%- endif -%}
     </div>
 
-    <!-- Mobile heading (no animation) -->
+    <!-- Mobile heading + date + location (no animation) -->
     <div class="[grid-area:1/1] flex items-end md:hidden z-10 p-4">
-      {% render 'heading', text: product.title, level: resolved_heading_level, class: 'text-xl text-balance' %}
+      <div>
+        {% render 'heading', text: product.title, level: resolved_heading_level, class: 'text-xl text-balance' %}
+        {%- if event_dates != blank -%}
+          <p class="text-sm">{{ event_dates }}</p>
+        {%- endif -%}
+        {% render 'event-location', product: product %}
+      </div>
     </div>
 
     <!-- Status badge -->

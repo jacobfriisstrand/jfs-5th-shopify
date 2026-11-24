@@ -1,8 +1,12 @@
 {% doc %}
   Renders the product title as the PDP <h1> via the shared title-block
   snippet. Event products (identified by a `custom.event_start_date`
-  metafield) show the event date(s) as the eyebrow line; normal products
-  render no eyebrow.
+  metafield) show the event date(s) + time(s) as the eyebrow line, via
+  the event-dates snippet (single source of truth for event date
+  display). The `custom.event_location_address` and
+  `custom.event_location_additional_info` metafields render as muted
+  sublines directly under the eyebrow, one per set field, in that
+  order. Normal products render no eyebrow and no sublines.
 
   Used by `sections/main-product.liquid` via `{% content_for 'block', type: 'product-title' %}`.
   The element id is derived from `section.id` so the parent section can reference
@@ -17,10 +21,19 @@
     render 'event-dates', product: product
   endcapture
   assign event_dates = event_dates | strip
+
+  assign event_location_address = product.metafields.custom.event_location_address
+  assign event_location_info = product.metafields.custom.event_location_additional_info
+  assign event_location_sep = ''
+  if event_location_address != blank and event_location_info != blank
+    assign event_location_sep = '|'
+  endif
+  assign event_location_lines = event_location_address | append: event_location_sep | append: event_location_info | split: '|'
 %}
 
 {% render 'title-block',
   eyebrow: event_dates,
+  subline: event_location_lines,
   title: product.title,
   heading_line: 'title_h1',
   id: heading_id,
