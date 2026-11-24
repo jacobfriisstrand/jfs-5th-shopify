@@ -7,6 +7,12 @@
   metafields. A started-but-not-ended event is treated as upcoming. An
   event with no start date renders no badge.
 
+  The date + time line comes from the event-dates snippet (single source
+  of truth for event date display). The location comes from the
+  event-location snippet (single source of truth for event location
+  display) and renders as muted line(s) below the date + time (gap-1),
+  right-aligned on desktop like the date.
+
   @param {product} product - The product to render. Required.
   @param {number} [heading_level] - Heading level for the product title. Defaults to 3.
   @param {string} [cta_text] - CTA button label. Optional. Defaults to 'View event'.
@@ -24,9 +30,14 @@
   endcapture
   assign event_status = event_status | strip
 
-  assign event_date = product.metafields.custom.event_start_date
-  if event_date != blank
-    assign event_date_formatted = event_date | date: '%B %d, %Y'
+  capture event_dates
+    render 'event-dates', product: product
+  endcapture
+  assign event_dates = event_dates | strip
+
+  assign event_has_location = false
+  if product.metafields.custom.event_location_address != blank or product.metafields.custom.event_location_additional_info != blank
+    assign event_has_location = true
   endif
 
   assign event_description = product.description | strip_html | truncate: 120
@@ -60,11 +71,16 @@
     {%- endif -%}
   </div>
 
-  {%- comment -%} Date {%- endcomment -%}
-  {%- if event_date_formatted != blank -%}
-    <p class="lg:col-start-1 lg:row-start-4 text-2xl lg:text-4xl w-fit lg:ml-auto font-heading mt-auto leading-none">
-      {{ event_date_formatted }}
-    </p>
+  {%- comment -%} Date + time + location {%- endcomment -%}
+  {%- if event_dates != blank or event_has_location -%}
+    <div class="lg:col-start-1 lg:row-start-4 flex flex-col gap-1 mt-auto">
+      {%- if event_dates != blank -%}
+        <p class="text-2xl lg:text-4xl w-fit lg:ml-auto font-heading leading-none">
+          {{ event_dates }}
+        </p>
+      {%- endif -%}
+      {% render 'event-location', product: product, class: 'w-fit lg:ml-auto lg:text-right' %}
+    </div>
   {%- endif -%}
 
   {%- comment -%} Title {%- endcomment -%}

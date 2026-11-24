@@ -205,15 +205,27 @@ A single model photo with the worn size and a caption line, rendered by `section
 
 ### `custom.event_start_date` — _required for event cards_
 
-- **Type:** Date
-- **Used by:** `snippets/event-status.liquid` (canonical status resolution), `snippets/event-card.liquid` and `snippets/event-card-plp.liquid` (status badge), `sections/events-collection.liquid` and `sections/generic-header.liquid` (sort buckets + counts), `sections/main-product.liquid` (buy-control visibility), `sections/event-teaser.liquid` (formatted date in header)
+- **Type:** Date and time
+- **Used by:** `snippets/event-status.liquid` (canonical status resolution), `snippets/event-dates.liquid` (canonical date + time display), `snippets/event-card.liquid` and `snippets/event-card-plp.liquid` (status badge), `sections/events-collection.liquid` and `sections/generic-header.liquid` (sort buckets + counts), `sections/main-product.liquid` (buy-control visibility), `sections/event-teaser.liquid` (formatted date in header)
 - **Notes:** All status logic lives in `snippets/event-status.liquid`, which compares start + end dates against `'now'` once. An event is `upcoming` if it hasn't started yet, or has started but not yet ended (a live event stays purchasable and reads as "Upcoming"). An event is `previous` once it has ended. An event with NO start date is unclassified: no badge, excluded from the Upcoming/Previous sort buckets, still shown under "All events". event-teaser formats the date as e.g. "March 23, 2026" and renders regardless of event status (previous, live, or upcoming) — it only requires an event product to be selected. Hidden if blank.
 
 ### `custom.event_end_date` — _optional (past-event detection)_
 
-- **Type:** Date
-- **Used by:** `snippets/event-status.liquid` (canonical status resolution), `sections/main-product.liquid` (hides the registration form / ATC once the event has ended)
+- **Type:** Date and time
+- **Used by:** `snippets/event-status.liquid` (canonical status resolution), `snippets/event-dates.liquid` (canonical date + time display), `sections/main-product.liquid` (hides the registration form / ATC once the event has ended)
 - **Notes:** Compared against `'now'` inside `snippets/event-status.liquid` to mark an event as ended: an event whose end date is in the past is `previous` everywhere (card badge, sort buckets, PDP form visibility). When set and still in the future, a started event stays `upcoming` — a live event keeps its buy controls. When blank, the start date alone decides (`start < now` → `previous`). Hidden if blank.
+
+### `custom.event_location_address` — _optional_
+
+- **Type:** Single line text
+- **Used by:** `snippets/event-location.liquid` — the single source of truth for event location display: `snippets/event-card-plp.liquid` (muted line below the date + time), `snippets/event-card.liquid` (muted lines below the date + time), `blocks/product-title.liquid` (PDP eyebrow subline below the date + time)
+- **Notes:** Venue address of the event, e.g. `Refshalevej 163A, Copenhagen`. Hidden if blank. The time part of `custom.event_start_date` / `custom.event_end_date` is displayed by `snippets/event-dates.liquid`, which treats a stored `00:00` as "no time set" (the admin date picker stores midnight when the merchant picks a date without a time).
+
+### `custom.event_location_additional_info` — _optional_
+
+- **Type:** Single line text
+- **Used by:** Same as `custom.event_location_address`
+- **Notes:** Extra location pointer rendered as a second muted line below the address, e.g. `Meeting point: Gate 3`. Hidden if blank.
 
 ### `custom.participant_fields` — _optional (enables participant registration)_
 

@@ -14,9 +14,19 @@
   comes from the `[data-heading]` tokens). Pass `eyebrow_class`,
   `title_class`, or `class` only to deviate.
 
-  Renders nothing when both lines are blank.
+  Optional muted `subline` lines render as plain paragraphs directly
+  under the eyebrow (e.g. the event location under the event date +
+  time). Pass an array — one paragraph per entry, entries may be blank
+  and are skipped. When present, eyebrow + sublines are grouped in a
+  `flex flex-col gap-1` wrapper so the group sits tighter together than
+  the group-to-title gap; when absent, the DOM is identical to before
+  the param existed. Entries are HTML-escaped and never participate in
+  the heading-level mapping.
+
+  Renders nothing when all lines are blank.
 
   @param {string} [eyebrow] - Lead-in line above the title.
+  @param {string[]} [subline] - Optional muted lines rendered under the eyebrow, one paragraph per entry.
   @param {string} [title] - The main line.
   @param {string} [heading_line] - Which line is the heading and at which level: 'title_h1', 'title_h2', 'eyebrow_h1', 'eyebrow_h2' or 'none' — the shared `heading_line` select value. Falls back to the eyebrow as H2.
   @param {string} [class] - Classes for the wrapper element, appended to the standard `flex flex-col gap-2`.
@@ -81,15 +91,33 @@
   endif
 %}
 
-{%- if eyebrow != blank or title != blank -%}
+{%- if eyebrow != blank or subline != blank or title != blank -%}
   <div class="{{ title_block_class }}">
-    {%- if eyebrow != blank -%}
-      {% render 'heading',
-        text: eyebrow,
-        level: title_block_eyebrow_level,
-        id: title_block_eyebrow_id,
-        class: title_block_eyebrow_class
-      %}
+    {%- if subline != blank -%}
+      <div class="flex flex-col gap-1">
+        {%- if eyebrow != blank -%}
+          {% render 'heading',
+            text: eyebrow,
+            level: title_block_eyebrow_level,
+            id: title_block_eyebrow_id,
+            class: title_block_eyebrow_class
+          %}
+        {%- endif -%}
+        {%- for subline_line in subline -%}
+          {%- if subline_line != blank -%}
+            <p class="text-sm text-foreground/70">{{ subline_line | escape }}</p>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      {%- if eyebrow != blank -%}
+        {% render 'heading',
+          text: eyebrow,
+          level: title_block_eyebrow_level,
+          id: title_block_eyebrow_id,
+          class: title_block_eyebrow_class
+        %}
+      {%- endif -%}
     {%- endif -%}
     {%- if title != blank -%}
       {% render 'heading',
