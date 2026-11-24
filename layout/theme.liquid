@@ -79,21 +79,6 @@
 
     {{ content_for_header }}
   </head>
-
-  <!--
-    Four explicit rows: announcement bar, sticky header group, main (1fr so
-    short pages still pin the footer to the bottom), footer. The header group
-    must own an `auto` row — inside the old 3-row template it occupied the
-    `1fr` row early in parsing (before <main> exists), stretched to the
-    leftover viewport height, and the pre-paint measurement script then
-    published that stretched height as --header-height, shifting every
-    negative-margin hero by hundreds of pixels on first paint.
-    The single explicit column is clamped with minmax(0, 1fr): the implicit
-    `auto` track would otherwise grow to the widest section's min-content
-    width and stretch the whole page past the viewport (e.g. the
-    announcement bar's unbreakable nowrap line at ~436px on a 393px
-    iPhone viewport, scrolling every page sideways).
-  -->
   <body class="grid grid-rows-[auto_auto_1fr_auto] grid-cols-[minmax(0,1fr)] min-h-svh">
     {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
     {% section 'announcement-bar' %}
